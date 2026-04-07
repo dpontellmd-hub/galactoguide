@@ -1,0 +1,22 @@
+{
+  "name": "GalactoGuide",
+  "short_name": "GalactoGuide",
+  "description": "Evidence-based galactogogue and galactofuge reference by Dyad Health Collective",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#272d4f",
+  "theme_color": "#272d4f",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "dhc-icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "dhc-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

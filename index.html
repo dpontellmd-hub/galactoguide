@@ -4,245 +4,299 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GalactoGuide</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#272d4f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="GalactoGuide" />
+  <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/dpontellmd-hub/galactoguide/main/dhc-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #faf8f6; color: #1a1a1a; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f6eb; color: #1a1a1a; }
     .hidden { display: none !important; }
-
-    /* BRAND COLORS */
     :root {
-      --dhc-brown: #7a5c4e;
-      --dhc-brown-light: #f0e6e0;
-      --dhc-brown-mid: #c9a99a;
-      --dhc-cream: #faf8f6;
+      --navy: #272d4f;
+      --brown: #5b4632;
+      --terra: #a27260;
+      --caramel: #c79f7f;
+      --gray: #d8d8dc;
+      --cream: #f8f6eb;
+      --white: #ffffff;
+      --navy-light: #e8eaf2;
+      --terra-light: #f5ede6;
     }
 
-    /* DISCLAIMER SCREEN */
-    #disclaimer-screen { max-width: 420px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 32px 24px 24px; background: #fff; }
-    .logo-wrap { text-align: center; margin-bottom: 28px; }
-    .dhc-logo { height: 48px; width: auto; margin: 0 auto 14px; display: block; }
-    .app-name { font-size: 26px; font-weight: 700; color: #1a1a1a; letter-spacing: -0.5px; }
-    .app-sub { font-size: 13px; color: #888; margin-top: 3px; }
-    .dyad-line { font-size: 12px; color: #aaa; margin-top: 6px; }
-    .dyad-line a { color: var(--dhc-brown); text-decoration: none; font-weight: 500; }
-    .disclaimer-box { background: var(--dhc-cream); border-radius: 16px; padding: 20px; flex: 1; margin-bottom: 20px; }
-    .disclaimer-box h2 { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 16px; }
-    .point { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
-    .point-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-    .icon-blue { background: #e6f1fb; }
-    .icon-amber { background: #faeeda; }
-    .icon-green { background: #eaf3de; }
-    .icon-red { background: #fcebeb; }
-    .point-title { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
-    .point-desc { font-size: 12px; color: #666; line-height: 1.5; }
-    .divider { height: 1px; background: #eee; margin: 14px 0; }
-    .fine-print { font-size: 11px; color: #aaa; line-height: 1.6; }
-    .agree-btn { width: 100%; padding: 14px; font-size: 15px; font-weight: 600; border: none; border-radius: 14px; background: var(--dhc-brown); color: #fff; cursor: pointer; margin-bottom: 10px; }
-    .agree-btn:hover { background: #6a4e42; }
-    .decline-note { text-align: center; font-size: 12px; color: #aaa; }
+    /* ── DISCLAIMER SCREEN ── */
+    #disclaimer-screen { max-width: 420px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 24px 20px 24px; background: var(--white); }
+    .logo-wrap { text-align: center; margin-bottom: 14px; }
+    .dhc-wordmark { height: 36px; width: auto; margin: 0 auto 10px; display: block; }
+    .app-name { font-size: 24px; font-weight: 700; color: var(--navy); letter-spacing: -0.5px; }
+    .app-sub { font-size: 12px; color: #888; margin-top: 2px; }
+    .dyad-line { font-size: 11px; color: #aaa; margin-top: 4px; }
+    .dyad-line a { color: var(--terra); text-decoration: none; font-weight: 600; }
+    .mission-box { background: var(--navy); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; }
+    .mission-box p { font-size: 12px; color: #d0d4e8; line-height: 1.7; }
+    .mission-box strong { color: #fff; }
+    .disclaimer-box { background: var(--cream); border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+    .disclaimer-box h2 { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 12px; }
+    .point { display: flex; gap: 10px; margin-bottom: 10px; align-items: flex-start; }
+    .point-icon { width: 24px; height: 24px; border-radius: 7px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .icon-blue{background:#e6f1fb;} .icon-amber{background:#faeeda;} .icon-green{background:#eaf3de;} .icon-red{background:#fcebeb;}
+    .point-title { font-size: 12px; font-weight: 600; color: #1a1a1a; margin-bottom: 1px; }
+    .point-desc { font-size: 11px; color: #666; line-height: 1.5; }
+    .divider { height: 1px; background: #eee; margin: 10px 0; }
+    .fine-print { font-size: 10px; color: #aaa; line-height: 1.6; }
+    .portal-label { font-size: 13px; font-weight: 600; color: #1a1a1a; text-align: center; margin-bottom: 8px; }
+    .portal-row { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin-bottom: 12px; }
+    .portal-btn { padding: 14px 10px; border-radius: 14px; border: 1.5px solid #eee; background: #fff; cursor: pointer; text-align: center; transition: all 0.15s; }
+    .portal-btn:hover { border-color: var(--terra); }
+    .portal-btn.selected.mother { border-color: var(--terra); background: var(--terra-light); }
+    .portal-btn.selected.provider { border-color: var(--navy); background: var(--navy-light); }
+    .portal-emoji { font-size: 22px; margin-bottom: 5px; }
+    .portal-name { font-size: 13px; font-weight: 600; color: #1a1a1a; }
+    .portal-desc { font-size: 11px; color: #888; margin-top: 2px; line-height: 1.3; }
+    .agree-btn { width: 100%; padding: 13px; font-size: 14px; font-weight: 600; border: none; border-radius: 13px; background: #ccc; color: #fff; cursor: not-allowed; transition: background 0.2s; margin-bottom: 8px; }
+    .agree-btn.ready-mother { background: var(--terra); cursor: pointer; }
+    .agree-btn.ready-provider { background: var(--navy); cursor: pointer; }
+    .portal-note { text-align: center; font-size: 11px; color: #aaa; }
 
-    /* MAIN APP */
+    /* ── MAIN APP ── */
     #main-app { display: none; }
     .app { max-width: 420px; margin: 0 auto; padding: 0 0 80px; background: #fff; min-height: 100vh; }
-    .topbar { padding: 16px 16px 0; display: flex; align-items: center; justify-content: space-between; }
-    .topbar-text h1 { font-size: 20px; font-weight: 700; color: #1a1a1a; }
-    .topbar-text p { font-size: 12px; color: #888; margin-top: 2px; }
-    .topbar-logo { height: 28px; width: auto; }
-    .tabs { display: flex; gap: 2px; padding: 12px 16px 0; border-bottom: 1px solid #eee; overflow-x: auto; }
-    .tab { padding: 8px 12px; font-size: 12px; border: none; background: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
-    .tab.active { color: var(--dhc-brown); border-bottom-color: var(--dhc-brown); font-weight: 600; }
-    .section { display: none; padding: 16px; }
+    .topbar { padding: 13px 14px 0; display: flex; align-items: flex-start; justify-content: space-between; }
+    .topbar-left h1 { font-size: 18px; font-weight: 700; color: #1a1a1a; }
+    .topbar-left p { font-size: 11px; color: #888; margin-top: 1px; }
+    .portal-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 8px; margin-top: 3px; display: inline-block; }
+    .badge-mother { background: var(--terra-light); color: var(--brown); }
+    .badge-provider { background: var(--navy-light); color: var(--navy); }
+    .topbar-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .topbar-logo { height: 22px; width: auto; }
+    .switch-btn { font-size: 10px; color: var(--terra); background: var(--terra-light); border: none; border-radius: 6px; padding: 3px 8px; cursor: pointer; }
+    .tabs { display: flex; padding: 10px 14px 0; border-bottom: 1px solid #eee; overflow-x: auto; gap: 0; }
+    .tab { padding: 7px 10px; font-size: 12px; border: none; background: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+    .tab.active-mother { color: var(--terra); border-bottom-color: var(--terra); font-weight: 600; }
+    .tab.active-provider { color: var(--navy); border-bottom-color: var(--navy); font-weight: 600; }
+    .section { display: none; padding: 14px; }
     .section.active { display: block; }
-    .search-wrap { position: relative; margin-bottom: 12px; }
-    .search-wrap input { width: 100%; padding: 10px 12px 10px 36px; font-size: 14px; border: 1px solid #e8e0dc; border-radius: 10px; background: var(--dhc-cream); color: #1a1a1a; }
-    .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #aaa; pointer-events: none; }
-    .filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-    .filter-btn { padding: 5px 12px; font-size: 12px; border: 1px solid #e0d4ce; border-radius: 20px; background: none; color: #888; cursor: pointer; }
-    .filter-btn.active { background: var(--dhc-brown); color: #fff; border-color: var(--dhc-brown); }
-    .card { background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.15s; }
-    .card:hover { border-color: var(--dhc-brown-mid); }
+
+    /* ── BROWSE ── */
+    .search-wrap { position: relative; margin-bottom: 10px; }
+    .search-wrap input { width: 100%; padding: 9px 12px 9px 34px; font-size: 14px; border: 1px solid #e0d8d0; border-radius: 10px; background: var(--cream); color: #1a1a1a; }
+    .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: #aaa; pointer-events: none; }
+    .filter-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 12px; }
+    .filter-btn { padding: 4px 10px; font-size: 12px; border: 1px solid #ddd; border-radius: 20px; background: none; color: #888; cursor: pointer; }
+    .filter-btn.active-m { background: var(--terra); color: #fff; border-color: var(--terra); }
+    .filter-btn.active-p { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .section-header { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin: 14px 0 8px; padding: 6px 10px; border-radius: 8px; }
+    .header-green { background: #eaf3de; color: #3b6d11; }
+    .header-red { background: #fcebeb; color: #a32d2d; }
+    .card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 12px; margin-bottom: 8px; cursor: pointer; }
+    .card:hover { border-color: #ccc; }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-    .card-name { font-size: 15px; font-weight: 600; color: #1a1a1a; }
-    .card-type { font-size: 11px; padding: 3px 9px; border-radius: 10px; margin-left: 6px; white-space: nowrap; }
-    .type-herbal { background: #eaf3de; color: #3b6d11; }
-    .type-pharma { background: #e6f1fb; color: #185fa5; }
-    .type-food { background: #faeeda; color: #854f0b; }
-    .evidence-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
-    .evidence-label { font-size: 12px; color: #888; }
+    .card-name { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+    .card-type { font-size: 10px; padding: 2px 8px; border-radius: 10px; margin-left: 5px; white-space: nowrap; }
+    .type-herbal{background:#eaf3de;color:#3b6d11;} .type-pharma{background:#e6f1fb;color:#185fa5;} .type-food{background:#faeeda;color:#854f0b;} .type-substance{background:#fcebeb;color:#a32d2d;}
+    .evidence-row { display: flex; align-items: center; gap: 5px; margin-top: 5px; }
+    .evidence-label { font-size: 11px; color: #888; }
     .evidence-dots { display: flex; gap: 3px; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; }
-    .dot.filled-high { background: #1d9e75; }
-    .dot.filled-mid { background: #ef9f27; }
-    .dot.filled-low { background: #e24b4a; }
-    .dot.empty { background: #ddd; }
-    .card-desc { font-size: 13px; color: #666; margin-top: 6px; line-height: 1.5; }
-    .detail-panel { display: none; position: fixed; bottom: 0; left: 0; right: 0; max-width: 420px; margin: 0 auto; background: #fff; border-top: 1px solid #eee; border-radius: 20px 20px 0 0; padding: 20px; z-index: 100; max-height: 75vh; overflow-y: auto; box-shadow: 0 -4px 24px rgba(0,0,0,0.08); }
+    .dot { width: 7px; height: 7px; border-radius: 50%; }
+    .dot.high{background:#1d9e75;} .dot.mid{background:#ef9f27;} .dot.low{background:#e24b4a;} .dot.empty{background:#ddd;}
+    .card-desc { font-size: 12px; color: #666; margin-top: 5px; line-height: 1.5; }
+    .avoid-banner { font-size: 11px; color: #a32d2d; font-weight: 600; background: #fcebeb; padding: 5px 9px; border-radius: 7px; margin-bottom: 8px; }
+
+    /* ── DETAIL PANEL ── */
+    .detail-panel { display: none; position: fixed; bottom: 0; left: 0; right: 0; max-width: 420px; margin: 0 auto; background: #fff; border-top: 1px solid #eee; border-radius: 20px 20px 0 0; padding: 18px; z-index: 100; max-height: 78vh; overflow-y: auto; box-shadow: 0 -4px 24px rgba(0,0,0,0.08); }
     .detail-panel.open { display: block; }
     .detail-close { float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: #aaa; }
-    .detail-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
-    .detail-section { margin-top: 14px; }
-    .detail-section h4 { font-size: 11px; font-weight: 600; color: var(--dhc-brown); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
-    .detail-section p { font-size: 14px; color: #333; line-height: 1.6; }
-    .detail-link { font-size: 13px; color: #185fa5; margin-top: 6px; display: inline-block; }
-    .safety-tag { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 12px; margin: 3px 3px 3px 0; }
-    .safe-yes { background: #eaf3de; color: #3b6d11; }
-    .safe-caution { background: #faeeda; color: #854f0b; }
-    .safe-no { background: #fcebeb; color: #a32d2d; }
+    .detail-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+    .detail-section { margin-top: 12px; }
+    .detail-h4-m { font-size: 11px; font-weight: 600; color: var(--terra); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .detail-h4-p { font-size: 11px; font-weight: 600; color: var(--navy); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 4px; }
+    .detail-section p { font-size: 13px; color: #333; line-height: 1.6; }
+    .detail-link { font-size: 12px; color: #185fa5; margin-top: 6px; display: inline-block; }
+    .safety-tag { display: inline-block; padding: 3px 9px; border-radius: 10px; font-size: 11px; margin: 2px 2px 2px 0; }
+    .s-rec{background:#eaf3de;color:#3b6d11;} .s-cau{background:#faeeda;color:#854f0b;} .s-no{background:#fcebeb;color:#a32d2d;}
     .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; }
     .overlay.open { display: block; }
-    .checker-card { background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
-    .checker-label { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
-    .checker-select { width: 100%; font-size: 14px; padding: 9px 10px; border: 1px solid #e0d4ce; border-radius: 10px; background: var(--dhc-cream); color: #1a1a1a; }
-    .situation-tag { display: inline-block; padding: 5px 12px; font-size: 12px; border: 1px solid #e0d4ce; border-radius: 12px; margin: 4px 4px 0 0; cursor: pointer; color: #888; }
-    .situation-tag.selected { background: var(--dhc-brown); color: #fff; border-color: var(--dhc-brown); }
-    .result-card { border-radius: 14px; padding: 14px; margin-top: 12px; border: 1px solid #eee; }
-    .result-card.rec { background: #eaf3de; border-color: #c0dd97; }
-    .result-card.caution { background: #faeeda; border-color: #fac775; }
-    .result-card.avoid { background: #fcebeb; border-color: #f7c1c1; }
-    .result-title { font-size: 13px; font-weight: 600; }
-    .result-card.rec .result-title { color: #3b6d11; }
-    .result-card.caution .result-title { color: #854f0b; }
-    .result-card.avoid .result-title { color: #a32d2d; }
-    .result-items { margin-top: 5px; font-size: 13px; }
-    .result-card.rec .result-items { color: #27500a; }
-    .result-card.caution .result-items { color: #633806; }
-    .result-card.avoid .result-items { color: #791f1f; }
-    .info-badge { display: flex; align-items: flex-start; gap: 8px; background: var(--dhc-brown-light); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; }
-    .info-badge span { font-size: 12px; color: var(--dhc-brown); line-height: 1.5; }
-    .run-btn { width: 100%; padding: 12px; font-size: 14px; font-weight: 600; border: none; border-radius: 12px; background: var(--dhc-brown); color: #fff; cursor: pointer; margin-top: 14px; }
-    .run-btn:hover { background: #6a4e42; }
-    .empty-results { text-align: center; padding: 32px 16px; color: #aaa; font-size: 14px; }
-    .disclaimer { font-size: 11px; color: #aaa; text-align: center; padding: 16px; line-height: 1.5; border-top: 1px solid #eee; margin-top: 8px; }
 
-    /* ABOUT TAB */
-    .hero-card { background: var(--dhc-brown); border-radius: 16px; padding: 20px; margin-bottom: 12px; }
-    .hero-inner { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-    .avatar { width: 60px; height: 60px; border-radius: 50%; background: var(--dhc-brown-light); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--dhc-brown); flex-shrink: 0; }
-    .hero-name { font-size: 17px; font-weight: 700; color: #fff; }
-    .hero-title { font-size: 12px; color: #e8d8d0; margin-top: 3px; }
-    .badge-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
-    .hero-badge { padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; background: rgba(255,255,255,0.2); color: #fff; }
-    .hero-logo-wrap { border-top: 1px solid rgba(255,255,255,0.2); padding-top: 14px; text-align: center; }
-    .hero-logo { height: 28px; width: auto; filter: brightness(0) invert(1); opacity: 0.9; }
-    .visit-btn { display: block; text-align: center; padding: 10px; font-size: 13px; font-weight: 600; color: var(--dhc-brown); background: var(--dhc-brown-light); border-radius: 12px; text-decoration: none; margin-top: 10px; }
-    .about-card { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 16px; margin-bottom: 12px; }
-    .about-label { font-size: 11px; font-weight: 600; color: var(--dhc-brown); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    /* ── SAFETY & RECOMMEND ── */
+    .checker-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 13px; margin-bottom: 10px; }
+    .checker-label { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 7px; }
+    .checker-select { width: 100%; font-size: 14px; padding: 8px 10px; border: 1px solid #e0d8d0; border-radius: 10px; background: var(--cream); color: #1a1a1a; }
+    .sit-tag { display: inline-block; padding: 5px 11px; font-size: 12px; border: 1px solid #e0d8d0; border-radius: 12px; margin: 3px 3px 0 0; cursor: pointer; color: #888; }
+    .sit-tag.sel-m { background: var(--terra); color: #fff; border-color: var(--terra); }
+    .sit-tag.sel-p { background: var(--navy); color: #fff; border-color: var(--navy); }
+    .result-card { border-radius: 12px; padding: 12px; margin-top: 9px; border: 1px solid #eee; }
+    .result-card.rec{background:#eaf3de;border-color:#c0dd97;} .result-card.cau{background:#faeeda;border-color:#fac775;} .result-card.avd{background:#fcebeb;border-color:#f7c1c1;}
+    .result-title { font-size: 12px; font-weight: 600; }
+    .rec .result-title{color:#3b6d11;} .cau .result-title{color:#854f0b;} .avd .result-title{color:#a32d2d;}
+    .result-items { margin-top: 4px; font-size: 12px; }
+    .rec .result-items{color:#27500a;} .cau .result-items{color:#633806;} .avd .result-items{color:#791f1f;}
+    .info-badge { display: flex; gap: 8px; border-radius: 10px; padding: 9px 11px; margin-bottom: 12px; }
+    .info-m { background: var(--terra-light); }
+    .info-p { background: var(--navy-light); }
+    .info-badge span { font-size: 12px; line-height: 1.5; }
+    .info-m span { color: var(--brown); }
+    .info-p span { color: var(--navy); }
+    .run-btn-m { width: 100%; padding: 11px; font-size: 14px; font-weight: 600; border: none; border-radius: 12px; background: var(--terra); color: #fff; cursor: pointer; margin-top: 12px; }
+    .run-btn-p { width: 100%; padding: 11px; font-size: 14px; font-weight: 600; border: none; border-radius: 12px; background: var(--navy); color: #fff; cursor: pointer; margin-top: 12px; }
+    .empty-results { text-align: center; padding: 28px; color: #aaa; font-size: 13px; }
+    .disclaimer { font-size: 10px; color: #aaa; text-align: center; padding: 14px; line-height: 1.5; border-top: 1px solid #eee; margin-top: 6px; }
+
+    /* ── RESOURCES ── */
+    .res-section { margin-bottom: 14px; }
+    .res-section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 7px; padding: 0 2px; }
+    .res-title-m { color: var(--terra); }
+    .res-title-p { color: var(--navy); }
+    .res-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 12px; margin-bottom: 7px; }
+    .res-name { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 3px; }
+    .res-desc { font-size: 12px; color: #666; line-height: 1.5; margin-bottom: 7px; }
+    .res-links { display: flex; flex-wrap: wrap; gap: 6px; }
+    .res-link-m { font-size: 12px; color: var(--brown); background: var(--terra-light); padding: 4px 10px; border-radius: 8px; text-decoration: none; font-weight: 500; }
+    .res-link-p { font-size: 12px; color: var(--navy); background: var(--navy-light); padding: 4px 10px; border-radius: 8px; text-decoration: none; font-weight: 500; }
+    .res-phone { font-size: 12px; color: #3b6d11; background: #eaf3de; padding: 4px 10px; border-radius: 8px; font-weight: 600; }
+    .res-tag { font-size: 10px; color: #185fa5; background: #e6f1fb; padding: 2px 7px; border-radius: 6px; }
+
+    /* ── ABOUT ── */
+    .hero-card { background: var(--navy); border-radius: 16px; padding: 18px; margin-bottom: 10px; }
+    .hero-inner { display: flex; align-items: center; gap: 13px; margin-bottom: 13px; }
+    .avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--terra-light); display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; color: var(--navy); flex-shrink: 0; }
+    .hero-name { font-size: 16px; font-weight: 700; color: #fff; }
+    .hero-title { font-size: 11px; color: #a0a8c8; margin-top: 3px; }
+    .hero-badges { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 7px; }
+    .hero-badge { padding: 2px 9px; border-radius: 10px; font-size: 11px; font-weight: 600; background: rgba(255,255,255,0.15); color: #fff; }
+    .hero-logo-wrap { border-top: 1px solid rgba(255,255,255,0.15); padding-top: 12px; text-align: center; }
+    .hero-logo { height: 24px; width: auto; filter: brightness(0) invert(1); opacity: 0.85; }
+    .visit-btn { display: block; text-align: center; padding: 9px; font-size: 12px; font-weight: 600; color: var(--navy); background: var(--terra-light); border-radius: 10px; text-decoration: none; margin-top: 9px; }
+    .about-card { background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 13px; margin-bottom: 9px; }
+    .about-label-m { font-size: 11px; font-weight: 600; color: var(--terra); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+    .about-label-p { font-size: 11px; font-weight: 600; color: var(--navy); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
     .about-card p { font-size: 13px; color: #444; line-height: 1.7; }
-    .quote-bar { border-left: 3px solid var(--dhc-brown); border-radius: 0; padding-left: 12px; margin: 12px 0; }
-    .quote-bar p { font-size: 13px; font-style: italic; color: #666; line-height: 1.6; }
-    .cred-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .cred-item { background: var(--dhc-cream); border-radius: 10px; padding: 10px 12px; }
-    .cred-year { font-size: 11px; color: var(--dhc-brown); font-weight: 600; margin-bottom: 3px; }
-    .cred-title { font-size: 12px; color: #444; line-height: 1.4; }
-    .source-row { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid #f0e8e4; }
-    .source-row:last-child { border-bottom: none; }
-    .source-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dhc-brown); flex-shrink: 0; margin-top: 5px; }
-    .source-text { font-size: 12px; color: #666; line-height: 1.5; }
-    .footer-note { font-size: 11px; color: #aaa; text-align: center; padding: 8px 0 16px; line-height: 1.6; }
+    .quote-bar { border-left: 3px solid var(--caramel); border-radius: 0; padding-left: 11px; margin: 11px 0; }
+    .quote-bar p { font-size: 12px; font-style: italic; color: #666; line-height: 1.6; }
+    .cred-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+    .cred-item { background: var(--cream); border-radius: 9px; padding: 9px 10px; }
+    .cred-year { font-size: 11px; color: var(--terra); font-weight: 600; margin-bottom: 2px; }
+    .cred-title { font-size: 11px; color: #444; line-height: 1.4; }
+    .footer-note { font-size: 10px; color: #aaa; text-align: center; padding: 6px 0 14px; line-height: 1.6; }
   </style>
 </head>
 <body>
 
-<!-- DISCLAIMER SCREEN -->
+<!-- ══ DISCLAIMER + PORTAL SELECTION ══ -->
 <div id="disclaimer-screen">
   <div class="logo-wrap">
-    <img class="dhc-logo" src="https://raw.githubusercontent.com/dpontellmd-hub/galactoguide/main/DHC_Wordmark_K.png" alt="Dyad Health Collective" onerror="this.style.display='none'" />
+    <img class="dhc-wordmark" src="https://raw.githubusercontent.com/dpontellmd-hub/galactoguide/main/DHC_Wordmark_K.png" alt="Dyad Health Collective" onerror="this.style.display='none'" />
     <div class="app-name">GalactoGuide</div>
-    <div class="app-sub">Evidence-based galactogogue reference</div>
+    <div class="app-sub">Galactogogues &amp; Galactofuges Reference</div>
     <div class="dyad-line">A clinical tool by <a href="https://dyadhealthcollective.com" target="_blank">Dyad Health Collective</a></div>
   </div>
+
+  <div class="mission-box">
+    <p><strong>Our purpose:</strong> GalactoGuide brings education and awareness to current research on substances that may <strong>increase (galactogogues)</strong> or <strong>decrease (galactofuges)</strong> breast milk supply. This app does not evaluate the safety of these substances during lactation, assess individual risk, or provide personalized medical recommendations. All substances carry potential benefits, risks, and contraindications that must be reviewed through <strong>shared decision-making with a qualified medical provider</strong> before use.</p>
+  </div>
+
   <div class="disclaimer-box">
-    <h2>Before you begin</h2>
+    <h2>Important notices</h2>
     <div class="point">
-      <div class="point-icon icon-blue">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#185fa5" stroke-width="1.3"/><path d="M7 6v4M7 4.5v.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
-      </div>
-      <div><div class="point-title">Educational reference only</div><div class="point-desc">GalactoGuide is an educational tool. It does not constitute medical advice and does not create a patient-provider relationship.</div></div>
+      <div class="point-icon icon-blue"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#185fa5" stroke-width="1.3"/><path d="M7 6v4M7 4.5v.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+      <div><div class="point-title">Educational reference only</div><div class="point-desc">GalactoGuide does not constitute medical advice and does not create a patient-provider relationship.</div></div>
     </div>
     <div class="point">
-      <div class="point-icon icon-amber">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2L12.5 11.5H1.5L7 2Z" stroke="#854f0b" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 6v3M7 10.5v.2" stroke="#854f0b" stroke-width="1.3" stroke-linecap="round"/></svg>
-      </div>
-      <div><div class="point-title">Always consult your provider</div><div class="point-desc">Never start, stop, or change a galactogogue based solely on this app. Always discuss with your IBCLC, physician, or pharmacist first.</div></div>
+      <div class="point-icon icon-amber"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 2L12.5 11.5H1.5L7 2Z" stroke="#854f0b" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 6v3M7 10.5v.2" stroke="#854f0b" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+      <div><div class="point-title">Always consult your provider</div><div class="point-desc">Never start, stop, or change any supplement or medication based solely on this app. Shared decision-making with your provider is essential.</div></div>
     </div>
     <div class="point">
-      <div class="point-icon icon-green">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#3b6d11" stroke-width="1.3"/><path d="M4 7l2 2 4-4" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      </div>
-      <div><div class="point-title">Evidence is limited</div><div class="point-desc">Most galactogogues have low-certainty evidence. This app summarizes current research honestly, including its limitations.</div></div>
+      <div class="point-icon icon-green"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#3b6d11" stroke-width="1.3"/><path d="M4 7l2 2 4-4" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div><div class="point-title">Evidence is limited</div><div class="point-desc">Most galactogogues and galactofuges have low-certainty evidence. This app summarizes current research honestly, including its limitations.</div></div>
     </div>
     <div class="point">
-      <div class="point-icon icon-red">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#a32d2d" stroke-width="1.3"/><path d="M5 5l4 4M9 5l-4 4" stroke="#a32d2d" stroke-width="1.3" stroke-linecap="round"/></svg>
-      </div>
-      <div><div class="point-title">Not for emergencies</div><div class="point-desc">If you or your baby have an urgent medical concern, contact your healthcare provider or call 911 immediately.</div></div>
+      <div class="point-icon icon-red"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#a32d2d" stroke-width="1.3"/><path d="M5 5l4 4M9 5l-4 4" stroke="#a32d2d" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+      <div><div class="point-title">Not for emergencies</div><div class="point-desc">For urgent concerns, contact your provider or call 911 immediately.</div></div>
     </div>
     <div class="divider"></div>
-    <div class="fine-print">By tapping "I understand and agree" you acknowledge this app is for educational purposes only and agree to our Terms of Use and Privacy Policy. GalactoGuide content is developed and reviewed by Dr. Diana Pontell, MD, IBCLC. Last reviewed April 2026.</div>
+    <div class="fine-print">Content developed and reviewed by Dr. Diana Pontell, MD, IBCLC, Dyad Health Collective. Last reviewed April 2026. By continuing you agree to our Terms of Use and Privacy Policy.</div>
   </div>
-  <button class="agree-btn" onclick="handleAgree()">I understand and agree</button>
-  <div class="decline-note">For healthcare providers and breastfeeding families</div>
+
+  <div class="portal-label">Who are you?</div>
+  <div class="portal-row">
+    <button class="portal-btn mother" onclick="selectPortal('mother',this)">
+      <div class="portal-emoji">🤱</div>
+      <div class="portal-name">Breastfeeding mother</div>
+      <div class="portal-desc">Plain language guides for families</div>
+    </button>
+    <button class="portal-btn provider" onclick="selectPortal('provider',this)">
+      <div class="portal-emoji">🩺</div>
+      <div class="portal-name">Healthcare provider</div>
+      <div class="portal-desc">Full clinical detail &amp; references</div>
+    </button>
+  </div>
+  <button class="agree-btn" id="agree-btn" onclick="handleAgree()">Select your portal to continue</button>
+  <div class="portal-note">GalactoGuide · Dyad Health Collective · Nashville, TN</div>
 </div>
 
-<!-- MAIN APP -->
+<!-- ══ MAIN APP ══ -->
 <div id="main-app">
   <div class="app">
     <div class="topbar">
-      <div class="topbar-text">
+      <div class="topbar-left">
         <h1>GalactoGuide</h1>
-        <p>Evidence-based · IBCLC & MD reviewed</p>
+        <p id="topbar-sub">Evidence-based reference</p>
+        <span class="portal-badge" id="portal-badge"></span>
       </div>
-      <img class="topbar-logo" src="https://raw.githubusercontent.com/dpontellmd-hub/galactoguide/main/DHC_Wordmark_K.png" alt="DHC" onerror="this.style.display='none'" />
+      <div class="topbar-right">
+        <img class="topbar-logo" src="https://raw.githubusercontent.com/dpontellmd-hub/galactoguide/main/DHC_Wordmark_K.png" alt="DHC" onerror="this.style.display='none'" />
+        <button class="switch-btn" onclick="switchPortal()">Switch portal</button>
+      </div>
     </div>
-    <div class="tabs">
-      <button class="tab active" onclick="showTab('browse',this)">Browse</button>
-      <button class="tab" onclick="showTab('safety',this)">Safety</button>
-      <button class="tab" onclick="showTab('recommend',this)">Recommend</button>
-      <button class="tab" onclick="showTab('about',this)">About</button>
-    </div>
+    <div class="tabs" id="tab-bar"></div>
 
+    <!-- BROWSE -->
     <div id="tab-browse" class="section active">
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M10.5 10.5l3 3"/></svg>
-        <input type="text" placeholder="Search galactogogues..." id="search-input" oninput="renderCards()" />
+        <input type="text" placeholder="Search..." id="search-input" oninput="renderCards()" />
       </div>
-      <div class="filter-row">
-        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
-        <button class="filter-btn" onclick="setFilter('herbal',this)">Herbal</button>
-        <button class="filter-btn" onclick="setFilter('pharma',this)">Pharmaceutical</button>
-        <button class="filter-btn" onclick="setFilter('food',this)">Food/dietary</button>
-      </div>
+      <div class="filter-row" id="filter-row"></div>
       <div id="card-list"></div>
-      <div class="disclaimer">GalactoGuide is an educational reference tool. Not a substitute for clinical judgment or personalized medical advice. &copy; 2026 Dyad Health Collective LLC.</div>
+      <div class="disclaimer">GalactoGuide covers research on milk supply effects — not safety during lactation. Always discuss with your provider. © 2026 Dyad Health Collective LLC.</div>
     </div>
 
+    <!-- SAFETY -->
     <div id="tab-safety" class="section">
-      <div class="info-badge"><span>Safety data sourced from LactMed and ABM Protocol #9. Always confirm with prescriber for pharmaceutical options.</span></div>
+      <div class="info-badge" id="safety-badge"><span id="safety-badge-text"></span></div>
       <div class="checker-card">
-        <div class="checker-label">Select a galactogogue</div>
+        <div class="checker-label">Select a substance</div>
         <select class="checker-select" id="safety-select" onchange="showSafety()"><option value="">Choose one...</option></select>
       </div>
       <div id="safety-result"></div>
     </div>
 
+    <!-- RECOMMEND -->
     <div id="tab-recommend" class="section">
-      <div class="info-badge"><span>Suggestions are educational, not prescriptive. Clinical judgment is always required.</span></div>
+      <div class="info-badge" id="rec-badge"><span id="rec-badge-text"></span></div>
       <div class="checker-card">
-        <div class="checker-label">Select clinical situation(s)</div>
+        <div class="checker-label" id="rec-label">Select clinical situation(s)</div>
         <div id="situation-tags">
-          <span class="situation-tag" onclick="toggleSit(this,'preterm')">Preterm infant</span>
-          <span class="situation-tag" onclick="toggleSit(this,'pcos')">PCOS / insulin resistance</span>
-          <span class="situation-tag" onclick="toggleSit(this,'hypoplasia')">Breast hypoplasia</span>
-          <span class="situation-tag" onclick="toggleSit(this,'low-supply')">General low supply</span>
-          <span class="situation-tag" onclick="toggleSit(this,'relactation')">Relactation</span>
-          <span class="situation-tag" onclick="toggleSit(this,'cardiac')">Cardiac history</span>
-          <span class="situation-tag" onclick="toggleSit(this,'diabetes')">Diabetes / blood sugar issues</span>
+          <span class="sit-tag" onclick="toggleSit(this,'preterm')">Preterm infant</span>
+          <span class="sit-tag" onclick="toggleSit(this,'pcos')">PCOS / insulin resistance</span>
+          <span class="sit-tag" onclick="toggleSit(this,'hypoplasia')">Breast hypoplasia</span>
+          <span class="sit-tag" onclick="toggleSit(this,'low-supply')">General low supply</span>
+          <span class="sit-tag" onclick="toggleSit(this,'relactation')">Relactation</span>
+          <span class="sit-tag" onclick="toggleSit(this,'cardiac')">Cardiac history</span>
+          <span class="sit-tag" onclick="toggleSit(this,'diabetes')">Diabetes / blood sugar issues</span>
         </div>
       </div>
-      <button class="run-btn" onclick="runRecommend()">Show recommendations</button>
+      <button id="run-btn" onclick="runRecommend()">Show recommendations</button>
       <div id="recommend-result"></div>
     </div>
 
+    <!-- RESOURCES -->
+    <div id="tab-resources" class="section">
+      <div id="resources-content"></div>
+    </div>
+
+    <!-- ABOUT -->
     <div id="tab-about" class="section">
       <div class="hero-card">
         <div class="hero-inner">
@@ -250,7 +304,7 @@
           <div>
             <div class="hero-name">Dr. Diana Pontell</div>
             <div class="hero-title">Pediatrician · IBCLC · Nashville, TN</div>
-            <div class="badge-row">
+            <div class="hero-badges">
               <span class="hero-badge">MD</span>
               <span class="hero-badge">IBCLC</span>
               <span class="hero-badge">NAABLM candidate</span>
@@ -264,7 +318,7 @@
       </div>
 
       <div class="about-card">
-        <div class="about-label">My story</div>
+        <div class="about-label-m" id="about-label-story">My story</div>
         <p>I first became interested in breastfeeding medicine after having my first child at the end of my pediatric residency. Despite years of medical training, I realized I had real gaps in the practical side of breastfeeding — what pump, what flange size, when to start, how often, what positions.</p>
         <div class="quote-bar">
           <p>"I know through caring for my own patients that finding adequate breastfeeding support is not easy. Women often feel alone navigating their infant feeding goals among premature birth, medical complexities, mental health concerns, and the demands of work and family life."</p>
@@ -273,32 +327,34 @@
       </div>
 
       <div class="about-card">
-        <div class="about-label">About Dyad Health Collective</div>
-        <p>Founded in 2025, Dyad Health Collective bridges a gap in postpartum care by providing physician-level breastfeeding and lactation medicine consulting in the Nashville area. We offer both in-home and virtual visits for maximum ease during the "fourth trimester."</p>
+        <div class="about-label-m" id="about-label-dyad">About Dyad Health Collective</div>
+        <p>Founded in 2025, Dyad Health Collective bridges a gap in postpartum care by providing physician-level breastfeeding and lactation medicine consulting in the Nashville area, with both in-home and virtual visits during the "fourth trimester."</p>
       </div>
 
       <div class="about-card">
-        <div class="about-label">Credentials</div>
+        <div class="about-label-m" id="about-label-cred">Credentials</div>
         <div class="cred-grid">
           <div class="cred-item"><div class="cred-year">2009</div><div class="cred-title">B.S. Emory University</div></div>
           <div class="cred-item"><div class="cred-year">2014</div><div class="cred-title">M.D. UPenn Perelman School of Medicine</div></div>
           <div class="cred-item"><div class="cred-year">2017</div><div class="cred-title">Chief Resident, Children's Hospital of Philadelphia</div></div>
           <div class="cred-item"><div class="cred-year">2018</div><div class="cred-title">Board Certified, American Board of Pediatrics</div></div>
           <div class="cred-item"><div class="cred-year">2023</div><div class="cred-title">IBCLC Certified</div></div>
-          <div class="cred-item"><div class="cred-year">2026</div><div class="cred-title">Deep Dive Breastfeeding & Lactation Medicine Curriculum, IABLE</div></div>
+          <div class="cred-item"><div class="cred-year">2026</div><div class="cred-title">Deep Dive Breastfeeding & Lactation Medicine, IABLE</div></div>
         </div>
       </div>
 
       <div class="about-card">
-        <div class="about-label">Content sources</div>
-        <div class="source-row"><div class="source-dot"></div><div class="source-text">LactMed — NIH Drugs and Lactation Database</div></div>
-        <div class="source-row"><div class="source-dot"></div><div class="source-text">ABM Clinical Protocol #9 (2018, second revision)</div></div>
-        <div class="source-row"><div class="source-dot"></div><div class="source-text">Hale's Medications and Mothers' Milk</div></div>
-        <div class="source-row"><div class="source-dot"></div><div class="source-text">Cochrane Reviews on oral galactogogues (2020)</div></div>
-        <div class="source-row"><div class="source-dot"></div><div class="source-text">Peer-reviewed literature, updated periodically</div></div>
+        <div class="about-label-m" id="about-label-sources">Content sources</div>
+        <div style="font-size:12px;color:#555;line-height:2">
+          LactMed — NIH Drugs and Lactation Database<br/>
+          ABM Clinical Protocol #9 (2018, second revision)<br/>
+          Hale's Medications and Mothers' Milk<br/>
+          Cochrane Reviews on oral galactogogues (2020)<br/>
+          Breastfeeding Medicine journal<br/>
+          Peer-reviewed literature, updated periodically
+        </div>
       </div>
-
-      <div class="footer-note">GalactoGuide is for educational purposes only. Not medical advice.<br>&copy; 2026 Dyad Health Collective LLC &middot; Nashville, TN</div>
+      <div class="footer-note">GalactoGuide is for educational purposes only. Not medical advice.<br/>© 2026 Dyad Health Collective LLC · Nashville, TN</div>
     </div>
   </div>
 </div>
@@ -310,216 +366,518 @@
 </div>
 
 <script>
-const data = [
-  { id:'fenugreek', name:'Fenugreek', type:'herbal', evidence:2,
-    short:'Most widely used herbal galactogogue. Mixed evidence; may cause maple-syrup odor.',
-    mechanism:'Thought to stimulate sweat glands (similar to mammary glands) and may mimic estrogen.',
-    evidence_detail:'Several small RCTs show modest increases in milk volume (24–103 mL/day). Evidence is low-certainty due to small sample sizes and lack of standardization.',
-    dosing:'500–1000 mg three times daily (capsule). Effects typically noted within 24–72 hrs.',
-    safety:{preterm:'caution',pcos:'avoid',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'avoid'},
-    notes:'May lower blood glucose — caution in diabetics. Contraindicated in peanut/chickpea allergy. Avoid in PCOS.',
-    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501793/' },
-  { id:'moringa', name:'Moringa (Malunggay)', type:'herbal', evidence:3,
-    short:'Promising evidence, especially in Filipino/Asian populations. Well tolerated.',
-    mechanism:'Rich in phytosterols; may stimulate prolactin secretion. Nutritionally dense.',
-    evidence_detail:'Multiple RCTs (primarily in SE Asia) show significant increases in milk volume. Cochrane review noted moringa as one of the better-studied botanicals.',
-    dosing:'250–500 mg capsule twice daily, or 1–2 tsp leaf powder in food daily.',
-    safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'recommend',relactation:'may use',cardiac:'may use',diabetes:'may use'},
-    notes:'Generally well tolerated. Avoid root/bark extract. Limited long-term safety data.',
-    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK551531/' },
-  { id:'domperidone', name:'Domperidone', type:'pharma', evidence:4,
-    short:'Best pharmaceutical evidence, especially for mothers of preterm infants. Off-label use.',
-    mechanism:'Dopamine antagonist that raises prolactin. Does not significantly cross the blood-brain barrier.',
-    evidence_detail:'Multiple RCTs show increased milk volume in mothers of preterm infants. Strongest pharmaceutical evidence per ABM Protocol #9, though still low-certainty overall.',
-    dosing:'10–20 mg three times daily. Reassess at 2 weeks. Not FDA-approved; available via compounding pharmacies in the US.',
-    safety:{preterm:'recommend',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'avoid',diabetes:'may use'},
-    notes:'Cardiac risk (QT prolongation) — requires ECG screening in at-risk patients. Avoid with azole antifungals, macrolide antibiotics, and grapefruit. Prescriber required.',
-    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501064/' },
-  { id:'metoclopramide', name:'Metoclopramide', type:'pharma', evidence:2,
-    short:'FDA-approved antiemetic used off-label. Risk of maternal depression limits use.',
-    mechanism:'Dopamine antagonist — raises prolactin. Crosses the blood-brain barrier.',
-    evidence_detail:'Small RCTs show mixed results. ABM Protocol #9 advises caution due to CNS side effects including depression and tardive dyskinesia with prolonged use.',
-    dosing:'10 mg three times daily, typically no more than 4 weeks.',
-    safety:{preterm:'caution',pcos:'caution',hypoplasia:'caution',low_supply:'caution',relactation:'caution',cardiac:'may use',diabetes:'may use'},
-    notes:'Risk of maternal depression, anxiety, and rare tardive dyskinesia. Not recommended beyond 4 weeks. Screen for depression history before use.',
-    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501086/' },
-  { id:'oats', name:'Oats / oatmeal', type:'food', evidence:1,
-    short:'Traditional food galactogogue. No RCT evidence; widely used and safe.',
-    mechanism:'Hypothesized: beta-glucan may affect prolactin. High iron content may help if supply is affected by anemia.',
-    evidence_detail:'No peer-reviewed RCTs. Widely reported in cultural traditions. Safe and nutritious — no reason to discourage.',
-    dosing:'1 cup cooked oats daily. Commonly used in lactation cookies with brewer\'s yeast and flaxseed.',
-    safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
-    notes:'Gluten cross-contamination possible in non-certified oats. High glycemic index — caution in poorly controlled diabetes.',
-    lactmed:null },
-  { id:'blessed-thistle', name:'Blessed thistle', type:'herbal', evidence:1,
-    short:'Often paired with fenugreek. Very limited independent evidence.',
-    mechanism:'Unknown. Traditionally thought to stimulate digestion and lactation.',
-    evidence_detail:'No standalone RCTs. Typically studied in combination products. Evidence is anecdotal.',
-    dosing:'390–400 mg capsule three times daily. Often used in combination products.',
-    safety:{preterm:'caution',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'may use'},
-    notes:'Avoid in ragweed allergy (Asteraceae family). May cause GI upset at high doses. Avoid during pregnancy.',
-    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501802/' },
-  { id:'goats-rue', name:"Goat's rue", type:'herbal', evidence:2,
-    short:"Contains galegin — the compound metformin was derived from. Useful in PCOS and hypoplasia.",
-    mechanism:'Galegin has insulin-sensitizing properties and may stimulate mammary gland development.',
-    evidence_detail:"Limited RCTs but mechanistically plausible. Recommended by West & Marasco for insulin resistance, PCOS, and breast hypoplasia.",
-    dosing:'300–400 mg standardized extract twice daily.',
-    safety:{preterm:'may use',pcos:'recommend',hypoplasia:'recommend',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
-    notes:"May lower blood glucose — caution with diabetes medications. Avoid in legume allergy.",
-    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK582119/' },
-  { id:'brewers-yeast', name:"Brewer's yeast", type:'food', evidence:1,
-    short:'Common in lactation cookies. Nutritionally rich; no direct RCT evidence.',
-    mechanism:'Rich in B vitamins, chromium, selenium, and protein. Hypothesized nutritional support role.',
-    evidence_detail:'No standalone RCTs for milk supply. Nutritional benefits well-established. Often used alongside oats and flaxseed.',
-    dosing:'1–2 tbsp powder daily in smoothies, oatmeal, or baked goods.',
-    safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
-    notes:"May interact with MAOIs. Possible GI gas. Generally safe.",
-    lactmed:null }
-];
-
+let portal = null;
 let activeFilter = 'all';
 let activeSituations = [];
 
+// ── DATA: GALACTOGOGUES ──
+const galactogogues = [
+  { id:'fenugreek', name:'Fenugreek', type:'herbal', evidence:2,
+    short_p:'Most widely used herbal galactogogue. Mixed evidence; may cause maple-syrup odor.',
+    short_m:'One of the most popular herbs used to boost milk supply — but results are mixed. May make your sweat and milk smell like maple syrup.',
+    mechanism:'Thought to stimulate sweat glands (similar to mammary glands) and may mimic estrogen.',
+    evidence_p:'Several small RCTs show modest increases in milk volume (24–103 mL/day). Evidence is low-certainty due to small sample sizes and lack of standardization.',
+    evidence_m:'A few small studies show it may help increase milk, but the research is not strong. Many mothers report it works; others see no change.',
+    dosing_p:'500–1000 mg three times daily (capsule). Effects typically noted within 24–72 hrs.',
+    dosing_m:'Usually taken as capsules, 3 times a day. Many mothers notice a change within 1–3 days if it\'s going to work.',
+    safety:{preterm:'caution',pcos:'avoid',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'avoid'},
+    notes_p:'May lower blood glucose — caution in diabetics. Contraindicated in peanut/chickpea allergy. Avoid in PCOS (may worsen hormonal profile).',
+    notes_m:'Not recommended if you have diabetes or PCOS. Avoid if you have a peanut or chickpea allergy. Always check with your provider first.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501793/' },
+  { id:'moringa', name:'Moringa (Malunggay)', type:'herbal', evidence:3,
+    short_p:'Promising evidence, especially in Filipino/Asian populations. Well tolerated.',
+    short_m:'One of the better-studied herbs for milk supply. Widely used in Southeast Asia and generally very well tolerated.',
+    mechanism:'Rich in phytosterols; may stimulate prolactin secretion. Nutritionally dense.',
+    evidence_p:'Multiple RCTs (primarily in SE Asia) show significant increases in milk volume. Cochrane review noted moringa as one of the better-studied botanicals.',
+    evidence_m:'Multiple studies — especially from the Philippines — show it can meaningfully increase milk volume. Among the strongest evidence of any herbal option.',
+    dosing_p:'250–500 mg capsule twice daily, or 1–2 tsp leaf powder in food daily.',
+    dosing_m:'Available as capsules or leaf powder. Can be added to smoothies or food. Usually taken twice a day.',
+    safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'recommend',relactation:'may use',cardiac:'may use',diabetes:'may use'},
+    notes_p:'Generally well tolerated. Avoid root/bark extract (different safety profile than leaf). Limited long-term safety data.',
+    notes_m:'Generally considered safe. Make sure you\'re using leaf products — not root or bark extracts, which are different. Always discuss with your provider.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK551531/' },
+  { id:'domperidone', name:'Domperidone', type:'pharma', evidence:4,
+    short_p:'Best pharmaceutical evidence, especially for mothers of preterm infants. Off-label use in the US.',
+    short_m:'A prescription medication with the strongest research evidence for increasing milk supply. Requires a doctor\'s prescription.',
+    mechanism:'Dopamine antagonist that raises prolactin levels. Does not significantly cross the blood-brain barrier.',
+    evidence_p:'Multiple RCTs show increased milk volume in mothers of preterm infants. Strongest pharmaceutical evidence per ABM Protocol #9, though still low-certainty overall.',
+    evidence_m:'The most well-studied medication for milk supply. Several good studies show it can significantly increase milk, especially for mothers of premature babies.',
+    dosing_p:'10–20 mg three times daily. Reassess at 2 weeks. Not FDA-approved in the US; available via compounding pharmacies.',
+    dosing_m:'Taken as a pill, usually 3 times a day. Not available over the counter — your doctor needs to prescribe it. Usually reassessed after 2 weeks.',
+    safety:{preterm:'recommend',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'avoid',diabetes:'may use'},
+    notes_p:'Cardiac risk (QT prolongation) — requires ECG screening in at-risk patients. Avoid with azole antifungals, macrolide antibiotics, and grapefruit. Prescriber required.',
+    notes_m:'Not safe if you have certain heart conditions. Your doctor will want to review your health history before prescribing. Cannot be combined with some common medications — always tell your doctor everything you are taking.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501064/' },
+  { id:'metoclopramide', name:'Metoclopramide', type:'pharma', evidence:2,
+    short_p:'FDA-approved antiemetic used off-label. Risk of maternal depression limits use.',
+    short_m:'A prescription medication sometimes used for milk supply. Important mental health considerations mean it\'s used carefully.',
+    mechanism:'Dopamine antagonist — raises prolactin. Crosses the blood-brain barrier.',
+    evidence_p:'Small RCTs show mixed results. ABM Protocol #9 advises caution due to CNS side effects including depression and tardive dyskinesia with prolonged use.',
+    evidence_m:'Evidence is mixed — it works for some mothers but not others. Because of the risk of depression and anxiety, most providers use this only in specific situations.',
+    dosing_p:'10 mg three times daily, typically no more than 4 weeks.',
+    dosing_m:'Taken as a pill, 3 times a day. Usually not used for more than 4 weeks due to side effect risks.',
+    safety:{preterm:'caution',pcos:'caution',hypoplasia:'caution',low_supply:'caution',relactation:'caution',cardiac:'may use',diabetes:'may use'},
+    notes_p:'Risk of maternal depression, anxiety, and rare tardive dyskinesia. Not recommended beyond 4 weeks. Screen for depression history before use.',
+    notes_m:'Can cause or worsen depression and anxiety in some women. Tell your doctor if you have any history of depression or anxiety before starting this medication. Do not take for more than 4 weeks.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501086/' },
+  { id:'oats', name:'Oats / oatmeal', type:'food', evidence:1,
+    short_p:'Traditional food galactogogue. No RCT evidence; widely used and safe.',
+    short_m:'A classic and beloved milk-boosting food! No strong scientific proof, but safe, nutritious, and worth adding to your diet.',
+    mechanism:'Hypothesized: beta-glucan may affect prolactin. High iron content may help if supply is affected by anemia.',
+    evidence_p:'No peer-reviewed RCTs. Widely reported in cultural traditions. Safe and nutritious — no reason to discourage.',
+    evidence_m:'There are no formal studies proving oats boost milk supply, but they have been used across cultures for generations. They\'re nutritious and there\'s no reason not to enjoy them!',
+    dosing_p:'1 cup cooked oats daily. Commonly used in lactation cookies with brewer\'s yeast and flaxseed.',
+    dosing_m:'A bowl of oatmeal a day is a great start. Many mothers enjoy lactation cookies made with oats, brewer\'s yeast, and flaxseed.',
+    safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
+    notes_p:'Gluten cross-contamination possible in non-certified oats. High glycemic index — caution in poorly controlled diabetes.',
+    notes_m:'If you have celiac disease or gluten sensitivity, look for certified gluten-free oats. If you have diabetes, talk to your provider as oats can raise blood sugar.',
+    lactmed:null },
+  { id:'blessed-thistle', name:'Blessed thistle', type:'herbal', evidence:1,
+    short_p:'Often paired with fenugreek. Very limited independent evidence.',
+    short_m:'Often sold alongside fenugreek in lactation supplements. Very little independent research, but widely used.',
+    mechanism:'Unknown. Traditionally thought to stimulate digestion and lactation.',
+    evidence_p:'No standalone RCTs. Typically studied in combination products. Evidence is anecdotal.',
+    evidence_m:'There\'s no strong research on blessed thistle alone for milk supply. It\'s most commonly found in combination herbal supplements.',
+    dosing_p:'390–400 mg capsule three times daily. Often used in combination products.',
+    dosing_m:'Most often taken as part of a combination supplement. If taken alone, usually as capsules 3 times a day.',
+    safety:{preterm:'caution',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'may use'},
+    notes_p:'Avoid in ragweed allergy (Asteraceae family). May cause GI upset at high doses. Avoid during pregnancy.',
+    notes_m:'Avoid if you have ragweed or daisy allergies. Can cause stomach upset at high doses. Not safe to use during pregnancy.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501802/' },
+  { id:'goats-rue', name:"Goat's rue", type:'herbal', evidence:2,
+    short_p:"Contains galegin — the compound metformin was derived from. Useful in PCOS and hypoplasia.",
+    short_m:"A herb that may be particularly helpful if you have PCOS or underdeveloped breast tissue. Contains a compound related to the diabetes medication metformin.",
+    mechanism:'Galegin has insulin-sensitizing properties and may stimulate mammary gland development.',
+    evidence_p:"Limited RCTs but mechanistically plausible. Recommended by West & Marasco for insulin resistance, PCOS, and breast hypoplasia.",
+    evidence_m:"More limited research than some other options, but there are good reasons to think it may help — especially if supply issues are related to hormones or breast tissue development.",
+    dosing_p:'300–400 mg standardized extract twice daily.',
+    dosing_m:'Usually taken as capsules, twice a day. Make sure you\'re using a standardized extract.',
+    safety:{preterm:'may use',pcos:'recommend',hypoplasia:'recommend',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
+    notes_p:"May lower blood glucose — caution with diabetes medications. Avoid in legume allergy.",
+    notes_m:"Can lower blood sugar — let your doctor know if you take any diabetes medications. Avoid if you have a legume (bean/pea) allergy.",
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK582119/' },
+  { id:'brewers-yeast', name:"Brewer's yeast", type:'food', evidence:1,
+    short_p:"Common in lactation cookies. Nutritionally rich; no direct RCT evidence.",
+    short_m:"A popular ingredient in lactation cookies and smoothies. Packed with B vitamins and minerals — great for your nutrition even if the milk-boosting effect is unproven.",
+    mechanism:'Rich in B vitamins, chromium, selenium, and protein. Hypothesized nutritional support role.',
+    evidence_p:'No standalone RCTs for milk supply. Nutritional benefits well-established. Often used alongside oats and flaxseed.',
+    evidence_m:'No formal studies specifically on milk supply, but it\'s very nutritious and widely loved by breastfeeding mothers. A great addition to lactation baking.',
+    dosing_p:'1–2 tbsp powder daily in smoothies, oatmeal, or baked goods.',
+    dosing_m:'Usually 1–2 tablespoons of powder a day, mixed into smoothies, oatmeal, or baked into lactation cookies.',
+    safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
+    notes_p:"May interact with MAOIs. Possible GI gas. Generally safe.",
+    notes_m:"May cause gas or bloating when you first start using it. If you take antidepressants, check with your doctor first. Generally very safe.",
+    lactmed:null }
+];
+
+// ── DATA: GALACTOFUGES ──
+const galactofuges = [
+  { id:'sage', name:'Sage', type:'herbal', evidence:2,
+    short_p:'Most evidence-supported galactofuge. Historically used intentionally for weaning.',
+    short_m:'Sage is the herb most strongly linked to reducing milk supply — it\'s actually sometimes used on purpose when mothers want to wean.',
+    mechanism:'Contains phytoestrogens and compounds that may reduce prolactin; historically used medicinally to dry up milk.',
+    evidence_p:'Most consistently reported galactofuge in the herbal literature. Used in multiple cultures specifically for weaning. Evidence is still primarily observational.',
+    evidence_m:'While not from formal clinical trials, sage has been used across many cultures specifically to reduce milk supply. If you\'re cooking with it occasionally, small amounts are likely fine — but large amounts or supplements may reduce your supply.',
+    dosing_p:'Supply reduction reported with regular supplemental doses or high culinary use. Sage tea, capsules, or essential oil (not for ingestion).',
+    dosing_m:'Even regular use of sage tea or sage supplements could affect supply. Occasional cooking use (like a Thanksgiving stuffing!) is unlikely to cause problems.',
+    safety:{preterm:'avoid',pcos:'caution',hypoplasia:'avoid',low_supply:'avoid',relactation:'avoid',cardiac:'may use',diabetes:'may use'},
+    notes_p:'Most consistently reported galactofuge in traditional and herbal medicine. Advise patients to avoid sage supplements or teas while breastfeeding if maintaining supply is a goal.',
+    notes_m:'Avoid sage supplements and teas while breastfeeding if you want to keep your milk supply up. Small amounts in food (like cooking) are generally fine.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501809/' },
+  { id:'peppermint', name:'Peppermint / spearmint', type:'herbal', evidence:2,
+    short_p:'High-dose peppermint — especially menthol — reported to reduce supply. Culinary use considered safe.',
+    short_m:'High doses of peppermint (like strong peppermint tea, menthol drops, or peppermint oil) may reduce milk supply. A little peppermint in your toothpaste or gum is fine!',
+    mechanism:'Menthol may have anti-prolactin properties at high doses.',
+    evidence_p:'Reported in traditional medicine and case reports. High-dose menthol exposure (peppermint oil, teas, candies) associated with reduced supply. Culinary use not a concern.',
+    evidence_m:'Most of the concern is with very high doses — like drinking several cups of strong peppermint tea a day, or using peppermint essential oil near your chest. Normal amounts in food or dental products are fine.',
+    dosing_p:'Avoid high-dose peppermint tea, peppermint oil topically to breasts, or menthol-containing supplements while breastfeeding if supply is a concern.',
+    dosing_m:'Avoid large amounts of peppermint tea (more than 1 cup/day) and avoid applying peppermint oil to your chest or near your breasts.',
+    safety:{preterm:'caution',pcos:'may use',hypoplasia:'caution',low_supply:'avoid',relactation:'avoid',cardiac:'may use',diabetes:'may use'},
+    notes_p:'High-dose menthol products are the primary concern. Advise patients to avoid peppermint essential oil topically near breasts.',
+    notes_m:'Avoid peppermint essential oils on or near your breasts. Regular use of mint-flavored products like gum or toothpaste is not a concern.',
+    lactmed:null },
+  { id:'parsley', name:'Parsley', type:'herbal', evidence:1,
+    short_p:'High-dose parsley reported as galactofuge in traditional medicine. Culinary use not a concern.',
+    short_m:'Large amounts of parsley — like parsley supplements or large quantities of parsley juice — may reduce supply. Using parsley as a garnish in cooking is completely fine.',
+    mechanism:'Contains apiol and myristicin, compounds with potential anti-estrogenic and anti-prolactin activity at high doses.',
+    evidence_p:'Traditional use as galactofuge. No clinical RCTs. Evidence is ethnobotanical and observational only.',
+    evidence_m:'No strong formal studies, but parsley has been used in many cultures to reduce milk when weaning. High doses — not normal cooking amounts — are the concern.',
+    dosing_p:'Supplemental or medicinal doses of parsley or parsley seed oil are the concern — not culinary use.',
+    dosing_m:'Feel free to use parsley in your cooking! The concern is only with parsley supplements, parsley seed oil, or very large quantities.',
+    safety:{preterm:'caution',pcos:'may use',hypoplasia:'caution',low_supply:'avoid',relactation:'avoid',cardiac:'may use',diabetes:'may use'},
+    notes_p:'Culinary use is safe. Advise against parsley supplements, parsley seed oil, or medicinal-dose preparations.',
+    notes_m:'Parsley on your plate is totally fine. Avoid parsley supplements or juices in large quantities while breastfeeding.',
+    lactmed:null },
+  { id:'pseudoephedrine', name:'Pseudoephedrine (Sudafed)', type:'pharma', evidence:3,
+    short_p:'Well-documented galactofuge. Single dose studies show measurable reductions in milk output.',
+    short_m:'Sudafed (the decongestant kept behind the pharmacy counter) has solid research showing it can significantly reduce milk supply — even after just one dose.',
+    mechanism:'Sympathomimetic amine — may reduce milk via vasoconstriction of mammary blood flow and/or direct inhibition of prolactin.',
+    evidence_p:'Small but well-designed studies show significant reductions in milk output (up to 24%) after a single dose. Among the most evidence-supported galactofuges.',
+    evidence_m:'Studies show Sudafed can reduce milk output by nearly a quarter — even after just one dose. If you need a decongestant while breastfeeding, ask your provider about a safer alternative.',
+    dosing_p:'60 mg single dose shown to reduce milk output ~24% in one study. Advise patients to avoid or use with caution if supply is a concern.',
+    dosing_m:'Even a single recommended dose of Sudafed has been shown to reduce milk supply. If you have a cold, ask your provider for a breastfeeding-safe alternative.',
+    safety:{preterm:'avoid',pcos:'caution',hypoplasia:'avoid',low_supply:'avoid',relactation:'avoid',cardiac:'avoid',diabetes:'caution'},
+    notes_p:'Recommend patients avoid pseudoephedrine if supply maintenance is a goal. Phenylephrine (PE formulas) has less data but similar concern. Note: phenylephrine — found in many non-prescription cold medications — may also have galactofuge effects.',
+    notes_m:'Check all cold medications carefully! Many "non-drowsy" decongestants contain pseudoephedrine or phenylephrine. Ask your pharmacist for a breastfeeding-safe option.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK500986/' },
+  { id:'diphenhydramine', name:'Diphenhydramine (Benadryl)', type:'pharma', evidence:2,
+    short_p:'Anticholinergic effects may reduce milk supply. Use with caution if supply is a concern.',
+    short_m:'Benadryl and similar antihistamines may reduce milk supply due to their drying effects. There are often safer antihistamine options for breastfeeding mothers.',
+    mechanism:'Anticholinergic properties may reduce secretions including milk; sedating antihistamines have higher concern than non-sedating alternatives.',
+    evidence_p:'Primarily theoretical/mechanistic concern plus clinical reports. Non-sedating antihistamines (cetirizine, loratadine) considered preferred alternatives.',
+    evidence_m:'Benadryl has a "drying" effect on body secretions — that same effect may reduce milk supply. Non-drowsy antihistamines like Zyrtec or Claritin are generally preferred.',
+    dosing_p:'Occasional single dose likely lower risk than regular use. Non-sedating alternatives preferred. Counsel patients accordingly.',
+    dosing_m:'Try to use Zyrtec (cetirizine) or Claritin (loratadine) instead of Benadryl if you need an allergy medication while breastfeeding.',
+    safety:{preterm:'caution',pcos:'may use',hypoplasia:'caution',low_supply:'avoid',relactation:'avoid',cardiac:'caution',diabetes:'may use'},
+    notes_p:'Regular use more concerning than occasional use. Sedating antihistamines also pass into breast milk and may sedate the infant. Non-sedating alternatives preferred.',
+    notes_m:'Besides potentially reducing supply, Benadryl can also make your baby sleepy through your breast milk. Ask your provider before using it regularly.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501088/' },
+  { id:'estrogen', name:'Combined hormonal contraceptives', type:'pharma', evidence:3,
+    short_p:'Estrogen-containing contraceptives well-documented to reduce milk supply. Progestin-only options preferred.',
+    short_m:'Birth control pills or patches that contain estrogen can significantly reduce your milk supply. Progestin-only options (the "mini pill") are the recommended choice while breastfeeding.',
+    mechanism:'Exogenous estrogen suppresses prolactin and milk production. Progestin-only contraceptives do not carry the same risk.',
+    evidence_p:'Well-established. Combined OCP, patch, and ring all carry risk. Progestin-only pill, hormonal IUD, implant, and DMPA considered compatible with breastfeeding after supply is established.',
+    evidence_m:'Regular birth control pills contain estrogen, which is known to reduce milk supply. The "mini pill" (progestin only), hormonal IUD (Mirena/Kyleena), or implant are all safe options that won\'t affect your supply. Talk to your OB or midwife.',
+    dosing_p:'Counsel to avoid combined hormonal methods until breastfeeding is well established (ideally 6+ weeks postpartum) and even then with caution if supply is fragile.',
+    dosing_m:'If you need birth control while breastfeeding, ask your provider specifically for a progestin-only option. Make sure to mention you are breastfeeding.',
+    safety:{preterm:'avoid',pcos:'caution',hypoplasia:'avoid',low_supply:'avoid',relactation:'avoid',cardiac:'caution',diabetes:'caution'},
+    notes_p:'IUDs (hormonal and copper), progestin-only implant, and DMPA are preferred contraceptive options for breastfeeding patients.',
+    notes_m:'Always tell any provider prescribing you birth control that you are breastfeeding so they can choose the right type for you.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501922/' },
+  { id:'alcohol', name:'Alcohol (large amounts)', type:'substance', evidence:2,
+    short_p:'Chronic or heavy alcohol use documented to reduce milk supply and inhibit let-down. Moderate use more nuanced.',
+    short_m:'While an occasional drink is considered compatible with breastfeeding, regular or heavy drinking can reduce your milk supply and affect your let-down reflex.',
+    mechanism:'Acutely stimulates prolactin but chronically inhibits oxytocin release and let-down reflex; chronic use impairs milk production.',
+    evidence_p:'Acute alcohol transiently raises prolactin but inhibits oxytocin-mediated let-down. Chronic/heavy use reduces overall supply. The "beer helps milk" belief is not evidence-supported.',
+    evidence_m:'An occasional glass of wine or beer is not harmful, but the old advice that beer boosts milk supply is actually a myth. Heavy or regular drinking can reduce your let-down reflex and overall supply.',
+    dosing_p:'Counsel that the brewer\'s yeast in beer — not alcohol — is the proposed mechanism for any benefit. Heavy or regular alcohol use should be avoided.',
+    dosing_m:'If you choose to drink occasionally, timing your feeding before or waiting 2 hours per drink after is a common approach. Talk to your provider about what\'s right for you.',
+    safety:{preterm:'avoid',pcos:'caution',hypoplasia:'caution',low_supply:'avoid',relactation:'avoid',cardiac:'caution',diabetes:'caution'},
+    notes_p:'Alcohol passes into breast milk. Timing of feeding relative to drinking is relevant. Chronic use is the primary supply concern.',
+    notes_m:'Alcohol does pass into breast milk. If you choose to drink, talk to your provider or IBCLC about timing to minimize exposure to your baby.',
+    lactmed:null },
+  { id:'nicotine', name:'Nicotine / smoking', type:'substance', evidence:3,
+    short_p:'Well-documented galactofuge. Nicotine inhibits prolactin and reduces milk volume and fat content.',
+    short_m:'Smoking and nicotine products can reduce your milk supply and also change the composition of your breast milk. Quitting or reducing is strongly encouraged.',
+    mechanism:'Nicotine inhibits prolactin release; smoking also associated with reduced milk fat content and volume. Secondhand smoke a separate infant risk.',
+    evidence_p:'Multiple studies document reduced milk volume and fat content in smokers. Nicotine replacement therapy considered preferable to continued smoking while breastfeeding.',
+    evidence_m:'Research clearly shows that smoking reduces milk supply and changes the nutritional quality of breast milk. Nicotine patches or gum are considered safer alternatives to smoking if you\'re working on quitting.',
+    dosing_p:'Nicotine replacement therapy preferred over continued smoking. Counsel on timing of NRT use relative to feeding.',
+    dosing_m:'If you smoke and want to quit, nicotine replacement therapy (patch, gum) is safer for your baby than continued smoking. Talk to your provider about support for quitting.',
+    safety:{preterm:'avoid',pcos:'caution',hypoplasia:'avoid',low_supply:'avoid',relactation:'avoid',cardiac:'avoid',diabetes:'caution'},
+    notes_p:'Counsel that continuing to breastfeed even while smoking provides infant benefits compared to formula, but cessation is strongly preferred.',
+    notes_m:'Even if you currently smoke, breastfeeding is still beneficial for your baby. But quitting or reducing is the best thing you can do for both your supply and your baby\'s health.',
+    lactmed:null }
+];
+
+// ── RESOURCES ──
+const resources_mother = [
+  { name:'LactMed', desc:'A free, easy-to-search database from the National Library of Medicine with information on medications, herbs, and supplements during breastfeeding.', links:[{label:'Visit LactMed',url:'https://www.ncbi.nlm.nih.gov/books/NBK501922/'}], tag:'Free · NIH' },
+  { name:'Infant Risk Center', desc:'Staffed by pharmacists and researchers at Texas Tech University. You can call them directly with questions about medications and breastfeeding — they are incredibly helpful!', links:[{label:'infantrisk.com',url:'https://www.infantrisk.com'},{label:'MommyMeds App',url:'https://www.infantrisk.com/mommymeds'}], phone:'(806) 352-2519', tag:'Free phone line' },
+  { name:'MotherToBaby', desc:'Evidence-based information on medications, supplements, vaccines, and exposures during pregnancy and breastfeeding. Run by teratology specialists.', links:[{label:'mothertobaby.org',url:'https://mothertobaby.org'}], tag:'Free' },
+  { name:'e-lactancia', desc:'A Spanish and English database covering drug and herb compatibility with breastfeeding. Clear safety ratings and easy to navigate.', links:[{label:'e-lactancia.org',url:'https://e-lactancia.org'}], tag:'Free · Spanish/English' },
+  { name:'Dyad Health Collective', desc:'Book a consultation with Dr. Diana Pontell, MD, IBCLC for personalized breastfeeding medicine support in Nashville or virtually.', links:[{label:'Book a visit',url:'https://dyadhealthcollective.com'}], tag:'Nashville · Virtual' }
+];
+
+const resources_provider = [
+  { name:'LactMed (NLM)', desc:'NIH Drugs and Lactation Database. Evidence-based monographs on drugs, herbs, and dietary supplements. Essential clinical reference.', links:[{label:'nlm.nih.gov/lactmed',url:'https://www.ncbi.nlm.nih.gov/books/NBK501922/'}], tag:'Free · NIH' },
+  { name:"Hale's Medications and Mothers' Milk", desc:'The gold standard clinical reference for medication use during lactation. Available in print and via the HalesMeds online platform.', links:[{label:'HalesMeds App',url:'https://halesmeds.com'}], tag:'Subscription' },
+  { name:'Infant Risk Center — Texas Tech', desc:'Pharmacist-staffed consultation line for complex medication and lactation questions. Invaluable for unusual or high-risk cases.', links:[{label:'infantrisk.com',url:'https://www.infantrisk.com'},{label:'Infant Risk HCP App',url:'https://www.infantrisk.com/infantriskcenter'}], phone:'(806) 352-2519', tag:'HCP line available' },
+  { name:'e-lactancia', desc:'Spanish/English drug and herb compatibility database with clear risk ratings. Particularly useful for international or herbal queries.', links:[{label:'e-lactancia.org',url:'https://e-lactancia.org'}], tag:'Free' },
+  { name:'MotherToBaby', desc:'Teratogen information service providing evidence-based information on medication and supplement exposures. Useful for complex prenatal and postnatal queries.', links:[{label:'mothertobaby.org',url:'https://mothertobaby.org'}], tag:'Free' },
+  { name:'ABM Clinical Protocol #9', desc:'Academy of Breastfeeding Medicine protocol on use of galactogogues in initiating or augmenting maternal milk production (2018 second revision).', links:[{label:'Read Protocol',url:'https://www.bfmed.org/protocols'}], tag:'Clinical guideline' },
+  { name:'Breastfeeding Medicine Journal', desc:'Peer-reviewed journal of the Academy of Breastfeeding Medicine. Primary literature source for lactation medicine research.', links:[{label:'liebertpub.com/bfm',url:'https://www.liebertpub.com/loi/bfm'}], tag:'Peer-reviewed' },
+  { name:'Dyad Health Collective', desc:'Physician-led breastfeeding medicine practice available for co-management and consultation. In-home and virtual visits in Nashville area.', links:[{label:'dyadhealthcollective.com',url:'https://dyadhealthcollective.com'}], tag:'Nashville · Virtual' }
+];
+
+// ── PORTAL SELECTION ──
+function selectPortal(p, btn) {
+  portal = p;
+  document.querySelectorAll('.portal-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  const ab = document.getElementById('agree-btn');
+  ab.textContent = p === 'mother' ? 'Continue as breastfeeding mother' : 'Continue as healthcare provider';
+  ab.className = 'agree-btn ' + (p === 'mother' ? 'ready-mother' : 'ready-provider');
+}
+
 function handleAgree() {
-  try { localStorage.setItem('gg_agreed','1'); } catch(e) {}
+  if (!portal) return;
   document.getElementById('disclaimer-screen').classList.add('hidden');
   document.getElementById('main-app').style.display = 'block';
+  setupPortal();
+}
+
+function switchPortal() {
+  portal = null;
+  document.getElementById('main-app').style.display = 'none';
+  document.getElementById('disclaimer-screen').classList.remove('hidden');
+  document.querySelectorAll('.portal-btn').forEach(b => b.classList.remove('selected'));
+  const ab = document.getElementById('agree-btn');
+  ab.textContent = 'Select your portal to continue';
+  ab.className = 'agree-btn';
+}
+
+function setupPortal() {
+  const isMother = portal === 'mother';
+  const ac = isMother ? 'active-mother' : 'active-provider';
+
+  document.getElementById('portal-badge').textContent = isMother ? 'Breastfeeding mother' : 'Healthcare provider';
+  document.getElementById('portal-badge').className = 'portal-badge ' + (isMother ? 'badge-mother' : 'badge-provider');
+
+  const tabs = ['browse','safety','recommend','resources','about'];
+  const tabLabels = ['Browse','Safety','Recommend','Resources','About'];
+  const tabBar = document.getElementById('tab-bar');
+  tabBar.innerHTML = tabs.map((t,i) =>
+    `<button class="tab${i===0?' '+ac:''}" onclick="showTab('${t}',this)">${tabLabels[i]}</button>`
+  ).join('');
+
+  document.getElementById('safety-badge').className = 'info-badge ' + (isMother ? 'info-m' : 'info-p');
+  document.getElementById('safety-badge-text').textContent = isMother
+    ? 'This checker shows how each substance is generally used in different situations. Always discuss with your provider before starting anything.'
+    : 'Safety profiles sourced from LactMed, ABM Protocol #9, and Hale\'s. Confirm with prescriber for pharmaceutical options.';
+
+  document.getElementById('rec-badge').className = 'info-badge ' + (isMother ? 'info-m' : 'info-p');
+  document.getElementById('rec-badge-text').textContent = isMother
+    ? 'These suggestions are for educational purposes only. Please discuss any results with your doctor or IBCLC before making changes.'
+    : 'Suggestions are educational, not prescriptive. Clinical judgment and individual patient assessment always required.';
+
+  document.getElementById('rec-label').textContent = isMother ? 'What\'s your situation?' : 'Select clinical situation(s)';
+
+  const runBtn = document.getElementById('run-btn');
+  runBtn.className = isMother ? 'run-btn-m' : 'run-btn-p';
+  runBtn.textContent = isMother ? 'Show suggestions' : 'Show recommendations';
+
+  document.querySelectorAll('.sit-tag').forEach(t => {
+    t.className = 'sit-tag';
+    if (activeSituations.includes(t.getAttribute('onclick').match(/'([^']+)'/)[1])) {
+      t.classList.add(isMother ? 'sel-m' : 'sel-p');
+    }
+  });
+
+  const aboutLabelClass = isMother ? 'about-label-m' : 'about-label-p';
+  ['about-label-story','about-label-dyad','about-label-cred','about-label-sources'].forEach(id => {
+    document.getElementById(id).className = aboutLabelClass;
+  });
+
   populateSafetySelect();
   renderCards();
+  renderResources();
 }
 
-window.onload = function() {
-  let agreed = false;
-  try { agreed = localStorage.getItem('gg_agreed') === '1'; } catch(e) {}
-  if(agreed) {
-    document.getElementById('disclaimer-screen').classList.add('hidden');
-    document.getElementById('main-app').style.display = 'block';
-    populateSafetySelect();
-    renderCards();
+// ── EVIDENCE DOTS ──
+function dots(score) {
+  let h = '<div class="evidence-dots">';
+  for (let i = 1; i <= 4; i++) {
+    let c = 'empty';
+    if (i <= score) c = score >= 3 ? 'high' : score === 2 ? 'mid' : 'low';
+    h += `<div class="dot ${c}"></div>`;
   }
-};
-
-function evidenceDots(score) {
-  let html = '<div class="evidence-dots">';
-  for(let i=1;i<=4;i++){
-    let cls='empty';
-    if(i<=score){ cls=score>=3?'filled-high':score===2?'filled-mid':'filled-low'; }
-    html+='<div class="dot '+cls+'"></div>';
-  }
-  return html+'</div>';
+  return h + '</div>';
 }
-function evidenceText(s){ return s>=4?'Strong (relative)':s===3?'Moderate':s===2?'Limited':'Very limited'; }
+function evText(s) { return s>=4?'Strong (relative)':s===3?'Moderate':s===2?'Limited':'Very limited'; }
 
-function renderCards(){
-  const q=document.getElementById('search-input').value.toLowerCase();
-  const list=document.getElementById('card-list');
-  const filtered=data.filter(d=>{
-    if(activeFilter!=='all'&&d.type!==activeFilter) return false;
-    if(q&&!d.name.toLowerCase().includes(q)&&!d.short.toLowerCase().includes(q)) return false;
+// ── RENDER CARDS ──
+function renderCards() {
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const isMother = portal === 'mother';
+  const ac = isMother ? 'active-m' : 'active-p';
+
+  const fr = document.getElementById('filter-row');
+  fr.innerHTML = ['all','herbal','pharma','food','substance'].map((f,i) => {
+    const labels = ['All','Herbal','Pharmaceutical','Food/dietary','Substances'];
+    const isActive = activeFilter === f;
+    return `<button class="filter-btn${isActive?' '+ac:''}" onclick="setFilter('${f}',this)">${labels[i]}</button>`;
+  }).join('');
+
+  const list = document.getElementById('card-list');
+  let html = '';
+
+  const filteredG = galactogogues.filter(d => {
+    if (activeFilter !== 'all' && d.type !== activeFilter) return false;
+    if (q && !d.name.toLowerCase().includes(q) && !(isMother?d.short_m:d.short_p).toLowerCase().includes(q)) return false;
     return true;
   });
-  if(!filtered.length){list.innerHTML='<div class="empty-results">No results found</div>';return;}
-  list.innerHTML=filtered.map(d=>'<div class="card" onclick="openDetail(\''+d.id+'\')">'+
-    '<div class="card-top"><span class="card-name">'+d.name+'</span>'+
-    '<span class="card-type type-'+d.type+'">'+(d.type==='pharma'?'pharmaceutical':d.type==='herbal'?'herbal':'food/dietary')+'</span></div>'+
-    '<div class="evidence-row">'+evidenceDots(d.evidence)+
-    '<span class="evidence-label">'+evidenceText(d.evidence)+' evidence</span></div>'+
-    '<div class="card-desc">'+d.short+'</div></div>'
-  ).join('');
+  const filteredF = galactofuges.filter(d => {
+    if (activeFilter !== 'all' && d.type !== activeFilter) return false;
+    if (q && !d.name.toLowerCase().includes(q) && !(isMother?d.short_m:d.short_p).toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  if (filteredG.length) {
+    html += `<div class="section-header header-green">${isMother ? 'May boost supply — galactogogues' : 'Galactogogues — may increase supply'}</div>`;
+    html += filteredG.map(d =>
+      `<div class="card" onclick="openDetail('${d.id}','gogue')">
+        <div class="card-top"><span class="card-name">${d.name}</span>
+        <span class="card-type type-${d.type}">${d.type==='pharma'?'pharmaceutical':d.type==='herbal'?'herbal':'food/dietary'}</span></div>
+        <div class="evidence-row">${dots(d.evidence)}<span class="evidence-label">${evText(d.evidence)} evidence</span></div>
+        <div class="card-desc">${isMother?d.short_m:d.short_p}</div></div>`
+    ).join('');
+  }
+
+  if (filteredF.length) {
+    html += `<div class="section-header header-red">${isMother ? 'May reduce supply — galactofuges' : 'Galactofuges — may decrease supply'}</div>`;
+    if (isMother) html += `<div class="avoid-banner">These substances may reduce your milk supply — use with caution and discuss with your provider.</div>`;
+    html += filteredF.map(d =>
+      `<div class="card" onclick="openDetail('${d.id}','fuge')">
+        <div class="card-top"><span class="card-name">${d.name}</span>
+        <span class="card-type type-${d.type==='substance'?'substance':d.type}">${d.type==='pharma'?'pharmaceutical':d.type==='herbal'?'herbal':d.type==='substance'?'substance':'food/dietary'}</span></div>
+        <div class="evidence-row">${dots(d.evidence)}<span class="evidence-label">${evText(d.evidence)} evidence</span></div>
+        <div class="card-desc">${isMother?d.short_m:d.short_p}</div></div>`
+    ).join('');
+  }
+
+  if (!filteredG.length && !filteredF.length) html = '<div class="empty-results">No results found</div>';
+  list.innerHTML = html;
 }
 
-function setFilter(f,btn){
-  activeFilter=f;
-  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
+function setFilter(f, btn) {
+  activeFilter = f;
   renderCards();
 }
 
-function openDetail(id){
-  const d=data.find(x=>x.id===id);
-  const sitLabels={preterm:'Preterm',pcos:'PCOS',hypoplasia:'Hypoplasia',low_supply:'Low supply',relactation:'Relactation',cardiac:'Cardiac',diabetes:'Diabetes'};
-  const tags=Object.entries(d.safety).map(([k,v])=>{
-    const cls=v==='recommend'?'safe-yes':v==='avoid'?'safe-no':'safe-caution';
-    return '<span class="safety-tag '+cls+'">'+sitLabels[k]+': '+v+'</span>';
+// ── DETAIL PANEL ──
+function openDetail(id, kind) {
+  const isMother = portal === 'mother';
+  const h4class = isMother ? 'detail-h4-m' : 'detail-h4-p';
+  const d = kind === 'gogue' ? galactogogues.find(x=>x.id===id) : galactofuges.find(x=>x.id===id);
+  const isGfuge = kind === 'fuge';
+  const sitLabels = {preterm:'Preterm',pcos:'PCOS',hypoplasia:'Hypoplasia',low_supply:'Low supply',relactation:'Relactation',cardiac:'Cardiac',diabetes:'Diabetes'};
+  const tags = Object.entries(d.safety).map(([k,v]) => {
+    const cls = v==='recommend'?'s-rec':v==='avoid'?'s-no':'s-cau';
+    return `<span class="safety-tag ${cls}">${sitLabels[k]}: ${v}</span>`;
   }).join('');
-  document.getElementById('detail-content').innerHTML=
-    '<div class="detail-title">'+d.name+'</div>'+
-    '<div style="margin-top:4px;display:flex;align-items:center;gap:8px;">'+
-    '<span class="card-type type-'+d.type+'">'+(d.type==='pharma'?'pharmaceutical':d.type==='herbal'?'herbal':'food/dietary')+'</span>'+
-    evidenceDots(d.evidence)+'<span style="font-size:12px;color:#888">'+evidenceText(d.evidence)+'</span></div>'+
-    '<div class="detail-section"><h4>Mechanism</h4><p>'+d.mechanism+'</p></div>'+
-    '<div class="detail-section"><h4>Evidence summary</h4><p>'+d.evidence_detail+'</p></div>'+
-    '<div class="detail-section"><h4>Typical dosing</h4><p>'+d.dosing+'</p></div>'+
-    '<div class="detail-section"><h4>Safety notes</h4><p>'+d.notes+'</p></div>'+
-    '<div class="detail-section"><h4>Situational safety</h4>'+tags+'</div>'+
-    (d.lactmed?'<a class="detail-link" href="'+d.lactmed+'" target="_blank">View on LactMed &#8599;</a>':'');
+  const typelabel = d.type==='pharma'?'pharmaceutical':d.type==='herbal'?'herbal':d.type==='substance'?'substance':'food/dietary';
+
+  document.getElementById('detail-content').innerHTML =
+    `<div class="detail-title">${d.name}</div>
+    <div style="margin-top:4px;display:flex;align-items:center;gap:7px;">
+      <span class="card-type type-${d.type==='substance'?'substance':d.type}">${typelabel}</span>
+      ${dots(d.evidence)}<span style="font-size:11px;color:#888">${evText(d.evidence)}</span>
+      ${isGfuge?'<span class="card-type type-substance">galactofuge</span>':'<span class="card-type type-herbal" style="background:#eaf3de;color:#3b6d11">galactogogue</span>'}
+    </div>
+    ${!isMother?`<div class="detail-section"><h4 class="${h4class}">Mechanism</h4><p>${d.mechanism}</p></div>`:''}
+    <div class="detail-section"><h4 class="${h4class}">Evidence</h4><p>${isMother?d.evidence_m:d.evidence_p}</p></div>
+    <div class="detail-section"><h4 class="${h4class}">${isMother?'How it\'s typically used':'Typical dosing'}</h4><p>${isMother?d.dosing_m:d.dosing_p}</p></div>
+    <div class="detail-section"><h4 class="${h4class}">${isMother?'What to know':'Safety / clinical notes'}</h4><p>${isMother?d.notes_m:d.notes_p}</p></div>
+    <div class="detail-section"><h4 class="${h4class}">Situational profile</h4>${tags}</div>
+    ${d.lactmed?`<a class="detail-link" href="${d.lactmed}" target="_blank">View on LactMed ↗</a>`:''}`;
   document.getElementById('detail-panel').classList.add('open');
   document.getElementById('overlay').classList.add('open');
 }
 
-function closeDetail(){
+function closeDetail() {
   document.getElementById('detail-panel').classList.remove('open');
   document.getElementById('overlay').classList.remove('open');
 }
 
-function showTab(t,btn){
-  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
-  document.getElementById('tab-'+t).classList.add('active');
-  btn.classList.add('active');
+// ── TABS ──
+function showTab(t, btn) {
+  const isMother = portal === 'mother';
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active-mother','active-provider'));
+  document.getElementById('tab-' + t).classList.add('active');
+  btn.classList.add(isMother ? 'active-mother' : 'active-provider');
 }
 
-function populateSafetySelect(){
-  const sel=document.getElementById('safety-select');
-  sel.innerHTML='<option value="">Choose one...</option>';
-  data.forEach(d=>{const o=document.createElement('option');o.value=d.id;o.textContent=d.name;sel.appendChild(o);});
+// ── SAFETY CHECKER ──
+function populateSafetySelect() {
+  const sel = document.getElementById('safety-select');
+  sel.innerHTML = '<option value="">Choose one...</option>';
+  const allData = [...galactogogues.map(d=>({...d,kind:'gogue'})), ...galactofuges.map(d=>({...d,kind:'fuge'}))];
+  const og = document.createElement('optgroup'); og.label = 'Galactogogues (increase supply)';
+  galactogogues.forEach(d => { const o = document.createElement('option'); o.value = d.id+'|gogue'; o.textContent = d.name; og.appendChild(o); });
+  const fg = document.createElement('optgroup'); fg.label = 'Galactofuges (decrease supply)';
+  galactofuges.forEach(d => { const o = document.createElement('option'); o.value = d.id+'|fuge'; o.textContent = d.name; fg.appendChild(o); });
+  sel.appendChild(og); sel.appendChild(fg);
 }
 
-function showSafety(){
-  const id=document.getElementById('safety-select').value;
-  const el=document.getElementById('safety-result');
-  if(!id){el.innerHTML='';return;}
-  const d=data.find(x=>x.id===id);
-  const sitLabels={preterm:'Preterm infant',pcos:'PCOS / insulin resistance',hypoplasia:'Breast hypoplasia',low_supply:'General low supply',relactation:'Relactation',cardiac:'Cardiac history',diabetes:'Diabetes'};
-  const tags=Object.entries(d.safety).map(([k,v])=>{
-    const cls=v==='recommend'?'safe-yes':v==='avoid'?'safe-no':'safe-caution';
-    return '<span class="safety-tag '+cls+'">'+sitLabels[k]+': '+v+'</span>';
+function showSafety() {
+  const val = document.getElementById('safety-select').value;
+  const el = document.getElementById('safety-result');
+  if (!val) { el.innerHTML = ''; return; }
+  const [id, kind] = val.split('|');
+  const isMother = portal === 'mother';
+  const d = kind === 'gogue' ? galactogogues.find(x=>x.id===id) : galactofuges.find(x=>x.id===id);
+  const sitLabels = {preterm:'Preterm infant',pcos:'PCOS / insulin resistance',hypoplasia:'Breast hypoplasia',low_supply:'General low supply',relactation:'Relactation',cardiac:'Cardiac history',diabetes:'Diabetes'};
+  const tags = Object.entries(d.safety).map(([k,v]) => {
+    const cls = v==='recommend'?'s-rec':v==='avoid'?'s-no':'s-cau';
+    return `<span class="safety-tag ${cls}">${sitLabels[k]}: ${v}</span>`;
   }).join('');
-  el.innerHTML='<div class="checker-card"><div class="checker-label">Safety profile — '+d.name+'</div>'+
-    '<div style="margin-bottom:10px">'+tags+'</div>'+
-    '<p style="font-size:13px;color:#555;line-height:1.5">'+d.notes+'</p>'+
-    (d.lactmed?'<a class="detail-link" href="'+d.lactmed+'" target="_blank">LactMed reference &#8599;</a>':'')+'</div>';
+  el.innerHTML = `<div class="checker-card">
+    <div class="checker-label">Profile — ${d.name} ${kind==='fuge'?'(galactofuge)':'(galactogogue)'}</div>
+    <div style="margin-bottom:9px">${tags}</div>
+    <p style="font-size:12px;color:#555;line-height:1.6">${isMother?d.notes_m:d.notes_p}</p>
+    ${d.lactmed?`<a class="detail-link" href="${d.lactmed}" target="_blank">LactMed reference ↗</a>`:''}
+  </div>`;
 }
 
-function toggleSit(el,val){
-  el.classList.toggle('selected');
-  if(activeSituations.includes(val)) activeSituations=activeSituations.filter(x=>x!==val);
+// ── RECOMMEND ──
+function toggleSit(el, val) {
+  const isMother = portal === 'mother';
+  el.classList.toggle(isMother?'sel-m':'sel-p');
+  if (activeSituations.includes(val)) activeSituations = activeSituations.filter(x=>x!==val);
   else activeSituations.push(val);
 }
 
-const sitKeyMap={preterm:'preterm',pcos:'pcos',hypoplasia:'hypoplasia','low-supply':'low_supply',relactation:'relactation',cardiac:'cardiac',diabetes:'diabetes'};
+const sitMap = {preterm:'preterm',pcos:'pcos',hypoplasia:'hypoplasia','low-supply':'low_supply',relactation:'relactation',cardiac:'cardiac',diabetes:'diabetes'};
 
-function runRecommend(){
-  const el=document.getElementById('recommend-result');
-  if(!activeSituations.length){el.innerHTML='<p style="font-size:13px;color:#aaa;margin-top:12px">Select at least one clinical situation above.</p>';return;}
-  const rec=[],caution=[],avoid=[];
-  data.forEach(d=>{
-    let worst='recommend';
-    activeSituations.forEach(s=>{
-      const val=d.safety[sitKeyMap[s]];
-      if(val==='avoid') worst='avoid';
-      else if(val==='caution'&&worst!=='avoid') worst='caution';
-      else if(val==='may use'&&worst==='recommend') worst='may use';
+function runRecommend() {
+  const el = document.getElementById('recommend-result');
+  const isMother = portal === 'mother';
+  if (!activeSituations.length) {
+    el.innerHTML = `<p style="font-size:12px;color:#aaa;margin-top:10px">${isMother?'Please select your situation above.':'Select at least one clinical situation above.'}</p>`;
+    return;
+  }
+  const rec=[], cau=[], avd=[], gfuge_cau=[], gfuge_avoid=[];
+  galactogogues.forEach(d => {
+    let worst = 'recommend';
+    activeSituations.forEach(s => {
+      const v = d.safety[sitMap[s]];
+      if (v==='avoid') worst='avoid';
+      else if (v==='caution' && worst!=='avoid') worst='caution';
+      else if (v==='may use' && worst==='recommend') worst='may use';
     });
-    if(worst==='recommend') rec.push(d.name);
-    else if(worst==='may use'||worst==='caution') caution.push(d.name);
-    else avoid.push(d.name);
+    if (worst==='recommend') rec.push(d.name);
+    else if (worst==='may use'||worst==='caution') cau.push(d.name);
+    else avd.push(d.name);
   });
-  let html='';
-  if(rec.length) html+='<div class="result-card rec"><div class="result-title">Reasonable to consider</div><div class="result-items">'+rec.join(', ')+'</div></div>';
-  if(caution.length) html+='<div class="result-card caution"><div class="result-title">Use with caution / counsel first</div><div class="result-items">'+caution.join(', ')+'</div></div>';
-  if(avoid.length) html+='<div class="result-card avoid"><div class="result-title">Avoid or requires specialist input</div><div class="result-items">'+avoid.join(', ')+'</div></div>';
-  el.innerHTML=html;
+  galactofuges.forEach(d => {
+    let worst = 'recommend';
+    activeSituations.forEach(s => {
+      const v = d.safety[sitMap[s]];
+      if (v==='avoid') worst='avoid';
+      else if (v==='caution' && worst!=='avoid') worst='caution';
+    });
+    if (worst==='avoid') gfuge_avoid.push(d.name);
+    else gfuge_cau.push(d.name);
+  });
+
+  let html = '';
+  if (rec.length) html += `<div class="result-card rec"><div class="result-title">${isMother?'May be worth discussing with your provider':'Reasonable to consider'}</div><div class="result-items">${rec.join(', ')}</div></div>`;
+  if (cau.length) html += `<div class="result-card cau"><div class="result-title">${isMother?'Use with caution — ask your provider':'Use with caution / counsel first'}</div><div class="result-items">${cau.join(', ')}</div></div>`;
+  if (avd.length) html += `<div class="result-card avd"><div class="result-title">${isMother?'Not recommended for your situation':'Avoid or requires specialist input'}</div><div class="result-items">${avd.join(', ')}</div></div>`;
+  if (gfuge_avoid.length) html += `<div class="result-card avd"><div class="result-title">Galactofuges — avoid for your situation</div><div class="result-items">${gfuge_avoid.join(', ')}</div></div>`;
+  if (gfuge_cau.length) html += `<div class="result-card cau"><div class="result-title">Galactofuges — use with extra caution</div><div class="result-items">${gfuge_cau.join(', ')}</div></div>`;
+  el.innerHTML = html;
+}
+
+// ── RESOURCES ──
+function renderResources() {
+  const isMother = portal === 'mother';
+  const resources = isMother ? resources_mother : resources_provider;
+  const linkClass = isMother ? 'res-link-m' : 'res-link-p';
+  const titleClass = isMother ? 'res-title-m' : 'res-title-p';
+  let html = `<div class="res-section"><div class="res-section-title ${titleClass}">${isMother?'Trusted resources for families':'Clinical references for providers'}</div>`;
+  resources.forEach(r => {
+    html += `<div class="res-card"><div class="res-name">${r.name} <span class="res-tag">${r.tag}</span></div>
+      <div class="res-desc">${r.desc}</div>
+      <div class="res-links">
+        ${r.links.map(l=>`<a class="${linkClass}" href="${l.url}" target="_blank">${l.label} ↗</a>`).join('')}
+        ${r.phone?`<span class="res-phone">${r.phone}</span>`:''}
+      </div></div>`;
+  });
+  html += '</div>';
+  document.getElementById('resources-content').innerHTML = html;
 }
 </script>
 </body>
