@@ -7,6 +7,35 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f8f6; color: #1a1a1a; }
+    .hidden { display: none !important; }
+
+    /* DISCLAIMER SCREEN */
+    #disclaimer-screen { max-width: 420px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 32px 24px 24px; background: #fff; }
+    .logo-wrap { text-align: center; margin-bottom: 28px; }
+    .logo-mark { width: 64px; height: 64px; border-radius: 16px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+    .app-name { font-size: 26px; font-weight: 700; color: #1a1a1a; letter-spacing: -0.5px; }
+    .app-sub { font-size: 13px; color: #888; margin-top: 3px; }
+    .dyad-line { font-size: 12px; color: #aaa; margin-top: 6px; }
+    .dyad-line a { color: #888; text-decoration: underline; }
+    .disclaimer-box { background: #f8f8f6; border-radius: 16px; padding: 20px; flex: 1; margin-bottom: 20px; }
+    .disclaimer-box h2 { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 16px; }
+    .point { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+    .point-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+    .icon-blue { background: #e6f1fb; }
+    .icon-amber { background: #faeeda; }
+    .icon-green { background: #eaf3de; }
+    .icon-red { background: #fcebeb; }
+    .point-title { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 2px; }
+    .point-desc { font-size: 12px; color: #666; line-height: 1.5; }
+    .divider { height: 1px; background: #eee; margin: 14px 0; }
+    .fine-print { font-size: 11px; color: #aaa; line-height: 1.6; }
+    .fine-print a { color: #aaa; text-decoration: underline; }
+    .agree-btn { width: 100%; padding: 14px; font-size: 15px; font-weight: 600; border: none; border-radius: 14px; background: #1a1a1a; color: #fff; cursor: pointer; margin-bottom: 10px; }
+    .agree-btn:hover { background: #333; }
+    .decline-note { text-align: center; font-size: 12px; color: #aaa; }
+
+    /* MAIN APP */
+    #main-app { display: none; }
     .app { max-width: 420px; margin: 0 auto; padding: 0 0 80px; background: #fff; min-height: 100vh; }
     .topbar { padding: 20px 16px 0; }
     .topbar h1 { font-size: 22px; font-weight: 600; color: #1a1a1a; }
@@ -76,67 +105,166 @@
     .run-btn:hover { background: #333; }
     .empty-results { text-align: center; padding: 32px 16px; color: #aaa; font-size: 14px; }
     .disclaimer { font-size: 11px; color: #aaa; text-align: center; padding: 16px; line-height: 1.5; border-top: 1px solid #eee; margin-top: 8px; }
+    .about-card { background: #f8f8f6; border-radius: 16px; padding: 20px; margin-bottom: 12px; }
+    .about-card h3 { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+    .about-card p { font-size: 13px; color: #555; line-height: 1.6; }
+    .about-card a { color: #185fa5; text-decoration: none; }
+    .cred-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+    .cred-badge { padding: 4px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; background: #1a1a1a; color: #fff; }
   </style>
 </head>
 <body>
-<div class="app">
-  <div class="topbar">
-    <h1>GalactoGuide</h1>
-    <p>Evidence-based galactogogue reference · IBCLC-reviewed</p>
+
+<!-- DISCLAIMER SCREEN -->
+<div id="disclaimer-screen">
+  <div class="logo-wrap">
+    <div class="logo-mark">
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+        <ellipse cx="18" cy="14" rx="7" ry="8" stroke="white" stroke-width="2"/>
+        <path d="M11 20c0 4 3 7 7 7s7-3 7-7" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="26" cy="10" r="3" fill="#5DCAA5"/>
+      </svg>
+    </div>
+    <div class="app-name">GalactoGuide</div>
+    <div class="app-sub">Evidence-based galactogogue reference</div>
+    <div class="dyad-line">A clinical tool by <a href="https://dyadhealthcollective.com" target="_blank">Dyad Health Collective</a></div>
   </div>
 
-  <div class="tabs">
-    <button class="tab active" onclick="showTab('browse', this)">Browse</button>
-    <button class="tab" onclick="showTab('safety', this)">Safety checker</button>
-    <button class="tab" onclick="showTab('recommend', this)">Recommend</button>
-  </div>
-
-  <div id="tab-browse" class="section active">
-    <div class="search-wrap">
-      <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M10.5 10.5l3 3"/></svg>
-      <input type="text" placeholder="Search galactogogues..." id="search-input" oninput="renderCards()" />
-    </div>
-    <div class="filter-row">
-      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
-      <button class="filter-btn" onclick="setFilter('herbal',this)">Herbal</button>
-      <button class="filter-btn" onclick="setFilter('pharma',this)">Pharmaceutical</button>
-      <button class="filter-btn" onclick="setFilter('food',this)">Food/dietary</button>
-    </div>
-    <div id="card-list"></div>
-    <div class="disclaimer">GalactoGuide is an educational reference tool for IBCLCs and breastfeeding mothers. It is not a substitute for clinical judgment or personalized medical advice. Always consult a qualified healthcare provider before starting any galactogogue.</div>
-  </div>
-
-  <div id="tab-safety" class="section">
-    <div class="info-badge">
-      <span>Safety data sourced from LactMed &amp; ABM Protocol #9. Always confirm with prescriber for pharmaceutical options.</span>
-    </div>
-    <div class="checker-card">
-      <div class="checker-label">Select a galactogogue</div>
-      <select class="checker-select" id="safety-select" onchange="showSafety()">
-        <option value="">Choose one...</option>
-      </select>
-    </div>
-    <div id="safety-result"></div>
-  </div>
-
-  <div id="tab-recommend" class="section">
-    <div class="info-badge">
-      <span>Suggestions are educational, not prescriptive. Clinical judgment is always required. Not a substitute for IBCLC consultation.</span>
-    </div>
-    <div class="checker-card">
-      <div class="checker-label">Select clinical situation(s)</div>
-      <div id="situation-tags">
-        <span class="situation-tag" onclick="toggleSit(this,'preterm')">Preterm infant</span>
-        <span class="situation-tag" onclick="toggleSit(this,'pcos')">PCOS / insulin resistance</span>
-        <span class="situation-tag" onclick="toggleSit(this,'hypoplasia')">Breast hypoplasia</span>
-        <span class="situation-tag" onclick="toggleSit(this,'low-supply')">General low supply</span>
-        <span class="situation-tag" onclick="toggleSit(this,'relactation')">Relactation</span>
-        <span class="situation-tag" onclick="toggleSit(this,'cardiac')">Cardiac history</span>
-        <span class="situation-tag" onclick="toggleSit(this,'diabetes')">Diabetes / blood sugar issues</span>
+  <div class="disclaimer-box">
+    <h2>Before you begin</h2>
+    <div class="point">
+      <div class="point-icon icon-blue">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#185fa5" stroke-width="1.3"/><path d="M7 6v4M7 4.5v.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div class="point-title">Educational reference only</div>
+        <div class="point-desc">GalactoGuide is an educational tool. It does not constitute medical advice and does not create a patient-provider relationship.</div>
       </div>
     </div>
-    <button class="run-btn" onclick="runRecommend()">Show recommendations</button>
-    <div id="recommend-result"></div>
+    <div class="point">
+      <div class="point-icon icon-amber">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2L12.5 11.5H1.5L7 2Z" stroke="#854f0b" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 6v3M7 10.5v.2" stroke="#854f0b" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div class="point-title">Always consult your provider</div>
+        <div class="point-desc">Never start, stop, or change a galactogogue based solely on this app. Always discuss with your IBCLC, physician, or pharmacist first.</div>
+      </div>
+    </div>
+    <div class="point">
+      <div class="point-icon icon-green">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#3b6d11" stroke-width="1.3"/><path d="M4 7l2 2 4-4" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div>
+        <div class="point-title">Evidence is limited</div>
+        <div class="point-desc">Most galactogogues have low-certainty evidence. This app summarizes current research honestly, including its limitations.</div>
+      </div>
+    </div>
+    <div class="point">
+      <div class="point-icon icon-red">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#a32d2d" stroke-width="1.3"/><path d="M5 5l4 4M9 5l-4 4" stroke="#a32d2d" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <div class="point-title">Not for emergencies</div>
+        <div class="point-desc">If you or your baby have an urgent medical concern, contact your healthcare provider or call 911 immediately.</div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div class="fine-print">
+      By tapping "I understand and agree" you acknowledge this app is for educational purposes only and agree to our Terms of Use and Privacy Policy. GalactoGuide content is developed and reviewed by a board-certified pediatrician and IBCLC. Last reviewed April 2026.
+    </div>
+  </div>
+
+  <button class="agree-btn" onclick="handleAgree()">I understand and agree</button>
+  <div class="decline-note">For healthcare providers and breastfeeding families</div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app">
+  <div class="app">
+    <div class="topbar">
+      <h1>GalactoGuide</h1>
+      <p>Evidence-based galactogogue reference · IBCLC-reviewed</p>
+    </div>
+    <div class="tabs">
+      <button class="tab active" onclick="showTab('browse', this)">Browse</button>
+      <button class="tab" onclick="showTab('safety', this)">Safety</button>
+      <button class="tab" onclick="showTab('recommend', this)">Recommend</button>
+      <button class="tab" onclick="showTab('about', this)">About</button>
+    </div>
+
+    <div id="tab-browse" class="section active">
+      <div class="search-wrap">
+        <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M10.5 10.5l3 3"/></svg>
+        <input type="text" placeholder="Search galactogogues..." id="search-input" oninput="renderCards()" />
+      </div>
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setFilter('herbal',this)">Herbal</button>
+        <button class="filter-btn" onclick="setFilter('pharma',this)">Pharmaceutical</button>
+        <button class="filter-btn" onclick="setFilter('food',this)">Food/dietary</button>
+      </div>
+      <div id="card-list"></div>
+      <div class="disclaimer">GalactoGuide is an educational reference tool for IBCLCs and breastfeeding mothers. Not a substitute for clinical judgment or personalized medical advice.</div>
+    </div>
+
+    <div id="tab-safety" class="section">
+      <div class="info-badge">
+        <span>Safety data sourced from LactMed and ABM Protocol #9. Always confirm with prescriber for pharmaceutical options.</span>
+      </div>
+      <div class="checker-card">
+        <div class="checker-label">Select a galactogogue</div>
+        <select class="checker-select" id="safety-select" onchange="showSafety()">
+          <option value="">Choose one...</option>
+        </select>
+      </div>
+      <div id="safety-result"></div>
+    </div>
+
+    <div id="tab-recommend" class="section">
+      <div class="info-badge">
+        <span>Suggestions are educational, not prescriptive. Clinical judgment is always required.</span>
+      </div>
+      <div class="checker-card">
+        <div class="checker-label">Select clinical situation(s)</div>
+        <div id="situation-tags">
+          <span class="situation-tag" onclick="toggleSit(this,'preterm')">Preterm infant</span>
+          <span class="situation-tag" onclick="toggleSit(this,'pcos')">PCOS / insulin resistance</span>
+          <span class="situation-tag" onclick="toggleSit(this,'hypoplasia')">Breast hypoplasia</span>
+          <span class="situation-tag" onclick="toggleSit(this,'low-supply')">General low supply</span>
+          <span class="situation-tag" onclick="toggleSit(this,'relactation')">Relactation</span>
+          <span class="situation-tag" onclick="toggleSit(this,'cardiac')">Cardiac history</span>
+          <span class="situation-tag" onclick="toggleSit(this,'diabetes')">Diabetes / blood sugar issues</span>
+        </div>
+      </div>
+      <button class="run-btn" onclick="runRecommend()">Show recommendations</button>
+      <div id="recommend-result"></div>
+    </div>
+
+    <div id="tab-about" class="section">
+      <div class="about-card">
+        <h3>About GalactoGuide</h3>
+        <p>GalactoGuide is an evidence-based reference tool for breastfeeding mothers and healthcare providers. All clinical content reflects current research and is reviewed against Academy of Breastfeeding Medicine protocols.</p>
+      </div>
+      <div class="about-card">
+        <h3>Developed by</h3>
+        <p>GalactoGuide is a clinical tool developed by a board-certified pediatrician and International Board Certified Lactation Consultant (IBCLC) with a dedicated breastfeeding medicine practice.</p>
+        <div class="cred-row">
+          <span class="cred-badge">MD</span>
+          <span class="cred-badge">IBCLC</span>
+          <span class="cred-badge">Pediatrics</span>
+        </div>
+      </div>
+      <div class="about-card">
+        <h3>Dyad Health Collective</h3>
+        <p>GalactoGuide is a product of Dyad Health Collective, a breastfeeding medicine practice dedicated to supporting the mother-baby dyad with evidence-based care.</p>
+        <p style="margin-top:8px"><a href="https://dyadhealthcollective.com" target="_blank">Visit dyadhealthcollective.com ↗</a></p>
+      </div>
+      <div class="about-card">
+        <h3>Sources</h3>
+        <p>Content is informed by LactMed (NIH), ABM Clinical Protocol #9, Hale's Medications and Mothers' Milk, and peer-reviewed literature. Evidence ratings reflect current certainty levels and are updated periodically.</p>
+      </div>
+      <div class="disclaimer">GalactoGuide is for educational purposes only. It does not constitute medical advice. Always consult a qualified healthcare provider. &copy; 2026 Dyad Health Collective LLC.</div>
+    </div>
   </div>
 </div>
 
@@ -148,90 +276,91 @@
 
 <script>
 const data = [
-  {
-    id:'fenugreek', name:'Fenugreek', type:'herbal', evidence:2,
+  { id:'fenugreek', name:'Fenugreek', type:'herbal', evidence:2,
     short:'Most widely used herbal galactogogue. Mixed evidence; may cause maple-syrup odor.',
     mechanism:'Thought to stimulate sweat glands (which are similar to mammary glands) and may mimic estrogen.',
     evidence_detail:'Several small RCTs show modest increases in milk volume (24–103 mL/day). Evidence is low-certainty due to small sample sizes and lack of standardization.',
     dosing:'500–1000 mg three times daily (capsule). Effects typically noted within 24–72 hrs.',
     safety:{preterm:'caution',pcos:'avoid',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'avoid'},
-    notes:'May lower blood glucose — caution in diabetics. Contraindicated in peanut/chickpea allergy. Avoid in PCOS (may worsen hormonal profile in some women).',
-    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501793/'
-  },
-  {
-    id:'moringa', name:'Moringa (Malunggay)', type:'herbal', evidence:3,
+    notes:'May lower blood glucose — caution in diabetics. Contraindicated in peanut/chickpea allergy. Avoid in PCOS.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501793/' },
+  { id:'moringa', name:'Moringa (Malunggay)', type:'herbal', evidence:3,
     short:'Promising evidence, especially in Filipino/Asian populations. Well tolerated.',
     mechanism:'Rich in phytosterols; may stimulate prolactin secretion. Nutritionally dense.',
-    evidence_detail:'Multiple RCTs (primarily in SE Asia) show significant increases in milk volume. A Cochrane review noted moringa as one of the better-studied botanicals.',
+    evidence_detail:'Multiple RCTs (primarily in SE Asia) show significant increases in milk volume. Noted by Cochrane review as one of the better-studied botanicals.',
     dosing:'250–500 mg capsule twice daily, or 1–2 tsp leaf powder in food daily.',
     safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'recommend',relactation:'may use',cardiac:'may use',diabetes:'may use'},
-    notes:'Generally well tolerated. Avoid root/bark extract (different safety profile than leaf). Limited long-term safety data.',
-    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK551531/'
-  },
-  {
-    id:'domperidone', name:'Domperidone', type:'pharma', evidence:4,
+    notes:'Generally well tolerated. Avoid root/bark extract. Limited long-term safety data.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK551531/' },
+  { id:'domperidone', name:'Domperidone', type:'pharma', evidence:4,
     short:'Best pharmaceutical evidence, especially for mothers of preterm infants. Off-label use.',
-    mechanism:'Dopamine antagonist that raises prolactin levels. Does not significantly cross the blood-brain barrier.',
-    evidence_detail:'Multiple RCTs show increased milk volume in mothers of preterm infants. ABM Protocol #9 cites this as having the strongest pharmaceutical evidence base, though still low-certainty overall.',
+    mechanism:'Dopamine antagonist that raises prolactin. Does not significantly cross the blood-brain barrier.',
+    evidence_detail:'Multiple RCTs show increased milk volume in mothers of preterm infants. Strongest pharmaceutical evidence base per ABM Protocol #9, though still low-certainty overall.',
     dosing:'10–20 mg three times daily. Reassess at 2 weeks. Not FDA-approved; available via compounding pharmacies in the US.',
     safety:{preterm:'recommend',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'avoid',diabetes:'may use'},
     notes:'Cardiac risk (QT prolongation) — requires ECG screening in at-risk patients. Avoid with azole antifungals, macrolide antibiotics, and grapefruit. Prescriber required.',
-    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501064/'
-  },
-  {
-    id:'metoclopramide', name:'Metoclopramide', type:'pharma', evidence:2,
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501064/' },
+  { id:'metoclopramide', name:'Metoclopramide', type:'pharma', evidence:2,
     short:'FDA-approved antiemetic used off-label. Risk of maternal depression limits use.',
     mechanism:'Dopamine antagonist — raises prolactin. Crosses the blood-brain barrier.',
     evidence_detail:'Small RCTs show mixed results. ABM Protocol #9 advises caution due to CNS side effects including depression and tardive dyskinesia with prolonged use.',
     dosing:'10 mg three times daily, typically for no more than 4 weeks.',
     safety:{preterm:'caution',pcos:'caution',hypoplasia:'caution',low_supply:'caution',relactation:'caution',cardiac:'may use',diabetes:'may use'},
     notes:'Risk of maternal depression, anxiety, and rare tardive dyskinesia. Not recommended beyond 4 weeks. Screen for depression history before use.',
-    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501086/'
-  },
-  {
-    id:'oats', name:'Oats / oatmeal', type:'food', evidence:1,
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501086/' },
+  { id:'oats', name:'Oats / oatmeal', type:'food', evidence:1,
     short:'Traditional food galactogogue. No RCT evidence; widely used and safe.',
     mechanism:'Hypothesized: beta-glucan may affect prolactin. High iron content may help if supply is affected by anemia.',
-    evidence_detail:'No peer-reviewed RCTs found. Widely reported in cultural traditions. Safe and nutritious — no reason to discourage if the mother wishes to use.',
-    dosing:'Regular inclusion in diet (1 cup cooked oats daily). Lactation cookies typically contain oats, brewer\'s yeast, and flaxseed.',
+    evidence_detail:'No peer-reviewed RCTs. Widely reported in cultural traditions. Safe and nutritious — no reason to discourage.',
+    dosing:'1 cup cooked oats daily. Commonly used in lactation cookies with brewer\'s yeast and flaxseed.',
     safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
-    notes:'Gluten cross-contamination possible in non-certified oats. Safe for infant via breast milk. High glycemic index — caution in poorly controlled diabetes.',
-    lactmed:null
-  },
-  {
-    id:'blessed-thistle', name:'Blessed thistle', type:'herbal', evidence:1,
+    notes:'Gluten cross-contamination possible in non-certified oats. High glycemic index — caution in poorly controlled diabetes.',
+    lactmed:null },
+  { id:'blessed-thistle', name:'Blessed thistle', type:'herbal', evidence:1,
     short:'Often paired with fenugreek. Very limited independent evidence.',
     mechanism:'Unknown. Traditionally thought to stimulate digestion and lactation.',
     evidence_detail:'No standalone RCTs. Typically studied in combination products. Evidence is anecdotal.',
     dosing:'390–400 mg capsule three times daily. Often used in combination products.',
     safety:{preterm:'caution',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'may use'},
     notes:'Avoid in ragweed allergy (Asteraceae family). May cause GI upset at high doses. Avoid during pregnancy.',
-    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501802/'
-  },
-  {
-    id:'goats-rue', name:"Goat's rue", type:'herbal', evidence:2,
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501802/' },
+  { id:'goats-rue', name:"Goat's rue", type:'herbal', evidence:2,
     short:"Contains galegin — the compound metformin was derived from. Useful in PCOS and hypoplasia.",
     mechanism:'Galegin has insulin-sensitizing properties and may stimulate mammary gland development.',
-    evidence_detail:"Limited RCTs but mechanistically plausible. West & Marasco recommend for insulin resistance, PCOS, and breast hypoplasia. Evidence is primarily observational.",
+    evidence_detail:"Limited RCTs but mechanistically plausible. Recommended by West & Marasco for insulin resistance, PCOS, and breast hypoplasia.",
     dosing:'300–400 mg standardized extract twice daily.',
     safety:{preterm:'may use',pcos:'recommend',hypoplasia:'recommend',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
-    notes:"May lower blood glucose — caution with diabetes medications. From the pea family — avoid in legume allergy.",
-    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK582119/'
-  },
-  {
-    id:'brewers-yeast', name:"Brewer's yeast", type:'food', evidence:1,
+    notes:"May lower blood glucose — caution with diabetes medications. Avoid in legume allergy.",
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK582119/' },
+  { id:'brewers-yeast', name:"Brewer's yeast", type:'food', evidence:1,
     short:'Common in lactation cookies. Nutritionally rich; no direct RCT evidence.',
     mechanism:'Rich in B vitamins, chromium, selenium, and protein. Hypothesized nutritional support role.',
-    evidence_detail:'No standalone RCTs for milk supply. Nutritional benefits are well-established. Often used alongside oats and flaxseed in lactation baking.',
+    evidence_detail:'No standalone RCTs for milk supply. Nutritional benefits well-established. Often used alongside oats and flaxseed.',
     dosing:'1–2 tbsp powder daily in smoothies, oatmeal, or baked goods.',
     safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
-    notes:"May interact with MAOIs. Distinct from baker's yeast and nutritional yeast. Possible GI gas. Generally safe.",
-    lactmed:null
-  }
+    notes:"May interact with MAOIs. Possible GI gas. Generally safe.",
+    lactmed:null }
 ];
 
 let activeFilter = 'all';
 let activeSituations = [];
+
+function handleAgree() {
+  localStorage.setItem('gg_agreed', '1');
+  document.getElementById('disclaimer-screen').classList.add('hidden');
+  document.getElementById('main-app').style.display = 'block';
+  populateSafetySelect();
+  renderCards();
+}
+
+window.onload = function() {
+  if(localStorage.getItem('gg_agreed') === '1') {
+    document.getElementById('disclaimer-screen').classList.add('hidden');
+    document.getElementById('main-app').style.display = 'block';
+    populateSafetySelect();
+    renderCards();
+  }
+};
 
 function evidenceDots(score) {
   let html = '<div class="evidence-dots">';
@@ -306,6 +435,7 @@ function showTab(t, btn){
 
 function populateSafetySelect(){
   const sel = document.getElementById('safety-select');
+  sel.innerHTML = '<option value="">Choose one...</option>';
   data.forEach(d => {
     const o = document.createElement('option');
     o.value = d.id; o.textContent = d.name;
@@ -359,9 +489,6 @@ function runRecommend(){
   if(avoid.length) html += '<div class="result-card avoid"><div class="result-title">Avoid or requires specialist input</div><div class="result-items">' + avoid.join(', ') + '</div></div>';
   el.innerHTML = html;
 }
-
-populateSafetySelect();
-renderCards();
 </script>
 </body>
 </html>
