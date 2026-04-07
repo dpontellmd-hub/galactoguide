@@ -611,7 +611,7 @@ function switchPortal() {
 function setupPortal() {
   const isMother = portal === 'mother';
   const ac = isMother ? 'active-mother' : 'active-provider';
-  document.getElementById('portal-badge').textContent = isMother ? 'Lactating parent' : 'Healthcare provider';
+  document.getElementById('portal-badge').textContent = isMother ? 'Lactating Parent or Caregiver' : 'Healthcare Provider';
   document.getElementById('portal-badge').className = 'portal-badge ' + (isMother ? 'badge-mother' : 'badge-provider');
   const tabs = ['browse','safety','recommend','resources','about'];
   const tabLabels = ['Browse','Safety','Recommend','Resources','About'];
