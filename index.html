@@ -6,18 +6,26 @@
   <title>GalactoGuide</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f8f6; color: #1a1a1a; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #faf8f6; color: #1a1a1a; }
     .hidden { display: none !important; }
+
+    /* BRAND COLORS */
+    :root {
+      --dhc-brown: #7a5c4e;
+      --dhc-brown-light: #f0e6e0;
+      --dhc-brown-mid: #c9a99a;
+      --dhc-cream: #faf8f6;
+    }
 
     /* DISCLAIMER SCREEN */
     #disclaimer-screen { max-width: 420px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 32px 24px 24px; background: #fff; }
     .logo-wrap { text-align: center; margin-bottom: 28px; }
-    .logo-mark { width: 64px; height: 64px; border-radius: 16px; background: #1a1a1a; display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+    .dhc-logo { height: 48px; width: auto; margin: 0 auto 14px; display: block; }
     .app-name { font-size: 26px; font-weight: 700; color: #1a1a1a; letter-spacing: -0.5px; }
     .app-sub { font-size: 13px; color: #888; margin-top: 3px; }
     .dyad-line { font-size: 12px; color: #aaa; margin-top: 6px; }
-    .dyad-line a { color: #888; text-decoration: underline; }
-    .disclaimer-box { background: #f8f8f6; border-radius: 16px; padding: 20px; flex: 1; margin-bottom: 20px; }
+    .dyad-line a { color: var(--dhc-brown); text-decoration: none; font-weight: 500; }
+    .disclaimer-box { background: var(--dhc-cream); border-radius: 16px; padding: 20px; flex: 1; margin-bottom: 20px; }
     .disclaimer-box h2 { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 16px; }
     .point { display: flex; gap: 12px; margin-bottom: 14px; align-items: flex-start; }
     .point-icon { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
@@ -29,30 +37,30 @@
     .point-desc { font-size: 12px; color: #666; line-height: 1.5; }
     .divider { height: 1px; background: #eee; margin: 14px 0; }
     .fine-print { font-size: 11px; color: #aaa; line-height: 1.6; }
-    .fine-print a { color: #aaa; text-decoration: underline; }
-    .agree-btn { width: 100%; padding: 14px; font-size: 15px; font-weight: 600; border: none; border-radius: 14px; background: #1a1a1a; color: #fff; cursor: pointer; margin-bottom: 10px; }
-    .agree-btn:hover { background: #333; }
+    .agree-btn { width: 100%; padding: 14px; font-size: 15px; font-weight: 600; border: none; border-radius: 14px; background: var(--dhc-brown); color: #fff; cursor: pointer; margin-bottom: 10px; }
+    .agree-btn:hover { background: #6a4e42; }
     .decline-note { text-align: center; font-size: 12px; color: #aaa; }
 
     /* MAIN APP */
     #main-app { display: none; }
     .app { max-width: 420px; margin: 0 auto; padding: 0 0 80px; background: #fff; min-height: 100vh; }
-    .topbar { padding: 20px 16px 0; }
-    .topbar h1 { font-size: 22px; font-weight: 600; color: #1a1a1a; }
-    .topbar p { font-size: 13px; color: #666; margin-top: 3px; }
-    .tabs { display: flex; gap: 4px; padding: 14px 16px 0; border-bottom: 1px solid #eee; }
-    .tab { padding: 8px 14px; font-size: 13px; border: none; background: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
-    .tab.active { color: #1a1a1a; border-bottom-color: #1a1a1a; font-weight: 600; }
+    .topbar { padding: 16px 16px 0; display: flex; align-items: center; justify-content: space-between; }
+    .topbar-text h1 { font-size: 20px; font-weight: 700; color: #1a1a1a; }
+    .topbar-text p { font-size: 12px; color: #888; margin-top: 2px; }
+    .topbar-logo { height: 28px; width: auto; }
+    .tabs { display: flex; gap: 2px; padding: 12px 16px 0; border-bottom: 1px solid #eee; overflow-x: auto; }
+    .tab { padding: 8px 12px; font-size: 12px; border: none; background: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; white-space: nowrap; }
+    .tab.active { color: var(--dhc-brown); border-bottom-color: var(--dhc-brown); font-weight: 600; }
     .section { display: none; padding: 16px; }
     .section.active { display: block; }
     .search-wrap { position: relative; margin-bottom: 12px; }
-    .search-wrap input { width: 100%; padding: 10px 12px 10px 36px; font-size: 14px; border: 1px solid #ddd; border-radius: 10px; background: #f8f8f6; color: #1a1a1a; }
+    .search-wrap input { width: 100%; padding: 10px 12px 10px 36px; font-size: 14px; border: 1px solid #e8e0dc; border-radius: 10px; background: var(--dhc-cream); color: #1a1a1a; }
     .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #aaa; pointer-events: none; }
     .filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
-    .filter-btn { padding: 5px 12px; font-size: 12px; border: 1px solid #ddd; border-radius: 20px; background: none; color: #666; cursor: pointer; }
-    .filter-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .filter-btn { padding: 5px 12px; font-size: 12px; border: 1px solid #e0d4ce; border-radius: 20px; background: none; color: #888; cursor: pointer; }
+    .filter-btn.active { background: var(--dhc-brown); color: #fff; border-color: var(--dhc-brown); }
     .card { background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.15s; }
-    .card:hover { border-color: #ccc; }
+    .card:hover { border-color: var(--dhc-brown-mid); }
     .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
     .card-name { font-size: 15px; font-weight: 600; color: #1a1a1a; }
     .card-type { font-size: 11px; padding: 3px 9px; border-radius: 10px; margin-left: 6px; white-space: nowrap; }
@@ -73,7 +81,7 @@
     .detail-close { float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: #aaa; }
     .detail-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
     .detail-section { margin-top: 14px; }
-    .detail-section h4 { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+    .detail-section h4 { font-size: 11px; font-weight: 600; color: var(--dhc-brown); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
     .detail-section p { font-size: 14px; color: #333; line-height: 1.6; }
     .detail-link { font-size: 13px; color: #185fa5; margin-top: 6px; display: inline-block; }
     .safety-tag { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 12px; margin: 3px 3px 3px 0; }
@@ -84,9 +92,9 @@
     .overlay.open { display: block; }
     .checker-card { background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
     .checker-label { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
-    .checker-select { width: 100%; font-size: 14px; padding: 9px 10px; border: 1px solid #ddd; border-radius: 10px; background: #f8f8f6; color: #1a1a1a; }
-    .situation-tag { display: inline-block; padding: 5px 12px; font-size: 12px; border: 1px solid #ddd; border-radius: 12px; margin: 4px 4px 0 0; cursor: pointer; color: #666; }
-    .situation-tag.selected { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .checker-select { width: 100%; font-size: 14px; padding: 9px 10px; border: 1px solid #e0d4ce; border-radius: 10px; background: var(--dhc-cream); color: #1a1a1a; }
+    .situation-tag { display: inline-block; padding: 5px 12px; font-size: 12px; border: 1px solid #e0d4ce; border-radius: 12px; margin: 4px 4px 0 0; cursor: pointer; color: #888; }
+    .situation-tag.selected { background: var(--dhc-brown); color: #fff; border-color: var(--dhc-brown); }
     .result-card { border-radius: 14px; padding: 14px; margin-top: 12px; border: 1px solid #eee; }
     .result-card.rec { background: #eaf3de; border-color: #c0dd97; }
     .result-card.caution { background: #faeeda; border-color: #fac775; }
@@ -99,18 +107,38 @@
     .result-card.rec .result-items { color: #27500a; }
     .result-card.caution .result-items { color: #633806; }
     .result-card.avoid .result-items { color: #791f1f; }
-    .info-badge { display: flex; align-items: flex-start; gap: 8px; background: #f0f6ff; border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; }
-    .info-badge span { font-size: 12px; color: #185fa5; line-height: 1.5; }
-    .run-btn { width: 100%; padding: 12px; font-size: 14px; font-weight: 600; border: none; border-radius: 12px; background: #1a1a1a; color: #fff; cursor: pointer; margin-top: 14px; }
-    .run-btn:hover { background: #333; }
+    .info-badge { display: flex; align-items: flex-start; gap: 8px; background: var(--dhc-brown-light); border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; }
+    .info-badge span { font-size: 12px; color: var(--dhc-brown); line-height: 1.5; }
+    .run-btn { width: 100%; padding: 12px; font-size: 14px; font-weight: 600; border: none; border-radius: 12px; background: var(--dhc-brown); color: #fff; cursor: pointer; margin-top: 14px; }
+    .run-btn:hover { background: #6a4e42; }
     .empty-results { text-align: center; padding: 32px 16px; color: #aaa; font-size: 14px; }
     .disclaimer { font-size: 11px; color: #aaa; text-align: center; padding: 16px; line-height: 1.5; border-top: 1px solid #eee; margin-top: 8px; }
-    .about-card { background: #f8f8f6; border-radius: 16px; padding: 20px; margin-bottom: 12px; }
-    .about-card h3 { font-size: 15px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
-    .about-card p { font-size: 13px; color: #555; line-height: 1.6; }
-    .about-card a { color: #185fa5; text-decoration: none; }
-    .cred-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-    .cred-badge { padding: 4px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; background: #1a1a1a; color: #fff; }
+
+    /* ABOUT TAB */
+    .hero-card { background: var(--dhc-brown); border-radius: 16px; padding: 20px; margin-bottom: 12px; }
+    .hero-inner { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
+    .avatar { width: 60px; height: 60px; border-radius: 50%; background: var(--dhc-brown-light); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 700; color: var(--dhc-brown); flex-shrink: 0; }
+    .hero-name { font-size: 17px; font-weight: 700; color: #fff; }
+    .hero-title { font-size: 12px; color: #e8d8d0; margin-top: 3px; }
+    .badge-row { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 8px; }
+    .hero-badge { padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; background: rgba(255,255,255,0.2); color: #fff; }
+    .hero-logo-wrap { border-top: 1px solid rgba(255,255,255,0.2); padding-top: 14px; text-align: center; }
+    .hero-logo { height: 28px; width: auto; filter: brightness(0) invert(1); opacity: 0.9; }
+    .visit-btn { display: block; text-align: center; padding: 10px; font-size: 13px; font-weight: 600; color: var(--dhc-brown); background: var(--dhc-brown-light); border-radius: 12px; text-decoration: none; margin-top: 10px; }
+    .about-card { background: #fff; border: 1px solid #eee; border-radius: 16px; padding: 16px; margin-bottom: 12px; }
+    .about-label { font-size: 11px; font-weight: 600; color: var(--dhc-brown); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+    .about-card p { font-size: 13px; color: #444; line-height: 1.7; }
+    .quote-bar { border-left: 3px solid var(--dhc-brown); border-radius: 0; padding-left: 12px; margin: 12px 0; }
+    .quote-bar p { font-size: 13px; font-style: italic; color: #666; line-height: 1.6; }
+    .cred-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .cred-item { background: var(--dhc-cream); border-radius: 10px; padding: 10px 12px; }
+    .cred-year { font-size: 11px; color: var(--dhc-brown); font-weight: 600; margin-bottom: 3px; }
+    .cred-title { font-size: 12px; color: #444; line-height: 1.4; }
+    .source-row { display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; border-bottom: 1px solid #f0e8e4; }
+    .source-row:last-child { border-bottom: none; }
+    .source-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--dhc-brown); flex-shrink: 0; margin-top: 5px; }
+    .source-text { font-size: 12px; color: #666; line-height: 1.5; }
+    .footer-note { font-size: 11px; color: #aaa; text-align: center; padding: 8px 0 16px; line-height: 1.6; }
   </style>
 </head>
 <body>
@@ -118,62 +146,40 @@
 <!-- DISCLAIMER SCREEN -->
 <div id="disclaimer-screen">
   <div class="logo-wrap">
-    <div class="logo-mark">
-      <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-        <ellipse cx="18" cy="14" rx="7" ry="8" stroke="white" stroke-width="2"/>
-        <path d="M11 20c0 4 3 7 7 7s7-3 7-7" stroke="white" stroke-width="2" stroke-linecap="round"/>
-        <circle cx="26" cy="10" r="3" fill="#5DCAA5"/>
-      </svg>
-    </div>
+    <img class="dhc-logo" src="https://raw.githubusercontent.com/dpontellmd-hub/galactoguide/main/DHC_Wordmark_K.png" alt="Dyad Health Collective" onerror="this.style.display='none'" />
     <div class="app-name">GalactoGuide</div>
     <div class="app-sub">Evidence-based galactogogue reference</div>
     <div class="dyad-line">A clinical tool by <a href="https://dyadhealthcollective.com" target="_blank">Dyad Health Collective</a></div>
   </div>
-
   <div class="disclaimer-box">
     <h2>Before you begin</h2>
     <div class="point">
       <div class="point-icon icon-blue">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#185fa5" stroke-width="1.3"/><path d="M7 6v4M7 4.5v.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg>
       </div>
-      <div>
-        <div class="point-title">Educational reference only</div>
-        <div class="point-desc">GalactoGuide is an educational tool. It does not constitute medical advice and does not create a patient-provider relationship.</div>
-      </div>
+      <div><div class="point-title">Educational reference only</div><div class="point-desc">GalactoGuide is an educational tool. It does not constitute medical advice and does not create a patient-provider relationship.</div></div>
     </div>
     <div class="point">
       <div class="point-icon icon-amber">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 2L12.5 11.5H1.5L7 2Z" stroke="#854f0b" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 6v3M7 10.5v.2" stroke="#854f0b" stroke-width="1.3" stroke-linecap="round"/></svg>
       </div>
-      <div>
-        <div class="point-title">Always consult your provider</div>
-        <div class="point-desc">Never start, stop, or change a galactogogue based solely on this app. Always discuss with your IBCLC, physician, or pharmacist first.</div>
-      </div>
+      <div><div class="point-title">Always consult your provider</div><div class="point-desc">Never start, stop, or change a galactogogue based solely on this app. Always discuss with your IBCLC, physician, or pharmacist first.</div></div>
     </div>
     <div class="point">
       <div class="point-icon icon-green">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#3b6d11" stroke-width="1.3"/><path d="M4 7l2 2 4-4" stroke="#3b6d11" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <div>
-        <div class="point-title">Evidence is limited</div>
-        <div class="point-desc">Most galactogogues have low-certainty evidence. This app summarizes current research honestly, including its limitations.</div>
-      </div>
+      <div><div class="point-title">Evidence is limited</div><div class="point-desc">Most galactogogues have low-certainty evidence. This app summarizes current research honestly, including its limitations.</div></div>
     </div>
     <div class="point">
       <div class="point-icon icon-red">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#a32d2d" stroke-width="1.3"/><path d="M5 5l4 4M9 5l-4 4" stroke="#a32d2d" stroke-width="1.3" stroke-linecap="round"/></svg>
       </div>
-      <div>
-        <div class="point-title">Not for emergencies</div>
-        <div class="point-desc">If you or your baby have an urgent medical concern, contact your healthcare provider or call 911 immediately.</div>
-      </div>
+      <div><div class="point-title">Not for emergencies</div><div class="point-desc">If you or your baby have an urgent medical concern, contact your healthcare provider or call 911 immediately.</div></div>
     </div>
     <div class="divider"></div>
-    <div class="fine-print">
-      By tapping "I understand and agree" you acknowledge this app is for educational purposes only and agree to our Terms of Use and Privacy Policy. GalactoGuide content is developed and reviewed by a board-certified pediatrician and IBCLC. Last reviewed April 2026.
-    </div>
+    <div class="fine-print">By tapping "I understand and agree" you acknowledge this app is for educational purposes only and agree to our Terms of Use and Privacy Policy. GalactoGuide content is developed and reviewed by Dr. Diana Pontell, MD, IBCLC. Last reviewed April 2026.</div>
   </div>
-
   <button class="agree-btn" onclick="handleAgree()">I understand and agree</button>
   <div class="decline-note">For healthcare providers and breastfeeding families</div>
 </div>
@@ -182,14 +188,17 @@
 <div id="main-app">
   <div class="app">
     <div class="topbar">
-      <h1>GalactoGuide</h1>
-      <p>Evidence-based galactogogue reference · IBCLC-reviewed</p>
+      <div class="topbar-text">
+        <h1>GalactoGuide</h1>
+        <p>Evidence-based · IBCLC & MD reviewed</p>
+      </div>
+      <img class="topbar-logo" src="https://raw.githubusercontent.com/dpontellmd-hub/galactoguide/main/DHC_Wordmark_K.png" alt="DHC" onerror="this.style.display='none'" />
     </div>
     <div class="tabs">
-      <button class="tab active" onclick="showTab('browse', this)">Browse</button>
-      <button class="tab" onclick="showTab('safety', this)">Safety</button>
-      <button class="tab" onclick="showTab('recommend', this)">Recommend</button>
-      <button class="tab" onclick="showTab('about', this)">About</button>
+      <button class="tab active" onclick="showTab('browse',this)">Browse</button>
+      <button class="tab" onclick="showTab('safety',this)">Safety</button>
+      <button class="tab" onclick="showTab('recommend',this)">Recommend</button>
+      <button class="tab" onclick="showTab('about',this)">About</button>
     </div>
 
     <div id="tab-browse" class="section active">
@@ -204,26 +213,20 @@
         <button class="filter-btn" onclick="setFilter('food',this)">Food/dietary</button>
       </div>
       <div id="card-list"></div>
-      <div class="disclaimer">GalactoGuide is an educational reference tool for IBCLCs and breastfeeding mothers. Not a substitute for clinical judgment or personalized medical advice.</div>
+      <div class="disclaimer">GalactoGuide is an educational reference tool. Not a substitute for clinical judgment or personalized medical advice. &copy; 2026 Dyad Health Collective LLC.</div>
     </div>
 
     <div id="tab-safety" class="section">
-      <div class="info-badge">
-        <span>Safety data sourced from LactMed and ABM Protocol #9. Always confirm with prescriber for pharmaceutical options.</span>
-      </div>
+      <div class="info-badge"><span>Safety data sourced from LactMed and ABM Protocol #9. Always confirm with prescriber for pharmaceutical options.</span></div>
       <div class="checker-card">
         <div class="checker-label">Select a galactogogue</div>
-        <select class="checker-select" id="safety-select" onchange="showSafety()">
-          <option value="">Choose one...</option>
-        </select>
+        <select class="checker-select" id="safety-select" onchange="showSafety()"><option value="">Choose one...</option></select>
       </div>
       <div id="safety-result"></div>
     </div>
 
     <div id="tab-recommend" class="section">
-      <div class="info-badge">
-        <span>Suggestions are educational, not prescriptive. Clinical judgment is always required.</span>
-      </div>
+      <div class="info-badge"><span>Suggestions are educational, not prescriptive. Clinical judgment is always required.</span></div>
       <div class="checker-card">
         <div class="checker-label">Select clinical situation(s)</div>
         <div id="situation-tags">
@@ -241,29 +244,61 @@
     </div>
 
     <div id="tab-about" class="section">
-      <div class="about-card">
-        <h3>About GalactoGuide</h3>
-        <p>GalactoGuide is an evidence-based reference tool for breastfeeding mothers and healthcare providers. All clinical content reflects current research and is reviewed against Academy of Breastfeeding Medicine protocols.</p>
-      </div>
-      <div class="about-card">
-        <h3>Developed by</h3>
-        <p>GalactoGuide is a clinical tool developed by a board-certified pediatrician and International Board Certified Lactation Consultant (IBCLC) with a dedicated breastfeeding medicine practice.</p>
-        <div class="cred-row">
-          <span class="cred-badge">MD</span>
-          <span class="cred-badge">IBCLC</span>
-          <span class="cred-badge">Pediatrics</span>
+      <div class="hero-card">
+        <div class="hero-inner">
+          <div class="avatar">DP</div>
+          <div>
+            <div class="hero-name">Dr. Diana Pontell</div>
+            <div class="hero-title">Pediatrician · IBCLC · Nashville, TN</div>
+            <div class="badge-row">
+              <span class="hero-badge">MD</span>
+              <span class="hero-badge">IBCLC</span>
+              <span class="hero-badge">NAABLM candidate</span>
+            </div>
+          </div>
+        </div>
+        <div class="hero-logo-wrap">
+          <img class="hero-logo" src="https://raw.githubusercontent.com/dpontellmd-hub/galactoguide/main/DHC_Wordmark_K.png" alt="Dyad Health Collective" onerror="this.style.display='none'" />
+          <a class="visit-btn" href="https://dyadhealthcollective.com" target="_blank">Visit Dyad Health Collective ↗</a>
         </div>
       </div>
+
       <div class="about-card">
-        <h3>Dyad Health Collective</h3>
-        <p>GalactoGuide is a product of Dyad Health Collective, a breastfeeding medicine practice dedicated to supporting the mother-baby dyad with evidence-based care.</p>
-        <p style="margin-top:8px"><a href="https://dyadhealthcollective.com" target="_blank">Visit dyadhealthcollective.com ↗</a></p>
+        <div class="about-label">My story</div>
+        <p>I first became interested in breastfeeding medicine after having my first child at the end of my pediatric residency. Despite years of medical training, I realized I had real gaps in the practical side of breastfeeding — what pump, what flange size, when to start, how often, what positions.</p>
+        <div class="quote-bar">
+          <p>"I know through caring for my own patients that finding adequate breastfeeding support is not easy. Women often feel alone navigating their infant feeding goals among premature birth, medical complexities, mental health concerns, and the demands of work and family life."</p>
+        </div>
+        <p>I was fortunate to have healthy, full-term sons and incredible clinical mentors. Through all these experiences I realized there is SO MUCH to be shared about human milk — from the first latch to the squirmy toddler.</p>
       </div>
+
       <div class="about-card">
-        <h3>Sources</h3>
-        <p>Content is informed by LactMed (NIH), ABM Clinical Protocol #9, Hale's Medications and Mothers' Milk, and peer-reviewed literature. Evidence ratings reflect current certainty levels and are updated periodically.</p>
+        <div class="about-label">About Dyad Health Collective</div>
+        <p>Founded in 2025, Dyad Health Collective bridges a gap in postpartum care by providing physician-level breastfeeding and lactation medicine consulting in the Nashville area. We offer both in-home and virtual visits for maximum ease during the "fourth trimester."</p>
       </div>
-      <div class="disclaimer">GalactoGuide is for educational purposes only. It does not constitute medical advice. Always consult a qualified healthcare provider. &copy; 2026 Dyad Health Collective LLC.</div>
+
+      <div class="about-card">
+        <div class="about-label">Credentials</div>
+        <div class="cred-grid">
+          <div class="cred-item"><div class="cred-year">2009</div><div class="cred-title">B.S. Emory University</div></div>
+          <div class="cred-item"><div class="cred-year">2014</div><div class="cred-title">M.D. UPenn Perelman School of Medicine</div></div>
+          <div class="cred-item"><div class="cred-year">2017</div><div class="cred-title">Chief Resident, Children's Hospital of Philadelphia</div></div>
+          <div class="cred-item"><div class="cred-year">2018</div><div class="cred-title">Board Certified, American Board of Pediatrics</div></div>
+          <div class="cred-item"><div class="cred-year">2023</div><div class="cred-title">IBCLC Certified</div></div>
+          <div class="cred-item"><div class="cred-year">2026</div><div class="cred-title">Deep Dive Breastfeeding & Lactation Medicine Curriculum, IABLE</div></div>
+        </div>
+      </div>
+
+      <div class="about-card">
+        <div class="about-label">Content sources</div>
+        <div class="source-row"><div class="source-dot"></div><div class="source-text">LactMed — NIH Drugs and Lactation Database</div></div>
+        <div class="source-row"><div class="source-dot"></div><div class="source-text">ABM Clinical Protocol #9 (2018, second revision)</div></div>
+        <div class="source-row"><div class="source-dot"></div><div class="source-text">Hale's Medications and Mothers' Milk</div></div>
+        <div class="source-row"><div class="source-dot"></div><div class="source-text">Cochrane Reviews on oral galactogogues (2020)</div></div>
+        <div class="source-row"><div class="source-dot"></div><div class="source-text">Peer-reviewed literature, updated periodically</div></div>
+      </div>
+
+      <div class="footer-note">GalactoGuide is for educational purposes only. Not medical advice.<br>&copy; 2026 Dyad Health Collective LLC &middot; Nashville, TN</div>
     </div>
   </div>
 </div>
@@ -278,7 +313,7 @@
 const data = [
   { id:'fenugreek', name:'Fenugreek', type:'herbal', evidence:2,
     short:'Most widely used herbal galactogogue. Mixed evidence; may cause maple-syrup odor.',
-    mechanism:'Thought to stimulate sweat glands (which are similar to mammary glands) and may mimic estrogen.',
+    mechanism:'Thought to stimulate sweat glands (similar to mammary glands) and may mimic estrogen.',
     evidence_detail:'Several small RCTs show modest increases in milk volume (24–103 mL/day). Evidence is low-certainty due to small sample sizes and lack of standardization.',
     dosing:'500–1000 mg three times daily (capsule). Effects typically noted within 24–72 hrs.',
     safety:{preterm:'caution',pcos:'avoid',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'avoid'},
@@ -287,7 +322,7 @@ const data = [
   { id:'moringa', name:'Moringa (Malunggay)', type:'herbal', evidence:3,
     short:'Promising evidence, especially in Filipino/Asian populations. Well tolerated.',
     mechanism:'Rich in phytosterols; may stimulate prolactin secretion. Nutritionally dense.',
-    evidence_detail:'Multiple RCTs (primarily in SE Asia) show significant increases in milk volume. Noted by Cochrane review as one of the better-studied botanicals.',
+    evidence_detail:'Multiple RCTs (primarily in SE Asia) show significant increases in milk volume. Cochrane review noted moringa as one of the better-studied botanicals.',
     dosing:'250–500 mg capsule twice daily, or 1–2 tsp leaf powder in food daily.',
     safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'recommend',relactation:'may use',cardiac:'may use',diabetes:'may use'},
     notes:'Generally well tolerated. Avoid root/bark extract. Limited long-term safety data.',
@@ -295,7 +330,7 @@ const data = [
   { id:'domperidone', name:'Domperidone', type:'pharma', evidence:4,
     short:'Best pharmaceutical evidence, especially for mothers of preterm infants. Off-label use.',
     mechanism:'Dopamine antagonist that raises prolactin. Does not significantly cross the blood-brain barrier.',
-    evidence_detail:'Multiple RCTs show increased milk volume in mothers of preterm infants. Strongest pharmaceutical evidence base per ABM Protocol #9, though still low-certainty overall.',
+    evidence_detail:'Multiple RCTs show increased milk volume in mothers of preterm infants. Strongest pharmaceutical evidence per ABM Protocol #9, though still low-certainty overall.',
     dosing:'10–20 mg three times daily. Reassess at 2 weeks. Not FDA-approved; available via compounding pharmacies in the US.',
     safety:{preterm:'recommend',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'avoid',diabetes:'may use'},
     notes:'Cardiac risk (QT prolongation) — requires ECG screening in at-risk patients. Avoid with azole antifungals, macrolide antibiotics, and grapefruit. Prescriber required.',
@@ -304,7 +339,7 @@ const data = [
     short:'FDA-approved antiemetic used off-label. Risk of maternal depression limits use.',
     mechanism:'Dopamine antagonist — raises prolactin. Crosses the blood-brain barrier.',
     evidence_detail:'Small RCTs show mixed results. ABM Protocol #9 advises caution due to CNS side effects including depression and tardive dyskinesia with prolonged use.',
-    dosing:'10 mg three times daily, typically for no more than 4 weeks.',
+    dosing:'10 mg three times daily, typically no more than 4 weeks.',
     safety:{preterm:'caution',pcos:'caution',hypoplasia:'caution',low_supply:'caution',relactation:'caution',cardiac:'may use',diabetes:'may use'},
     notes:'Risk of maternal depression, anxiety, and rare tardive dyskinesia. Not recommended beyond 4 weeks. Screen for depression history before use.',
     lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501086/' },
@@ -346,7 +381,7 @@ let activeFilter = 'all';
 let activeSituations = [];
 
 function handleAgree() {
-  localStorage.setItem('gg_agreed', '1');
+  try { localStorage.setItem('gg_agreed','1'); } catch(e) {}
   document.getElementById('disclaimer-screen').classList.add('hidden');
   document.getElementById('main-app').style.display = 'block';
   populateSafetySelect();
@@ -354,7 +389,9 @@ function handleAgree() {
 }
 
 window.onload = function() {
-  if(localStorage.getItem('gg_agreed') === '1') {
+  let agreed = false;
+  try { agreed = localStorage.getItem('gg_agreed') === '1'; } catch(e) {}
+  if(agreed) {
     document.getElementById('disclaimer-screen').classList.add('hidden');
     document.getElementById('main-app').style.display = 'block';
     populateSafetySelect();
@@ -364,59 +401,58 @@ window.onload = function() {
 
 function evidenceDots(score) {
   let html = '<div class="evidence-dots">';
-  for(let i = 1; i <= 4; i++){
-    let cls = 'empty';
-    if(i <= score){ cls = score >= 3 ? 'filled-high' : score === 2 ? 'filled-mid' : 'filled-low'; }
-    html += '<div class="dot ' + cls + '"></div>';
+  for(let i=1;i<=4;i++){
+    let cls='empty';
+    if(i<=score){ cls=score>=3?'filled-high':score===2?'filled-mid':'filled-low'; }
+    html+='<div class="dot '+cls+'"></div>';
   }
-  return html + '</div>';
+  return html+'</div>';
 }
-
 function evidenceText(s){ return s>=4?'Strong (relative)':s===3?'Moderate':s===2?'Limited':'Very limited'; }
 
 function renderCards(){
-  const q = document.getElementById('search-input').value.toLowerCase();
-  const list = document.getElementById('card-list');
-  const filtered = data.filter(d => {
-    if(activeFilter !== 'all' && d.type !== activeFilter) return false;
-    if(q && !d.name.toLowerCase().includes(q) && !d.short.toLowerCase().includes(q)) return false;
+  const q=document.getElementById('search-input').value.toLowerCase();
+  const list=document.getElementById('card-list');
+  const filtered=data.filter(d=>{
+    if(activeFilter!=='all'&&d.type!==activeFilter) return false;
+    if(q&&!d.name.toLowerCase().includes(q)&&!d.short.toLowerCase().includes(q)) return false;
     return true;
   });
-  if(!filtered.length){ list.innerHTML = '<div class="empty-results">No results found</div>'; return; }
-  list.innerHTML = filtered.map(d => '<div class="card" onclick="openDetail(\'' + d.id + '\')">' +
-    '<div class="card-top"><span class="card-name">' + d.name + '</span>' +
-    '<span class="card-type type-' + d.type + '">' + (d.type==='pharma'?'pharmaceutical':d.type==='herbal'?'herbal':'food/dietary') + '</span></div>' +
-    '<div class="evidence-row">' + evidenceDots(d.evidence) +
-    '<span class="evidence-label">' + evidenceText(d.evidence) + ' evidence</span></div>' +
-    '<div class="card-desc">' + d.short + '</div></div>'
+  if(!filtered.length){list.innerHTML='<div class="empty-results">No results found</div>';return;}
+  list.innerHTML=filtered.map(d=>'<div class="card" onclick="openDetail(\''+d.id+'\')">'+
+    '<div class="card-top"><span class="card-name">'+d.name+'</span>'+
+    '<span class="card-type type-'+d.type+'">'+(d.type==='pharma'?'pharmaceutical':d.type==='herbal'?'herbal':'food/dietary')+'</span></div>'+
+    '<div class="evidence-row">'+evidenceDots(d.evidence)+
+    '<span class="evidence-label">'+evidenceText(d.evidence)+' evidence</span></div>'+
+    '<div class="card-desc">'+d.short+'</div></div>'
   ).join('');
 }
 
-function setFilter(f, btn){
-  activeFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+function setFilter(f,btn){
+  activeFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderCards();
 }
 
 function openDetail(id){
-  const d = data.find(x => x.id === id);
-  const sitLabels = {preterm:'Preterm',pcos:'PCOS',hypoplasia:'Hypoplasia',low_supply:'Low supply',relactation:'Relactation',cardiac:'Cardiac',diabetes:'Diabetes'};
-  const tags = Object.entries(d.safety).map(([k,v]) => {
-    const cls = v==='recommend'?'safe-yes':v==='avoid'?'safe-no':'safe-caution';
-    return '<span class="safety-tag ' + cls + '">' + sitLabels[k] + ': ' + v + '</span>';
+  const d=data.find(x=>x.id===id);
+  const sitLabels={preterm:'Preterm',pcos:'PCOS',hypoplasia:'Hypoplasia',low_supply:'Low supply',relactation:'Relactation',cardiac:'Cardiac',diabetes:'Diabetes'};
+  const tags=Object.entries(d.safety).map(([k,v])=>{
+    const cls=v==='recommend'?'safe-yes':v==='avoid'?'safe-no':'safe-caution';
+    return '<span class="safety-tag '+cls+'">'+sitLabels[k]+': '+v+'</span>';
   }).join('');
-  document.getElementById('detail-content').innerHTML =
-    '<div class="detail-title">' + d.name + '</div>' +
-    '<div style="margin-top:4px;display:flex;align-items:center;gap:8px;">' +
-    '<span class="card-type type-' + d.type + '">' + (d.type==='pharma'?'pharmaceutical':d.type==='herbal'?'herbal':'food/dietary') + '</span>' +
-    evidenceDots(d.evidence) + '<span style="font-size:12px;color:#888">' + evidenceText(d.evidence) + '</span></div>' +
-    '<div class="detail-section"><h4>Mechanism</h4><p>' + d.mechanism + '</p></div>' +
-    '<div class="detail-section"><h4>Evidence summary</h4><p>' + d.evidence_detail + '</p></div>' +
-    '<div class="detail-section"><h4>Typical dosing</h4><p>' + d.dosing + '</p></div>' +
-    '<div class="detail-section"><h4>Safety notes</h4><p>' + d.notes + '</p></div>' +
-    '<div class="detail-section"><h4>Situational safety</h4>' + tags + '</div>' +
-    (d.lactmed ? '<a class="detail-link" href="' + d.lactmed + '" target="_blank">View on LactMed &#8599;</a>' : '');
+  document.getElementById('detail-content').innerHTML=
+    '<div class="detail-title">'+d.name+'</div>'+
+    '<div style="margin-top:4px;display:flex;align-items:center;gap:8px;">'+
+    '<span class="card-type type-'+d.type+'">'+(d.type==='pharma'?'pharmaceutical':d.type==='herbal'?'herbal':'food/dietary')+'</span>'+
+    evidenceDots(d.evidence)+'<span style="font-size:12px;color:#888">'+evidenceText(d.evidence)+'</span></div>'+
+    '<div class="detail-section"><h4>Mechanism</h4><p>'+d.mechanism+'</p></div>'+
+    '<div class="detail-section"><h4>Evidence summary</h4><p>'+d.evidence_detail+'</p></div>'+
+    '<div class="detail-section"><h4>Typical dosing</h4><p>'+d.dosing+'</p></div>'+
+    '<div class="detail-section"><h4>Safety notes</h4><p>'+d.notes+'</p></div>'+
+    '<div class="detail-section"><h4>Situational safety</h4>'+tags+'</div>'+
+    (d.lactmed?'<a class="detail-link" href="'+d.lactmed+'" target="_blank">View on LactMed &#8599;</a>':'');
   document.getElementById('detail-panel').classList.add('open');
   document.getElementById('overlay').classList.add('open');
 }
@@ -426,68 +462,64 @@ function closeDetail(){
   document.getElementById('overlay').classList.remove('open');
 }
 
-function showTab(t, btn){
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-  document.getElementById('tab-' + t).classList.add('active');
+function showTab(t,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('tab-'+t).classList.add('active');
   btn.classList.add('active');
 }
 
 function populateSafetySelect(){
-  const sel = document.getElementById('safety-select');
-  sel.innerHTML = '<option value="">Choose one...</option>';
-  data.forEach(d => {
-    const o = document.createElement('option');
-    o.value = d.id; o.textContent = d.name;
-    sel.appendChild(o);
-  });
+  const sel=document.getElementById('safety-select');
+  sel.innerHTML='<option value="">Choose one...</option>';
+  data.forEach(d=>{const o=document.createElement('option');o.value=d.id;o.textContent=d.name;sel.appendChild(o);});
 }
 
 function showSafety(){
-  const id = document.getElementById('safety-select').value;
-  const el = document.getElementById('safety-result');
-  if(!id){ el.innerHTML = ''; return; }
-  const d = data.find(x => x.id === id);
-  const sitLabels = {preterm:'Preterm infant',pcos:'PCOS / insulin resistance',hypoplasia:'Breast hypoplasia',low_supply:'General low supply',relactation:'Relactation',cardiac:'Cardiac history',diabetes:'Diabetes'};
-  const tags = Object.entries(d.safety).map(([k,v]) => {
-    const cls = v==='recommend'?'safe-yes':v==='avoid'?'safe-no':'safe-caution';
-    return '<span class="safety-tag ' + cls + '">' + sitLabels[k] + ': ' + v + '</span>';
+  const id=document.getElementById('safety-select').value;
+  const el=document.getElementById('safety-result');
+  if(!id){el.innerHTML='';return;}
+  const d=data.find(x=>x.id===id);
+  const sitLabels={preterm:'Preterm infant',pcos:'PCOS / insulin resistance',hypoplasia:'Breast hypoplasia',low_supply:'General low supply',relactation:'Relactation',cardiac:'Cardiac history',diabetes:'Diabetes'};
+  const tags=Object.entries(d.safety).map(([k,v])=>{
+    const cls=v==='recommend'?'safe-yes':v==='avoid'?'safe-no':'safe-caution';
+    return '<span class="safety-tag '+cls+'">'+sitLabels[k]+': '+v+'</span>';
   }).join('');
-  el.innerHTML = '<div class="checker-card"><div class="checker-label">Safety profile — ' + d.name + '</div>' +
-    '<div style="margin-bottom:10px">' + tags + '</div>' +
-    '<p style="font-size:13px;color:#555;line-height:1.5">' + d.notes + '</p>' +
-    (d.lactmed ? '<a class="detail-link" href="' + d.lactmed + '" target="_blank">LactMed reference &#8599;</a>' : '') + '</div>';
+  el.innerHTML='<div class="checker-card"><div class="checker-label">Safety profile — '+d.name+'</div>'+
+    '<div style="margin-bottom:10px">'+tags+'</div>'+
+    '<p style="font-size:13px;color:#555;line-height:1.5">'+d.notes+'</p>'+
+    (d.lactmed?'<a class="detail-link" href="'+d.lactmed+'" target="_blank">LactMed reference &#8599;</a>':'')+'</div>';
 }
 
-function toggleSit(el, val){
+function toggleSit(el,val){
   el.classList.toggle('selected');
-  if(activeSituations.includes(val)) activeSituations = activeSituations.filter(x => x !== val);
+  if(activeSituations.includes(val)) activeSituations=activeSituations.filter(x=>x!==val);
   else activeSituations.push(val);
 }
 
-const sitKeyMap = {preterm:'preterm',pcos:'pcos',hypoplasia:'hypoplasia','low-supply':'low_supply',relactation:'relactation',cardiac:'cardiac',diabetes:'diabetes'};
+const sitKeyMap={preterm:'preterm',pcos:'pcos',hypoplasia:'hypoplasia','low-supply':'low_supply',relactation:'relactation',cardiac:'cardiac',diabetes:'diabetes'};
 
 function runRecommend(){
-  const el = document.getElementById('recommend-result');
-  if(!activeSituations.length){ el.innerHTML = '<p style="font-size:13px;color:#aaa;margin-top:12px">Select at least one clinical situation above.</p>'; return; }
-  const rec=[], caution=[], avoid=[];
-  data.forEach(d => {
-    let worst = 'recommend';
-    activeSituations.forEach(s => {
-      const val = d.safety[sitKeyMap[s]];
+  const el=document.getElementById('recommend-result');
+  if(!activeSituations.length){el.innerHTML='<p style="font-size:13px;color:#aaa;margin-top:12px">Select at least one clinical situation above.</p>';return;}
+  const rec=[],caution=[],avoid=[];
+  data.forEach(d=>{
+    let worst='recommend';
+    activeSituations.forEach(s=>{
+      const val=d.safety[sitKeyMap[s]];
       if(val==='avoid') worst='avoid';
-      else if(val==='caution' && worst!=='avoid') worst='caution';
-      else if(val==='may use' && worst==='recommend') worst='may use';
+      else if(val==='caution'&&worst!=='avoid') worst='caution';
+      else if(val==='may use'&&worst==='recommend') worst='may use';
     });
     if(worst==='recommend') rec.push(d.name);
     else if(worst==='may use'||worst==='caution') caution.push(d.name);
     else avoid.push(d.name);
   });
-  let html = '';
-  if(rec.length) html += '<div class="result-card rec"><div class="result-title">Reasonable to consider</div><div class="result-items">' + rec.join(', ') + '</div></div>';
-  if(caution.length) html += '<div class="result-card caution"><div class="result-title">Use with caution / counsel first</div><div class="result-items">' + caution.join(', ') + '</div></div>';
-  if(avoid.length) html += '<div class="result-card avoid"><div class="result-title">Avoid or requires specialist input</div><div class="result-items">' + avoid.join(', ') + '</div></div>';
-  el.innerHTML = html;
+  let html='';
+  if(rec.length) html+='<div class="result-card rec"><div class="result-title">Reasonable to consider</div><div class="result-items">'+rec.join(', ')+'</div></div>';
+  if(caution.length) html+='<div class="result-card caution"><div class="result-title">Use with caution / counsel first</div><div class="result-items">'+caution.join(', ')+'</div></div>';
+  if(avoid.length) html+='<div class="result-card avoid"><div class="result-title">Avoid or requires specialist input</div><div class="result-items">'+avoid.join(', ')+'</div></div>';
+  el.innerHTML=html;
 }
 </script>
 </body>
