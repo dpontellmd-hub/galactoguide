@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GalactoGuide</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f8f6; color: #1a1a1a; }
+    .app { max-width: 420px; margin: 0 auto; padding: 0 0 80px; background: #fff; min-height: 100vh; }
+    .topbar { padding: 20px 16px 0; }
+    .topbar h1 { font-size: 22px; font-weight: 600; color: #1a1a1a; }
+    .topbar p { font-size: 13px; color: #666; margin-top: 3px; }
+    .tabs { display: flex; gap: 4px; padding: 14px 16px 0; border-bottom: 1px solid #eee; }
+    .tab { padding: 8px 14px; font-size: 13px; border: none; background: none; color: #888; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+    .tab.active { color: #1a1a1a; border-bottom-color: #1a1a1a; font-weight: 600; }
+    .section { display: none; padding: 16px; }
+    .section.active { display: block; }
+    .search-wrap { position: relative; margin-bottom: 12px; }
+    .search-wrap input { width: 100%; padding: 10px 12px 10px 36px; font-size: 14px; border: 1px solid #ddd; border-radius: 10px; background: #f8f8f6; color: #1a1a1a; }
+    .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: #aaa; pointer-events: none; }
+    .filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px; }
+    .filter-btn { padding: 5px 12px; font-size: 12px; border: 1px solid #ddd; border-radius: 20px; background: none; color: #666; cursor: pointer; }
+    .filter-btn.active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .card { background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 14px; margin-bottom: 10px; cursor: pointer; transition: border-color 0.15s; }
+    .card:hover { border-color: #ccc; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
+    .card-name { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+    .card-type { font-size: 11px; padding: 3px 9px; border-radius: 10px; margin-left: 6px; white-space: nowrap; }
+    .type-herbal { background: #eaf3de; color: #3b6d11; }
+    .type-pharma { background: #e6f1fb; color: #185fa5; }
+    .type-food { background: #faeeda; color: #854f0b; }
+    .evidence-row { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+    .evidence-label { font-size: 12px; color: #888; }
+    .evidence-dots { display: flex; gap: 3px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot.filled-high { background: #1d9e75; }
+    .dot.filled-mid { background: #ef9f27; }
+    .dot.filled-low { background: #e24b4a; }
+    .dot.empty { background: #ddd; }
+    .card-desc { font-size: 13px; color: #666; margin-top: 6px; line-height: 1.5; }
+    .detail-panel { display: none; position: fixed; bottom: 0; left: 0; right: 0; max-width: 420px; margin: 0 auto; background: #fff; border-top: 1px solid #eee; border-radius: 20px 20px 0 0; padding: 20px; z-index: 100; max-height: 75vh; overflow-y: auto; box-shadow: 0 -4px 24px rgba(0,0,0,0.08); }
+    .detail-panel.open { display: block; }
+    .detail-close { float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: #aaa; }
+    .detail-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+    .detail-section { margin-top: 14px; }
+    .detail-section h4 { font-size: 11px; font-weight: 600; color: #aaa; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px; }
+    .detail-section p { font-size: 14px; color: #333; line-height: 1.6; }
+    .detail-link { font-size: 13px; color: #185fa5; margin-top: 6px; display: inline-block; }
+    .safety-tag { display: inline-block; padding: 3px 10px; border-radius: 10px; font-size: 12px; margin: 3px 3px 3px 0; }
+    .safe-yes { background: #eaf3de; color: #3b6d11; }
+    .safe-caution { background: #faeeda; color: #854f0b; }
+    .safe-no { background: #fcebeb; color: #a32d2d; }
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; }
+    .overlay.open { display: block; }
+    .checker-card { background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 14px; margin-bottom: 12px; }
+    .checker-label { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px; }
+    .checker-select { width: 100%; font-size: 14px; padding: 9px 10px; border: 1px solid #ddd; border-radius: 10px; background: #f8f8f6; color: #1a1a1a; }
+    .situation-tag { display: inline-block; padding: 5px 12px; font-size: 12px; border: 1px solid #ddd; border-radius: 12px; margin: 4px 4px 0 0; cursor: pointer; color: #666; }
+    .situation-tag.selected { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+    .result-card { border-radius: 14px; padding: 14px; margin-top: 12px; border: 1px solid #eee; }
+    .result-card.rec { background: #eaf3de; border-color: #c0dd97; }
+    .result-card.caution { background: #faeeda; border-color: #fac775; }
+    .result-card.avoid { background: #fcebeb; border-color: #f7c1c1; }
+    .result-title { font-size: 13px; font-weight: 600; }
+    .result-card.rec .result-title { color: #3b6d11; }
+    .result-card.caution .result-title { color: #854f0b; }
+    .result-card.avoid .result-title { color: #a32d2d; }
+    .result-items { margin-top: 5px; font-size: 13px; }
+    .result-card.rec .result-items { color: #27500a; }
+    .result-card.caution .result-items { color: #633806; }
+    .result-card.avoid .result-items { color: #791f1f; }
+    .info-badge { display: flex; align-items: flex-start; gap: 8px; background: #f0f6ff; border-radius: 10px; padding: 10px 12px; margin-bottom: 14px; }
+    .info-badge span { font-size: 12px; color: #185fa5; line-height: 1.5; }
+    .run-btn { width: 100%; padding: 12px; font-size: 14px; font-weight: 600; border: none; border-radius: 12px; background: #1a1a1a; color: #fff; cursor: pointer; margin-top: 14px; }
+    .run-btn:hover { background: #333; }
+    .empty-results { text-align: center; padding: 32px 16px; color: #aaa; font-size: 14px; }
+    .disclaimer { font-size: 11px; color: #aaa; text-align: center; padding: 16px; line-height: 1.5; border-top: 1px solid #eee; margin-top: 8px; }
+  </style>
+</head>
+<body>
+<div class="app">
+  <div class="topbar">
+    <h1>GalactoGuide</h1>
+    <p>Evidence-based galactogogue reference · IBCLC-reviewed</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showTab('browse', this)">Browse</button>
+    <button class="tab" onclick="showTab('safety', this)">Safety checker</button>
+    <button class="tab" onclick="showTab('recommend', this)">Recommend</button>
+  </div>
+
+  <div id="tab-browse" class="section active">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M10.5 10.5l3 3"/></svg>
+      <input type="text" placeholder="Search galactogogues..." id="search-input" oninput="renderCards()" />
+    </div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+      <button class="filter-btn" onclick="setFilter('herbal',this)">Herbal</button>
+      <button class="filter-btn" onclick="setFilter('pharma',this)">Pharmaceutical</button>
+      <button class="filter-btn" onclick="setFilter('food',this)">Food/dietary</button>
+    </div>
+    <div id="card-list"></div>
+    <div class="disclaimer">GalactoGuide is an educational reference tool for IBCLCs and breastfeeding mothers. It is not a substitute for clinical judgment or personalized medical advice. Always consult a qualified healthcare provider before starting any galactogogue.</div>
+  </div>
+
+  <div id="tab-safety" class="section">
+    <div class="info-badge">
+      <span>Safety data sourced from LactMed &amp; ABM Protocol #9. Always confirm with prescriber for pharmaceutical options.</span>
+    </div>
+    <div class="checker-card">
+      <div class="checker-label">Select a galactogogue</div>
+      <select class="checker-select" id="safety-select" onchange="showSafety()">
+        <option value="">Choose one...</option>
+      </select>
+    </div>
+    <div id="safety-result"></div>
+  </div>
+
+  <div id="tab-recommend" class="section">
+    <div class="info-badge">
+      <span>Suggestions are educational, not prescriptive. Clinical judgment is always required. Not a substitute for IBCLC consultation.</span>
+    </div>
+    <div class="checker-card">
+      <div class="checker-label">Select clinical situation(s)</div>
+      <div id="situation-tags">
+        <span class="situation-tag" onclick="toggleSit(this,'preterm')">Preterm infant</span>
+        <span class="situation-tag" onclick="toggleSit(this,'pcos')">PCOS / insulin resistance</span>
+        <span class="situation-tag" onclick="toggleSit(this,'hypoplasia')">Breast hypoplasia</span>
+        <span class="situation-tag" onclick="toggleSit(this,'low-supply')">General low supply</span>
+        <span class="situation-tag" onclick="toggleSit(this,'relactation')">Relactation</span>
+        <span class="situation-tag" onclick="toggleSit(this,'cardiac')">Cardiac history</span>
+        <span class="situation-tag" onclick="toggleSit(this,'diabetes')">Diabetes / blood sugar issues</span>
+      </div>
+    </div>
+    <button class="run-btn" onclick="runRecommend()">Show recommendations</button>
+    <div id="recommend-result"></div>
+  </div>
+</div>
+
+<div class="overlay" id="overlay" onclick="closeDetail()"></div>
+<div class="detail-panel" id="detail-panel">
+  <button class="detail-close" onclick="closeDetail()">&#x2715;</button>
+  <div id="detail-content"></div>
+</div>
+
+<script>
+const data = [
+  {
+    id:'fenugreek', name:'Fenugreek', type:'herbal', evidence:2,
+    short:'Most widely used herbal galactogogue. Mixed evidence; may cause maple-syrup odor.',
+    mechanism:'Thought to stimulate sweat glands (which are similar to mammary glands) and may mimic estrogen.',
+    evidence_detail:'Several small RCTs show modest increases in milk volume (24–103 mL/day). Evidence is low-certainty due to small sample sizes and lack of standardization.',
+    dosing:'500–1000 mg three times daily (capsule). Effects typically noted within 24–72 hrs.',
+    safety:{preterm:'caution',pcos:'avoid',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'avoid'},
+    notes:'May lower blood glucose — caution in diabetics. Contraindicated in peanut/chickpea allergy. Avoid in PCOS (may worsen hormonal profile in some women).',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501793/'
+  },
+  {
+    id:'moringa', name:'Moringa (Malunggay)', type:'herbal', evidence:3,
+    short:'Promising evidence, especially in Filipino/Asian populations. Well tolerated.',
+    mechanism:'Rich in phytosterols; may stimulate prolactin secretion. Nutritionally dense.',
+    evidence_detail:'Multiple RCTs (primarily in SE Asia) show significant increases in milk volume. A Cochrane review noted moringa as one of the better-studied botanicals.',
+    dosing:'250–500 mg capsule twice daily, or 1–2 tsp leaf powder in food daily.',
+    safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'recommend',relactation:'may use',cardiac:'may use',diabetes:'may use'},
+    notes:'Generally well tolerated. Avoid root/bark extract (different safety profile than leaf). Limited long-term safety data.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK551531/'
+  },
+  {
+    id:'domperidone', name:'Domperidone', type:'pharma', evidence:4,
+    short:'Best pharmaceutical evidence, especially for mothers of preterm infants. Off-label use.',
+    mechanism:'Dopamine antagonist that raises prolactin levels. Does not significantly cross the blood-brain barrier.',
+    evidence_detail:'Multiple RCTs show increased milk volume in mothers of preterm infants. ABM Protocol #9 cites this as having the strongest pharmaceutical evidence base, though still low-certainty overall.',
+    dosing:'10–20 mg three times daily. Reassess at 2 weeks. Not FDA-approved; available via compounding pharmacies in the US.',
+    safety:{preterm:'recommend',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'avoid',diabetes:'may use'},
+    notes:'Cardiac risk (QT prolongation) — requires ECG screening in at-risk patients. Avoid with azole antifungals, macrolide antibiotics, and grapefruit. Prescriber required.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501064/'
+  },
+  {
+    id:'metoclopramide', name:'Metoclopramide', type:'pharma', evidence:2,
+    short:'FDA-approved antiemetic used off-label. Risk of maternal depression limits use.',
+    mechanism:'Dopamine antagonist — raises prolactin. Crosses the blood-brain barrier.',
+    evidence_detail:'Small RCTs show mixed results. ABM Protocol #9 advises caution due to CNS side effects including depression and tardive dyskinesia with prolonged use.',
+    dosing:'10 mg three times daily, typically for no more than 4 weeks.',
+    safety:{preterm:'caution',pcos:'caution',hypoplasia:'caution',low_supply:'caution',relactation:'caution',cardiac:'may use',diabetes:'may use'},
+    notes:'Risk of maternal depression, anxiety, and rare tardive dyskinesia. Not recommended beyond 4 weeks. Screen for depression history before use.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501086/'
+  },
+  {
+    id:'oats', name:'Oats / oatmeal', type:'food', evidence:1,
+    short:'Traditional food galactogogue. No RCT evidence; widely used and safe.',
+    mechanism:'Hypothesized: beta-glucan may affect prolactin. High iron content may help if supply is affected by anemia.',
+    evidence_detail:'No peer-reviewed RCTs found. Widely reported in cultural traditions. Safe and nutritious — no reason to discourage if the mother wishes to use.',
+    dosing:'Regular inclusion in diet (1 cup cooked oats daily). Lactation cookies typically contain oats, brewer\'s yeast, and flaxseed.',
+    safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
+    notes:'Gluten cross-contamination possible in non-certified oats. Safe for infant via breast milk. High glycemic index — caution in poorly controlled diabetes.',
+    lactmed:null
+  },
+  {
+    id:'blessed-thistle', name:'Blessed thistle', type:'herbal', evidence:1,
+    short:'Often paired with fenugreek. Very limited independent evidence.',
+    mechanism:'Unknown. Traditionally thought to stimulate digestion and lactation.',
+    evidence_detail:'No standalone RCTs. Typically studied in combination products. Evidence is anecdotal.',
+    dosing:'390–400 mg capsule three times daily. Often used in combination products.',
+    safety:{preterm:'caution',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'may use'},
+    notes:'Avoid in ragweed allergy (Asteraceae family). May cause GI upset at high doses. Avoid during pregnancy.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501802/'
+  },
+  {
+    id:'goats-rue', name:"Goat's rue", type:'herbal', evidence:2,
+    short:"Contains galegin — the compound metformin was derived from. Useful in PCOS and hypoplasia.",
+    mechanism:'Galegin has insulin-sensitizing properties and may stimulate mammary gland development.',
+    evidence_detail:"Limited RCTs but mechanistically plausible. West & Marasco recommend for insulin resistance, PCOS, and breast hypoplasia. Evidence is primarily observational.",
+    dosing:'300–400 mg standardized extract twice daily.',
+    safety:{preterm:'may use',pcos:'recommend',hypoplasia:'recommend',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
+    notes:"May lower blood glucose — caution with diabetes medications. From the pea family — avoid in legume allergy.",
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK582119/'
+  },
+  {
+    id:'brewers-yeast', name:"Brewer's yeast", type:'food', evidence:1,
+    short:'Common in lactation cookies. Nutritionally rich; no direct RCT evidence.',
+    mechanism:'Rich in B vitamins, chromium, selenium, and protein. Hypothesized nutritional support role.',
+    evidence_detail:'No standalone RCTs for milk supply. Nutritional benefits are well-established. Often used alongside oats and flaxseed in lactation baking.',
+    dosing:'1–2 tbsp powder daily in smoothies, oatmeal, or baked goods.',
+    safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
+    notes:"May interact with MAOIs. Distinct from baker's yeast and nutritional yeast. Possible GI gas. Generally safe.",
+    lactmed:null
+  }
+];
+
+let activeFilter = 'all';
+let activeSituations = [];
+
+function evidenceDots(score) {
+  let html = '<div class="evidence-dots">';
+  for(let i = 1; i <= 4; i++){
+    let cls = 'empty';
+    if(i <= score){ cls = score >= 3 ? 'filled-high' : score === 2 ? 'filled-mid' : 'filled-low'; }
+    html += '<div class="dot ' + cls + '"></div>';
+  }
+  return html + '</div>';
+}
+
+function evidenceText(s){ return s>=4?'Strong (relative)':s===3?'Moderate':s===2?'Limited':'Very limited'; }
+
+function renderCards(){
+  const q = document.getElementById('search-input').value.toLowerCase();
+  const list = document.getElementById('card-list');
+  const filtered = data.filter(d => {
+    if(activeFilter !== 'all' && d.type !== activeFilter) return false;
+    if(q && !d.name.toLowerCase().includes(q) && !d.short.toLowerCase().includes(q)) return false;
+    return true;
+  });
+  if(!filtered.length){ list.innerHTML = '<div class="empty-results">No results found</div>'; return; }
+  list.innerHTML = filtered.map(d => '<div class="card" onclick="openDetail(\'' + d.id + '\')">' +
+    '<div class="card-top"><span class="card-name">' + d.name + '</span>' +
+    '<span class="card-type type-' + d.type + '">' + (d.type==='pharma'?'pharmaceutical':d.type==='herbal'?'herbal':'food/dietary') + '</span></div>' +
+    '<div class="evidence-row">' + evidenceDots(d.evidence) +
+    '<span class="evidence-label">' + evidenceText(d.evidence) + ' evidence</span></div>' +
+    '<div class="card-desc">' + d.short + '</div></div>'
+  ).join('');
+}
+
+function setFilter(f, btn){
+  activeFilter = f;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCards();
+}
+
+function openDetail(id){
+  const d = data.find(x => x.id === id);
+  const sitLabels = {preterm:'Preterm',pcos:'PCOS',hypoplasia:'Hypoplasia',low_supply:'Low supply',relactation:'Relactation',cardiac:'Cardiac',diabetes:'Diabetes'};
+  const tags = Object.entries(d.safety).map(([k,v]) => {
+    const cls = v==='recommend'?'safe-yes':v==='avoid'?'safe-no':'safe-caution';
+    return '<span class="safety-tag ' + cls + '">' + sitLabels[k] + ': ' + v + '</span>';
+  }).join('');
+  document.getElementById('detail-content').innerHTML =
+    '<div class="detail-title">' + d.name + '</div>' +
+    '<div style="margin-top:4px;display:flex;align-items:center;gap:8px;">' +
+    '<span class="card-type type-' + d.type + '">' + (d.type==='pharma'?'pharmaceutical':d.type==='herbal'?'herbal':'food/dietary') + '</span>' +
+    evidenceDots(d.evidence) + '<span style="font-size:12px;color:#888">' + evidenceText(d.evidence) + '</span></div>' +
+    '<div class="detail-section"><h4>Mechanism</h4><p>' + d.mechanism + '</p></div>' +
+    '<div class="detail-section"><h4>Evidence summary</h4><p>' + d.evidence_detail + '</p></div>' +
+    '<div class="detail-section"><h4>Typical dosing</h4><p>' + d.dosing + '</p></div>' +
+    '<div class="detail-section"><h4>Safety notes</h4><p>' + d.notes + '</p></div>' +
+    '<div class="detail-section"><h4>Situational safety</h4>' + tags + '</div>' +
+    (d.lactmed ? '<a class="detail-link" href="' + d.lactmed + '" target="_blank">View on LactMed &#8599;</a>' : '');
+  document.getElementById('detail-panel').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+}
+
+function closeDetail(){
+  document.getElementById('detail-panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+function showTab(t, btn){
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + t).classList.add('active');
+  btn.classList.add('active');
+}
+
+function populateSafetySelect(){
+  const sel = document.getElementById('safety-select');
+  data.forEach(d => {
+    const o = document.createElement('option');
+    o.value = d.id; o.textContent = d.name;
+    sel.appendChild(o);
+  });
+}
+
+function showSafety(){
+  const id = document.getElementById('safety-select').value;
+  const el = document.getElementById('safety-result');
+  if(!id){ el.innerHTML = ''; return; }
+  const d = data.find(x => x.id === id);
+  const sitLabels = {preterm:'Preterm infant',pcos:'PCOS / insulin resistance',hypoplasia:'Breast hypoplasia',low_supply:'General low supply',relactation:'Relactation',cardiac:'Cardiac history',diabetes:'Diabetes'};
+  const tags = Object.entries(d.safety).map(([k,v]) => {
+    const cls = v==='recommend'?'safe-yes':v==='avoid'?'safe-no':'safe-caution';
+    return '<span class="safety-tag ' + cls + '">' + sitLabels[k] + ': ' + v + '</span>';
+  }).join('');
+  el.innerHTML = '<div class="checker-card"><div class="checker-label">Safety profile — ' + d.name + '</div>' +
+    '<div style="margin-bottom:10px">' + tags + '</div>' +
+    '<p style="font-size:13px;color:#555;line-height:1.5">' + d.notes + '</p>' +
+    (d.lactmed ? '<a class="detail-link" href="' + d.lactmed + '" target="_blank">LactMed reference &#8599;</a>' : '') + '</div>';
+}
+
+function toggleSit(el, val){
+  el.classList.toggle('selected');
+  if(activeSituations.includes(val)) activeSituations = activeSituations.filter(x => x !== val);
+  else activeSituations.push(val);
+}
+
+const sitKeyMap = {preterm:'preterm',pcos:'pcos',hypoplasia:'hypoplasia','low-supply':'low_supply',relactation:'relactation',cardiac:'cardiac',diabetes:'diabetes'};
+
+function runRecommend(){
+  const el = document.getElementById('recommend-result');
+  if(!activeSituations.length){ el.innerHTML = '<p style="font-size:13px;color:#aaa;margin-top:12px">Select at least one clinical situation above.</p>'; return; }
+  const rec=[], caution=[], avoid=[];
+  data.forEach(d => {
+    let worst = 'recommend';
+    activeSituations.forEach(s => {
+      const val = d.safety[sitKeyMap[s]];
+      if(val==='avoid') worst='avoid';
+      else if(val==='caution' && worst!=='avoid') worst='caution';
+      else if(val==='may use' && worst==='recommend') worst='may use';
+    });
+    if(worst==='recommend') rec.push(d.name);
+    else if(worst==='may use'||worst==='caution') caution.push(d.name);
+    else avoid.push(d.name);
+  });
+  let html = '';
+  if(rec.length) html += '<div class="result-card rec"><div class="result-title">Reasonable to consider</div><div class="result-items">' + rec.join(', ') + '</div></div>';
+  if(caution.length) html += '<div class="result-card caution"><div class="result-title">Use with caution / counsel first</div><div class="result-items">' + caution.join(', ') + '</div></div>';
+  if(avoid.length) html += '<div class="result-card avoid"><div class="result-title">Avoid or requires specialist input</div><div class="result-items">' + avoid.join(', ') + '</div></div>';
+  el.innerHTML = html;
+}
+
+populateSafetySelect();
+renderCards();
+</script>
+</body>
+</html>
