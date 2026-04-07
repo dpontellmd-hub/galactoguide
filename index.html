@@ -586,7 +586,7 @@ function selectPortal(p, btn) {
   document.querySelectorAll('.portal-btn').forEach(b => b.classList.remove('selected'));
   btn.classList.add('selected');
   const ab = document.getElementById('agree-btn');
-  ab.textContent = p === 'mother' ? 'Continue as lactating parent' : 'Continue as healthcare provider';
+  ab.textContent = p === 'mother' ? 'Continue as Lactating Parent or Caregiver' : 'Continue as Healthcare Provider';
   ab.className = 'agree-btn ' + (p === 'mother' ? 'ready-mother' : 'ready-provider');
 }
 
