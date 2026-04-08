@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Galactogogue & Galactofuge Reference</title>
+  <title>Galactogogue &amp; Galactofuge Reference</title>
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#272d4f" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -15,8 +15,6 @@
     body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f8f6eb; color: #1a1a1a; }
     .hidden { display: none !important; }
     :root { --navy: #272d4f; --brown: #5b4632; --terra: #a27260; --caramel: #c79f7f; --gray: #d8d8dc; --cream: #f8f6eb; --white: #ffffff; --navy-light: #e8eaf2; --terra-light: #f5ede6; }
-
-    /* DISCLAIMER */
     #disclaimer-screen { max-width: 420px; margin: 0 auto; min-height: 100vh; display: flex; flex-direction: column; padding: 24px 20px 24px; background: var(--white); }
     .logo-wrap { text-align: center; margin-bottom: 14px; }
     .dhc-wordmark { height: 36px; width: auto; margin: 0 auto 10px; display: block; }
@@ -44,13 +42,10 @@
     .portal-btn.selected.provider { border-color: var(--navy); background: var(--navy-light); }
     .portal-emoji { font-size: 22px; margin-bottom: 5px; }
     .portal-name { font-size: 13px; font-weight: 600; color: #1a1a1a; }
-    .portal-desc { font-size: 11px; color: #888; margin-top: 2px; line-height: 1.3; }
     .agree-btn { width: 100%; padding: 13px; font-size: 14px; font-weight: 600; border: none; border-radius: 13px; background: #ccc; color: #fff; cursor: not-allowed; transition: background 0.2s; margin-bottom: 8px; }
     .agree-btn.ready-mother { background: var(--terra); cursor: pointer; }
     .agree-btn.ready-provider { background: var(--navy); cursor: pointer; }
     .portal-note { text-align: center; font-size: 11px; color: #aaa; }
-
-    /* MAIN APP */
     #main-app { display: none; }
     .app { max-width: 420px; margin: 0 auto; padding: 0 0 80px; background: #fff; min-height: 100vh; }
     .topbar { padding: 13px 14px 0; display: flex; align-items: flex-start; justify-content: space-between; }
@@ -68,8 +63,6 @@
     .tab.active-provider { color: var(--navy); border-bottom-color: var(--navy); font-weight: 600; }
     .section { display: none; padding: 14px; }
     .section.active { display: block; }
-
-    /* BROWSE */
     .search-wrap { position: relative; margin-bottom: 10px; }
     .search-wrap input { width: 100%; padding: 9px 12px 9px 34px; font-size: 14px; border: 1px solid #e0d8d0; border-radius: 10px; background: var(--cream); color: #1a1a1a; }
     .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; color: #aaa; pointer-events: none; }
@@ -93,8 +86,6 @@
     .dot.high{background:#1d9e75;} .dot.mid{background:#ef9f27;} .dot.low{background:#e24b4a;} .dot.empty{background:#ddd;}
     .card-desc { font-size: 12px; color: #666; margin-top: 5px; line-height: 1.5; }
     .avoid-banner { font-size: 11px; color: #a32d2d; font-weight: 600; background: #fcebeb; padding: 5px 9px; border-radius: 7px; margin-bottom: 8px; }
-
-    /* DETAIL PANEL */
     .detail-panel { display: none; position: fixed; bottom: 0; left: 0; right: 0; max-width: 420px; margin: 0 auto; background: #fff; border-top: 1px solid #eee; border-radius: 20px 20px 0 0; padding: 18px; z-index: 100; max-height: 78vh; overflow-y: auto; box-shadow: 0 -4px 24px rgba(0,0,0,0.08); }
     .detail-panel.open { display: block; }
     .detail-close { float: right; background: none; border: none; font-size: 20px; cursor: pointer; color: #aaa; }
@@ -108,8 +99,6 @@
     .s-rec{background:#eaf3de;color:#3b6d11;} .s-cau{background:#faeeda;color:#854f0b;} .s-no{background:#fcebeb;color:#a32d2d;}
     .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.3); z-index: 99; }
     .overlay.open { display: block; }
-
-    /* SAFETY & RECOMMEND */
     .checker-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 13px; margin-bottom: 10px; }
     .checker-label { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 7px; }
     .checker-select { width: 100%; font-size: 14px; padding: 8px 10px; border: 1px solid #e0d8d0; border-radius: 10px; background: var(--cream); color: #1a1a1a; }
@@ -123,21 +112,16 @@
     .result-items { margin-top: 4px; font-size: 12px; }
     .rec .result-items{color:#27500a;} .cau .result-items{color:#633806;} .avd .result-items{color:#791f1f;}
     .info-badge { display: flex; gap: 8px; border-radius: 10px; padding: 9px 11px; margin-bottom: 12px; }
-    .info-m { background: var(--terra-light); }
-    .info-p { background: var(--navy-light); }
+    .info-m { background: var(--terra-light); } .info-p { background: var(--navy-light); }
     .info-badge span { font-size: 12px; line-height: 1.5; }
-    .info-m span { color: var(--brown); }
-    .info-p span { color: var(--navy); }
+    .info-m span { color: var(--brown); } .info-p span { color: var(--navy); }
     .run-btn-m { width: 100%; padding: 11px; font-size: 14px; font-weight: 600; border: none; border-radius: 12px; background: var(--terra); color: #fff; cursor: pointer; margin-top: 12px; }
     .run-btn-p { width: 100%; padding: 11px; font-size: 14px; font-weight: 600; border: none; border-radius: 12px; background: var(--navy); color: #fff; cursor: pointer; margin-top: 12px; }
     .empty-results { text-align: center; padding: 28px; color: #aaa; font-size: 13px; }
     .disclaimer { font-size: 10px; color: #aaa; text-align: center; padding: 14px; line-height: 1.5; border-top: 1px solid #eee; margin-top: 6px; }
-
-    /* RESOURCES */
     .res-section { margin-bottom: 14px; }
     .res-section-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 7px; padding: 0 2px; }
-    .res-title-m { color: var(--terra); }
-    .res-title-p { color: var(--navy); }
+    .res-title-m { color: var(--terra); } .res-title-p { color: var(--navy); }
     .res-card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 12px; margin-bottom: 7px; }
     .res-name { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 3px; }
     .res-desc { font-size: 12px; color: #666; line-height: 1.5; margin-bottom: 7px; }
@@ -146,8 +130,6 @@
     .res-link-p { font-size: 12px; color: var(--navy); background: var(--navy-light); padding: 4px 10px; border-radius: 8px; text-decoration: none; font-weight: 500; }
     .res-phone { font-size: 12px; color: #3b6d11; background: #eaf3de; padding: 4px 10px; border-radius: 8px; font-weight: 600; }
     .res-tag { font-size: 10px; color: #185fa5; background: #e6f1fb; padding: 2px 7px; border-radius: 6px; }
-
-    /* ABOUT */
     .hero-card { background: var(--navy); border-radius: 16px; padding: 18px; margin-bottom: 10px; }
     .hero-inner { display: flex; align-items: center; gap: 13px; margin-bottom: 13px; }
     .avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--terra-light); display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 700; color: var(--navy); flex-shrink: 0; }
@@ -173,22 +155,21 @@
 </head>
 <body>
 
-<!-- DISCLAIMER + PORTAL -->
 <div id="disclaimer-screen">
   <div class="logo-wrap">
-    <img class="dhc-wordmark" src="https://raw.githubusercontent.com/dpontellmd-hub//main/DHC_Wordmark_K.png" alt="The Dyad Health Collective" onerror="this.style.display='none'" />
+    <img class="dhc-wordmark" src="https://raw.githubusercontent.com/dpontellmd-hub/galactoguide/main/DHC_Wordmark_K.png" alt="The Dyad Health Collective" onerror="this.style.display='none'" />
     <div class="app-name">GalactoGuide&trade;</div>
     <div class="app-sub">Galactogogues &amp; Galactofuges Reference</div>
-    <div class="dyad-line">A clinical tool by <a href="https://dyadhealthcollective.com" target="_blank"> The Dyad Health Collective</a></div>
+    <div class="dyad-line">A clinical tool by <a href="https://dyadhealthcollective.com" target="_blank">The Dyad Health Collective</a></div>
   </div>
   <div class="mission-box">
-    <p><strong>Our purpose:</strong>  brings education and awareness to current research on substances that may <strong>increase (galactogogues)</strong> or <strong>decrease (galactofuges)</strong> breast milk supply. This app does not evaluate the safety of these substances during lactation, assess individual risk, or provide personalized medical recommendations. All substances carry potential benefits, risks, and contraindications that must be reviewed through <strong>shared decision-making with a qualified medical provider</strong> before use.</p>
+    <p><strong>Our purpose:</strong> GalactoGuide brings education and awareness to current research on substances that may <strong>increase (galactogogues)</strong> or <strong>decrease (galactofuges)</strong> breast milk supply. This app does not evaluate the safety of these substances during lactation, assess individual risk, or provide personalized medical recommendations. All substances carry potential benefits, risks, and contraindications that must be reviewed through <strong>shared decision-making with a qualified medical provider</strong> before use.</p>
   </div>
   <div class="disclaimer-box">
     <h2>Important notices</h2>
     <div class="point">
       <div class="point-icon icon-blue"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#185fa5" stroke-width="1.3"/><path d="M7 6v4M7 4.5v.5" stroke="#185fa5" stroke-width="1.3" stroke-linecap="round"/></svg></div>
-      <div><div class="point-title">Educational reference only</div><div class="point-desc"> does not constitute medical advice and does not create a patient-provider relationship.</div></div>
+      <div><div class="point-title">Educational reference only</div><div class="point-desc">GalactoGuide does not constitute medical advice and does not create a patient-provider relationship.</div></div>
     </div>
     <div class="point">
       <div class="point-icon icon-amber"><svg width="13" height="13" viewBox="0 0 14 14" fill="none"><path d="M7 2L12.5 11.5H1.5L7 2Z" stroke="#854f0b" stroke-width="1.3" stroke-linejoin="round"/><path d="M7 6v3M7 10.5v.2" stroke="#854f0b" stroke-width="1.3" stroke-linecap="round"/></svg></div>
@@ -203,24 +184,23 @@
       <div><div class="point-title">Not for emergencies</div><div class="point-desc">For urgent concerns, contact your provider or call 911 immediately.</div></div>
     </div>
     <div class="divider"></div>
-    <div class="fine-print">Content developed and reviewed by Dr. Diana Pontell, MD, IBCLC, The Dyad Health Collective. Last reviewed April 2026. By continuing you agree to our Terms of Use and Privacy Policy.</div>
+    <div class="fine-print">Content developed and reviewed by Dr. Diana Pontell, MD, IBCLC, The Dyad Health Collective. Last reviewed April 2026. By continuing you agree to our <a href="/terms.html" style="color:#a27260">Terms of Use</a> and <a href="/privacy.html" style="color:#a27260">Privacy Policy</a>.</div>
   </div>
   <div class="portal-label">Who are you?</div>
   <div class="portal-row">
     <button class="portal-btn mother" onclick="selectPortal('mother',this)">
       <div class="portal-emoji">🤱</div>
-      <div class="portal-name">Lactating Parent or Caregiver</div
+      <div class="portal-name">Lactating Parent or Caregiver</div>
     </button>
     <button class="portal-btn provider" onclick="selectPortal('provider',this)">
       <div class="portal-emoji">🩺</div>
-      <div class="portal-name">Healthcare Provider</div
+      <div class="portal-name">Healthcare Provider</div>
     </button>
   </div>
   <button class="agree-btn" id="agree-btn" onclick="handleAgree()">Select your portal to continue</button>
-  <div class="portal-note"> · The Dyad Health Collective · Nashville, TN</div>
+  <div class="portal-note">GalactoGuide&trade; · The Dyad Health Collective · Nashville, TN</div>
 </div>
 
-<!-- MAIN APP -->
 <div id="main-app">
   <div class="app">
     <div class="topbar">
@@ -235,7 +215,6 @@
       </div>
     </div>
     <div class="tabs" id="tab-bar"></div>
-
     <div id="tab-browse" class="section active">
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6.5" cy="6.5" r="4.5"/><path d="M10.5 10.5l3 3"/></svg>
@@ -243,9 +222,8 @@
       </div>
       <div class="filter-row" id="filter-row"></div>
       <div id="card-list"></div>
-      <div class="disclaimer">GalactoGuide covers research on milk supply effects — not safety during lactation. Always discuss with your provider. © 2026 Dyad Health Collective LLC.</div>
+      <div class="disclaimer">GalactoGuide&trade; covers research on milk supply effects — not safety during lactation. Always discuss with your provider. &copy; 2026 Dyad Health Collective LLC.</div>
     </div>
-
     <div id="tab-safety" class="section">
       <div class="info-badge" id="safety-badge"><span id="safety-badge-text"></span></div>
       <div class="checker-card">
@@ -254,7 +232,6 @@
       </div>
       <div id="safety-result"></div>
     </div>
-
     <div id="tab-recommend" class="section">
       <div class="info-badge" id="rec-badge"><span id="rec-badge-text"></span></div>
       <div class="checker-card">
@@ -272,11 +249,7 @@
       <button id="run-btn" onclick="runRecommend()">Show recommendations</button>
       <div id="recommend-result"></div>
     </div>
-
-    <div id="tab-resources" class="section">
-      <div id="resources-content"></div>
-    </div>
-
+    <div id="tab-resources" class="section"><div id="resources-content"></div></div>
     <div id="tab-about" class="section">
       <div class="hero-card">
         <div class="hero-inner">
@@ -316,7 +289,7 @@
           <div class="cred-item"><div class="cred-year">2017</div><div class="cred-title">Chief Resident, Children's Hospital of Philadelphia</div></div>
           <div class="cred-item"><div class="cred-year">2018</div><div class="cred-title">Board Certified, American Board of Pediatrics</div></div>
           <div class="cred-item"><div class="cred-year">2023</div><div class="cred-title">IBCLC Certified</div></div>
-          <div class="cred-item"><div class="cred-year">2026</div><div class="cred-title">Deep Dive Breastfeeding & Lactation Medicine, IABLE</div></div>
+          <div class="cred-item"><div class="cred-year">2026</div><div class="cred-title">Deep Dive Breastfeeding &amp; Lactation Medicine, IABLE</div></div>
         </div>
       </div>
       <div class="about-card">
@@ -330,7 +303,7 @@
           Peer-reviewed literature, updated periodically
         </div>
       </div>
-      <div class="footer-note">GalactoGuide is for educational purposes only. Not medical advice.<br/> GalactoGuide&trade; · © 2026 Dyad Health Collective LLC. · Nashville, TN</div>
+      <div class="footer-note">GalactoGuide is for educational purposes only. Not medical advice.<br/>GalactoGuide&trade; &copy; 2026 Dyad Health Collective LLC · Nashville, TN</div>
     </div>
   </div>
 </div>
@@ -346,7 +319,6 @@ let portal = null;
 let activeFilter = 'all';
 let activeSituations = [];
 
-// ── GALACTOGOGUES ──
 const galactogogues = [
   { id:'fenugreek', name:'Fenugreek', type:'herbal', evidence:2,
     short_p:'Most widely used herbal galactogogue. Mixed evidence; may cause maple-syrup odor.',
@@ -375,14 +347,14 @@ const galactogogues = [
   { id:'silymarin', name:'Silymarin (milk thistle)', type:'herbal', evidence:2,
     short_p:'Silymarin, the active compound in milk thistle, has emerging evidence for galactogogue effect. Well-established safety profile.',
     short_m:'Milk thistle is a well-known herbal supplement with some promising early research showing it may help boost milk supply. Generally very well tolerated.',
-    mechanism:'Silymarin may stimulate prolactin secretion via dopaminergic pathways. Also has hepatoprotective properties. The galactogogue effect may be related to its phytoestrogenic activity.',
-    evidence_p:'A notable Italian RCT (Serkedjieva et al.) showed significant increases in milk production with silymarin supplementation. Evidence is limited but mechanistically plausible. Used in some European countries for lactation support.',
-    evidence_m:'A well-designed Italian study showed promising results for increasing milk supply. Not widely studied yet, but early evidence is encouraging and it has a long history of safe use as an herbal supplement.',
-    dosing_p:'420 mg/day of standardized silymarin extract (70–80% silymarin content), divided into 2–3 doses. Look for standardized extracts for consistent dosing.',
+    mechanism:'Silymarin may stimulate prolactin secretion via dopaminergic pathways and phytoestrogenic activity. Also has hepatoprotective properties.',
+    evidence_p:'A notable Italian RCT showed significant increases in milk production with silymarin supplementation. Evidence is limited but mechanistically plausible. Used in some European countries for lactation support.',
+    evidence_m:'A well-designed Italian study showed promising results for increasing milk supply. Not widely studied yet, but early evidence is encouraging with a long history of safe use.',
+    dosing_p:'420 mg/day of standardized silymarin extract (70–80% silymarin content), divided into 2–3 doses.',
     dosing_m:'Usually taken as capsules of standardized milk thistle extract, 2–3 times a day. Look for products that state the silymarin percentage on the label.',
     safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'may use'},
-    notes_p:'Well-established safety profile for general use. Minimal drug interactions at standard doses. Avoid in ragweed/daisy allergy (Asteraceae family). Phytoestrogenic — theoretical caution in hormone-sensitive conditions, though clinical significance at standard doses is unclear.',
-    notes_m:'Generally considered very safe. Avoid if you have a ragweed or daisy allergy. Because it has mild plant-based estrogen-like properties, check with your doctor if you have a history of hormone-sensitive conditions.',
+    notes_p:'Well-established safety profile. Avoid in ragweed/daisy allergy (Asteraceae family). Phytoestrogenic — theoretical caution in hormone-sensitive conditions.',
+    notes_m:'Generally very safe. Avoid if you have a ragweed or daisy allergy. Check with your doctor if you have a history of hormone-sensitive conditions.',
     lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501837/' },
   { id:'domperidone', name:'Domperidone', type:'pharma', evidence:4,
     short_p:'Best pharmaceutical evidence, especially for mothers of preterm infants. Off-label use in the US.',
@@ -391,10 +363,10 @@ const galactogogues = [
     evidence_p:'Multiple RCTs show increased milk volume in mothers of preterm infants. Strongest pharmaceutical evidence per ABM Protocol #9, though still low-certainty overall.',
     evidence_m:'The most well-studied medication for milk supply. Several good studies show it can significantly increase milk, especially for parents of premature babies.',
     dosing_p:'10–20 mg three times daily. Reassess at 2 weeks. Not FDA-approved in the US; available via compounding pharmacies.',
-    dosing_m:'Taken as a pill, usually 3 times a day. Not available over the counter — your doctor needs to prescribe it. Usually reassessed after 2 weeks.',
+    dosing_m:'Taken as a pill, usually 3 times a day. Not available over the counter — your doctor needs to prescribe it.',
     safety:{preterm:'recommend',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'avoid',diabetes:'may use'},
     notes_p:'Cardiac risk (QT prolongation) — requires ECG screening in at-risk patients. Avoid with azole antifungals, macrolide antibiotics, and grapefruit. Prescriber required.',
-    notes_m:'Not safe if you have certain heart conditions. Your doctor will review your health history before prescribing. Cannot be combined with some common medications — always tell your doctor everything you are taking.',
+    notes_m:'Not safe if you have certain heart conditions. Your doctor will review your health history before prescribing. Cannot be combined with some common medications.',
     lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501064/' },
   { id:'metoclopramide', name:'Metoclopramide', type:'pharma', evidence:2,
     short_p:'FDA-approved antiemetic used off-label. Risk of maternal depression limits use.',
@@ -406,26 +378,26 @@ const galactogogues = [
     dosing_m:'Taken as a pill, 3 times a day. Usually not used for more than 4 weeks due to side effect risks.',
     safety:{preterm:'caution',pcos:'caution',hypoplasia:'caution',low_supply:'caution',relactation:'caution',cardiac:'may use',diabetes:'may use'},
     notes_p:'Risk of maternal depression, anxiety, and rare tardive dyskinesia. Not recommended beyond 4 weeks. Screen for depression history before use.',
-    notes_m:'Can cause or worsen depression and anxiety. Tell your doctor about any history of depression or anxiety before starting. Do not take for more than 4 weeks.',
+    notes_m:'Can cause or worsen depression and anxiety. Tell your doctor about any history of depression or anxiety before starting.',
     lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501086/' },
   { id:'oats', name:'Oats / oatmeal', type:'food', evidence:1,
     short_p:'Traditional food galactogogue. No RCT evidence; widely used and safe.',
     short_m:'A classic and beloved milk-boosting food! No strong scientific proof, but safe, nutritious, and worth adding to your diet.',
     mechanism:'Hypothesized: beta-glucan may affect prolactin. High iron content may help if supply is affected by anemia.',
     evidence_p:'No peer-reviewed RCTs. Widely reported in cultural traditions. Safe and nutritious — no reason to discourage.',
-    evidence_m:'No formal studies proving oats boost milk supply, but they\'ve been used across cultures for generations. They\'re nutritious and there\'s no reason not to enjoy them!',
+    evidence_m:'No formal studies proving oats boost milk supply, but they\'ve been used across cultures for generations.',
     dosing_p:'1 cup cooked oats daily. Commonly used in lactation cookies with brewer\'s yeast and flaxseed.',
     dosing_m:'A bowl of oatmeal a day is a great start. Many parents enjoy lactation cookies made with oats, brewer\'s yeast, and flaxseed.',
     safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
     notes_p:'Gluten cross-contamination possible in non-certified oats. High glycemic index — caution in poorly controlled diabetes.',
-    notes_m:'If you have celiac disease or gluten sensitivity, look for certified gluten-free oats. If you have diabetes, talk to your provider as oats can raise blood sugar.',
+    notes_m:'If you have celiac disease, look for certified gluten-free oats. If you have diabetes, talk to your provider.',
     lactmed:null },
   { id:'blessed-thistle', name:'Blessed thistle', type:'herbal', evidence:1,
     short_p:'Often paired with fenugreek. Very limited independent evidence.',
     short_m:'Often sold alongside fenugreek in lactation supplements. Very little independent research, but widely used.',
     mechanism:'Unknown. Traditionally thought to stimulate digestion and lactation.',
     evidence_p:'No standalone RCTs. Typically studied in combination products. Evidence is anecdotal.',
-    evidence_m:'There\'s no strong research on blessed thistle alone for milk supply. It\'s most commonly found in combination herbal supplements.',
+    evidence_m:'There\'s no strong research on blessed thistle alone for milk supply. Most commonly found in combination herbal supplements.',
     dosing_p:'390–400 mg capsule three times daily. Often used in combination products.',
     dosing_m:'Most often taken as part of a combination supplement. If taken alone, usually as capsules 3 times a day.',
     safety:{preterm:'caution',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'may use'},
@@ -434,79 +406,78 @@ const galactogogues = [
     lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501802/' },
   { id:'goats-rue', name:"Goat's rue", type:'herbal', evidence:2,
     short_p:"Contains galegin — the compound metformin was derived from. Useful in PCOS and hypoplasia.",
-    short_m:"A herb that may be particularly helpful if you have PCOS or underdeveloped breast tissue. Contains a compound related to the diabetes medication metformin.",
+    short_m:"A herb that may be particularly helpful if you have PCOS or underdeveloped breast tissue.",
     mechanism:'Galegin has insulin-sensitizing properties and may stimulate mammary gland development.',
     evidence_p:"Limited RCTs but mechanistically plausible. Recommended by West & Marasco for insulin resistance, PCOS, and breast hypoplasia.",
-    evidence_m:"More limited research than some other options, but there are good reasons to think it may help — especially if supply issues are related to hormones or breast tissue development.",
+    evidence_m:"More limited research than some other options, but may help especially if supply issues are related to hormones or breast tissue development.",
     dosing_p:'300–400 mg standardized extract twice daily.',
     dosing_m:'Usually taken as capsules, twice a day. Make sure you\'re using a standardized extract.',
     safety:{preterm:'may use',pcos:'recommend',hypoplasia:'recommend',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
     notes_p:"May lower blood glucose — caution with diabetes medications. Avoid in legume allergy.",
-    notes_m:"Can lower blood sugar — let your doctor know if you take any diabetes medications. Avoid if you have a legume (bean/pea) allergy.",
+    notes_m:"Can lower blood sugar — let your doctor know if you take any diabetes medications. Avoid if you have a legume allergy.",
     lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK582119/' },
   { id:'brewers-yeast', name:"Brewer's yeast", type:'food', evidence:1,
     short_p:"Common in lactation cookies. Nutritionally rich; no direct RCT evidence.",
-    short_m:"A popular ingredient in lactation cookies and smoothies. Packed with B vitamins and minerals — great for your nutrition even if the milk-boosting effect is unproven.",
+    short_m:"A popular ingredient in lactation cookies and smoothies. Packed with B vitamins and minerals.",
     mechanism:'Rich in B vitamins, chromium, selenium, and protein. Hypothesized nutritional support role.',
-    evidence_p:'No standalone RCTs for milk supply. Nutritional benefits well-established. Often used alongside oats and flaxseed.',
-    evidence_m:'No formal studies specifically on milk supply, but it\'s very nutritious and widely loved by breastfeeding parents. A great addition to lactation baking.',
+    evidence_p:'No standalone RCTs for milk supply. Nutritional benefits well-established.',
+    evidence_m:'No formal studies specifically on milk supply, but very nutritious and widely loved by breastfeeding parents.',
     dosing_p:'1–2 tbsp powder daily in smoothies, oatmeal, or baked goods.',
-    dosing_m:'Usually 1–2 tablespoons of powder a day, mixed into smoothies, oatmeal, or baked into lactation cookies.',
+    dosing_m:'Usually 1–2 tablespoons a day, mixed into smoothies, oatmeal, or baked into lactation cookies.',
     safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
     notes_p:"May interact with MAOIs. Possible GI gas. Generally safe.",
-    notes_m:"May cause gas or bloating when you first start. If you take antidepressants, check with your doctor first. Generally very safe.",
+    notes_m:"May cause gas or bloating when you first start. If you take antidepressants, check with your doctor first.",
     lactmed:null }
 ];
 
-// ── GALACTOFUGES ──
 const galactofuges = [
   { id:'sage', name:'Sage', type:'herbal', evidence:2,
-    short_p:'Most evidence-supported galactofuge. Historically used intentionally for weaning.',
-    short_m:'Sage is the herb most strongly linked to reducing milk supply — it\'s sometimes used on purpose when parents want to wean.',
-    mechanism:'Contains phytoestrogens and compounds that may reduce prolactin; historically used medicinally to dry up milk.',
-    evidence_p:'Most consistently reported galactofuge in the herbal literature. Used in multiple cultures specifically for weaning. Evidence is primarily observational.',
-    evidence_m:'While not from formal clinical trials, sage has been used across many cultures to reduce milk supply. Occasional cooking use is likely fine — but supplements or teas may reduce your supply.',
+    short_p:'Most evidence-supported herbal galactofuge. Historically used intentionally for weaning.',
+    short_m:'Sage is the herb most strongly linked to reducing milk supply — sometimes used on purpose when parents want to wean.',
+    mechanism:'Contains phytoestrogens and compounds that may reduce prolactin; historically used medicinally to suppress lactation.',
+    evidence_p:'Most consistently reported galactofuge in the herbal literature. Used in multiple cultures specifically for weaning. Evidence primarily observational.',
+    evidence_m:'Not from formal clinical trials, but sage has been used across many cultures to reduce milk. Occasional cooking use is likely fine — supplements or teas may reduce supply.',
     dosing_p:'Supply reduction reported with regular supplemental doses or high culinary use. Sage tea, capsules, or essential oil (not for ingestion).',
-    dosing_m:'Even regular sage tea or sage supplements could affect supply. Occasional cooking use (like a Thanksgiving stuffing!) is unlikely to cause problems.',
+    dosing_m:'Even regular sage tea or supplements could affect supply. Occasional cooking use is unlikely to cause problems.',
     safety:{preterm:'avoid',pcos:'caution',hypoplasia:'avoid',low_supply:'avoid',relactation:'avoid',cardiac:'may use',diabetes:'may use'},
-    notes_p:'Most consistently reported galactofuge in traditional and herbal medicine. Advise patients to avoid sage supplements or teas if maintaining supply is a goal.',
-    notes_m:'Avoid sage supplements and teas while breastfeeding if you want to keep your milk supply up. Small amounts in cooking are generally fine.',
+    notes_p:'Advise patients to avoid sage supplements or teas if maintaining supply is a goal.',
+    notes_m:'Avoid sage supplements and teas while breastfeeding if you want to keep your supply up. Small amounts in cooking are generally fine.',
     lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501809/' },
   { id:'peppermint', name:'Peppermint / spearmint', type:'herbal', evidence:2,
     short_p:'High-dose peppermint — especially menthol — reported to reduce supply. Culinary use considered safe.',
-    short_m:'High doses of peppermint (strong tea, menthol drops, or oil) may reduce milk supply. A little peppermint in toothpaste or gum is fine!',
+    short_m:'High doses of peppermint (strong tea, menthol drops, or oil) may reduce milk supply. A little in toothpaste or gum is fine!',
     mechanism:'Menthol may have anti-prolactin properties at high doses.',
     evidence_p:'Reported in traditional medicine and case reports. High-dose menthol exposure associated with reduced supply. Culinary use not a concern.',
-    evidence_m:'The concern is with very high doses — like drinking several cups of strong peppermint tea daily, or using peppermint essential oil near your chest. Normal amounts in food or dental products are fine.',
+    evidence_m:'The concern is with very high doses — strong peppermint tea daily, or peppermint essential oil near your chest. Normal amounts in food are fine.',
     dosing_p:'Avoid high-dose peppermint tea, peppermint oil topically to breasts, or menthol-containing supplements while supply is a concern.',
-    dosing_m:'Avoid large amounts of peppermint tea (more than 1 cup/day) and avoid applying peppermint oil to or near your breasts.',
+    dosing_m:'Avoid large amounts of peppermint tea and avoid applying peppermint oil to or near your breasts.',
     safety:{preterm:'caution',pcos:'may use',hypoplasia:'caution',low_supply:'avoid',relactation:'avoid',cardiac:'may use',diabetes:'may use'},
     notes_p:'High-dose menthol products are the primary concern. Advise patients to avoid peppermint essential oil topically near breasts.',
     notes_m:'Avoid peppermint essential oils on or near your breasts. Regular mint-flavored products like gum or toothpaste are not a concern.',
     lactmed:null },
   { id:'parsley', name:'Parsley', type:'herbal', evidence:1,
     short_p:'High-dose parsley reported as galactofuge in traditional medicine. Culinary use not a concern.',
-    short_m:'Large amounts of parsley — like supplements or large quantities of parsley juice — may reduce supply. Using parsley as a garnish in cooking is completely fine.',
+    short_m:'Large amounts of parsley — like supplements or large quantities of juice — may reduce supply. Parsley as a garnish in cooking is completely fine.',
     mechanism:'Contains apiol and myristicin, compounds with potential anti-estrogenic and anti-prolactin activity at high doses.',
     evidence_p:'Traditional use as galactofuge. No clinical RCTs. Evidence is ethnobotanical and observational only.',
     evidence_m:'No strong formal studies, but parsley has been used in many cultures to reduce milk when weaning. High doses — not normal cooking amounts — are the concern.',
     dosing_p:'Supplemental or medicinal doses of parsley or parsley seed oil are the concern — not culinary use.',
-    dosing_m:'Feel free to use parsley in your cooking! The concern is only with parsley supplements, parsley seed oil, or very large quantities.',
+    dosing_m:'Feel free to use parsley in your cooking! The concern is only with supplements, parsley seed oil, or very large quantities.',
     safety:{preterm:'caution',pcos:'may use',hypoplasia:'caution',low_supply:'avoid',relactation:'avoid',cardiac:'may use',diabetes:'may use'},
     notes_p:'Culinary use is safe. Advise against parsley supplements, parsley seed oil, or medicinal-dose preparations.',
-    notes_m:'Parsley on your plate is totally fine. Avoid parsley supplements or juices in large quantities while breastfeeding.',
+    notes_m:'Parsley on your plate is totally fine. Avoid parsley supplements or juices in large quantities.',
     lactmed:null },
   { id:'pseudoephedrine', name:'Pseudoephedrine (Sudafed)', type:'pharma', evidence:3,
     short_p:'Well-documented galactofuge. Single dose studies show measurable reductions in milk output.',
     short_m:'Sudafed (the decongestant kept behind the pharmacy counter) has solid research showing it can significantly reduce milk supply — even after just one dose.',
     mechanism:'Sympathomimetic amine — may reduce milk via vasoconstriction of mammary blood flow and/or direct inhibition of prolactin.',
     evidence_p:'Small but well-designed studies show significant reductions in milk output (up to 24%) after a single dose. Among the most evidence-supported galactofuges.',
-    evidence_m:'Studies show Sudafed can reduce milk output by nearly a quarter — even after just one dose. If you need a decongestant while breastfeeding, ask your provider about a safer alternative.',
-    dosing_p:'60 mg single dose shown to reduce milk output ~24% in one study. Advise patients to avoid or use with caution if supply is a concern.',
-    dosing_m:'Even a single recommended dose of Sudafed has been shown to reduce milk supply. If you have a cold, ask your provider for a breastfeeding-safe alternative.',
+    evidence_m:'Studies show Sudafed can reduce milk output by nearly a quarter — even after just one dose. Ask your provider about a safer alternative if you need a decongestant.',
+    dosing_p:'60 mg single dose shown to reduce milk output ~24% in one study. Advise patients to avoid if supply maintenance is a goal.',
+    dosing_m:'Even a single recommended dose has been shown to reduce milk supply. Ask your pharmacist for a breastfeeding-safe alternative.',
     safety:{preterm:'avoid',pcos:'caution',hypoplasia:'avoid',low_supply:'avoid',relactation:'avoid',cardiac:'avoid',diabetes:'caution'},
-    notes_p:'Recommend patients avoid pseudoephedrine if supply maintenance is a goal. Phenylephrine (PE formulas) has less data but similar concern.',
-    notes_m:'Check all cold medications carefully! Many "non-drowsy" decongestants contain pseudoephedrine or phenylephrine. Ask your pharmacist for a breastfeeding-safe option.',
+    notes_p:'Recommend patients avoid pseudoephedrine if supply maintenance is a goal. Phenylephrine has less data but similar concern.',
+    notes_m:'Check all cold medications carefully! Many "non-drowsy" decongestants contain pseudoephedrine or phenylephrine.',
     lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK500986/' },
   { id:'diphenhydramine', name:'Diphenhydramine (Benadryl)', type:'pharma', evidence:2,
     short_p:'Anticholinergic effects may reduce milk supply. Non-sedating antihistamines preferred.',
@@ -514,20 +485,32 @@ const galactofuges = [
     mechanism:'Anticholinergic properties may reduce secretions including milk; sedating antihistamines have higher concern than non-sedating alternatives.',
     evidence_p:'Primarily theoretical/mechanistic concern plus clinical reports. Non-sedating antihistamines (cetirizine, loratadine) considered preferred alternatives.',
     evidence_m:'Benadryl has a "drying" effect on body secretions — that same effect may reduce milk supply. Non-drowsy antihistamines like Zyrtec or Claritin are generally preferred.',
-    dosing_p:'Occasional single dose lower risk than regular use. Non-sedating alternatives preferred. Counsel patients accordingly.',
+    dosing_p:'Occasional single dose lower risk than regular use. Non-sedating alternatives preferred.',
     dosing_m:'Try to use Zyrtec (cetirizine) or Claritin (loratadine) instead of Benadryl if you need an allergy medication while breastfeeding.',
     safety:{preterm:'caution',pcos:'may use',hypoplasia:'caution',low_supply:'avoid',relactation:'avoid',cardiac:'caution',diabetes:'may use'},
     notes_p:'Regular use more concerning than occasional use. Sedating antihistamines also pass into breast milk and may sedate the infant.',
-    notes_m:'Besides potentially reducing supply, Benadryl can also make your baby sleepy through your breast milk. Ask your provider before using it regularly.',
+    notes_m:'Besides potentially reducing supply, Benadryl can also make your baby sleepy through your breast milk.',
     lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501088/' },
+  { id:'antihistamines', name:'Sedating antihistamines (chlorpheniramine etc.)', type:'pharma', evidence:2,
+    short_p:'Sedating (first-generation) antihistamines as a class carry anticholinergic galactofuge risk. Dose and duration dependent.',
+    short_m:'Older antihistamines found in many cold and allergy products — like chlorpheniramine (Chlor-Trimeton) — may reduce milk supply due to their drying effects.',
+    mechanism:'First-generation antihistamines have significant anticholinergic activity and may reduce prolactin at higher doses, especially dexchlorpheniramine by injection. Suckling-induced prolactin appears less affected than basal levels.',
+    evidence_p:'Per LactMed (updated Feb 2026): small occasional doses acceptable but larger doses or prolonged use may decrease milk supply, particularly in combination with a sympathomimetic such as pseudoephedrine. Non-sedating antihistamines (cetirizine, loratadine, fexofenadine) strongly preferred.',
+    evidence_m:'A class of older antihistamines found in many OTC cold and allergy products. LactMed notes that larger doses or prolonged use may decrease milk supply, especially early in breastfeeding. Non-drowsy options are much safer.',
+    dosing_p:'Small occasional doses (2–4 mg chlorpheniramine) are low risk. Prolonged use, higher doses, or combination with sympathomimetics increase galactofuge risk. Single bedtime doses after last feed of day minimize risk.',
+    dosing_m:'If you need an antihistamine, choose a non-drowsy option like Zyrtec (cetirizine) or Claritin (loratadine). If you must use a sedating antihistamine, use the smallest dose for the shortest time, and consider taking it after your last feed of the day.',
+    safety:{preterm:'avoid',pcos:'caution',hypoplasia:'caution',low_supply:'avoid',relactation:'avoid',cardiac:'caution',diabetes:'may use'},
+    notes_p:'Class effect concern. Cetirizine, loratadine, fexofenadine, and levocetirizine are preferred alternatives. Combination products with pseudoephedrine carry additive galactofuge risk.',
+    notes_m:'Read labels carefully — many multi-symptom cold products contain sedating antihistamines. When in doubt, ask your pharmacist for a breastfeeding-safe option.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501530/' },
   { id:'estrogen', name:'Combined hormonal contraceptives', type:'pharma', evidence:3,
     short_p:'Estrogen-containing contraceptives well-documented to reduce milk supply. Progestin-only options preferred.',
     short_m:'Birth control pills or patches that contain estrogen can significantly reduce your milk supply. Progestin-only options are the recommended choice while breastfeeding.',
     mechanism:'Exogenous estrogen suppresses prolactin and milk production. Progestin-only contraceptives do not carry the same risk.',
     evidence_p:'Well-established. Combined OCP, patch, and ring all carry risk. Progestin-only pill, hormonal IUD, implant, and DMPA considered compatible with breastfeeding after supply is established.',
-    evidence_m:'Regular birth control pills contain estrogen, which is known to reduce milk supply. The "mini pill," hormonal IUD (Mirena/Kyleena), or implant are safe options. Talk to your OB or midwife.',
-    dosing_p:'Counsel to avoid combined hormonal methods until breastfeeding is well established (ideally 6+ weeks postpartum) and even then with caution if supply is fragile.',
-    dosing_m:'If you need birth control while breastfeeding, ask your provider specifically for a progestin-only option. Make sure to mention you are breastfeeding.',
+    evidence_m:'Regular birth control pills contain estrogen, which is known to reduce milk supply. The "mini pill," hormonal IUD (Mirena/Kyleena), or implant are safe options.',
+    dosing_p:'Counsel to avoid combined hormonal methods until breastfeeding is well established (ideally 6+ weeks postpartum).',
+    dosing_m:'If you need birth control while breastfeeding, ask your provider specifically for a progestin-only option.',
     safety:{preterm:'avoid',pcos:'caution',hypoplasia:'avoid',low_supply:'avoid',relactation:'avoid',cardiac:'caution',diabetes:'caution'},
     notes_p:'IUDs (hormonal and copper), progestin-only implant, and DMPA are preferred contraceptive options for breastfeeding patients.',
     notes_m:'Always tell any provider prescribing birth control that you are breastfeeding so they can choose the right type for you.',
@@ -537,28 +520,99 @@ const galactofuges = [
     short_m:'While an occasional drink is considered compatible with breastfeeding, regular or heavy drinking can reduce your milk supply and affect your let-down reflex.',
     mechanism:'Acutely stimulates prolactin but chronically inhibits oxytocin release and let-down reflex; chronic use impairs milk production.',
     evidence_p:'Acute alcohol transiently raises prolactin but inhibits oxytocin-mediated let-down. Chronic/heavy use reduces overall supply. The "beer helps milk" belief is not evidence-supported.',
-    evidence_m:'An occasional glass of wine or beer is not harmful, but the old advice that beer boosts milk supply is a myth. Heavy or regular drinking can reduce your let-down reflex and overall supply.',
-    dosing_p:'Counsel that the brewer\'s yeast in beer — not alcohol — is the proposed mechanism for any benefit. Heavy or regular alcohol use should be avoided.',
-    dosing_m:'If you choose to drink occasionally, timing your feeding before or waiting 2 hours per drink after is a common approach. Talk to your provider about what\'s right for you.',
+    evidence_m:'An occasional glass of wine or beer is not harmful, but heavy or regular drinking can reduce your let-down reflex and overall supply.',
+    dosing_p:'Heavy or regular alcohol use should be avoided. Brewer\'s yeast in beer — not alcohol — is the proposed mechanism for any galactogogue benefit.',
+    dosing_m:'If you choose to drink occasionally, timing your feeding before or waiting 2 hours per drink after is a common approach.',
     safety:{preterm:'avoid',pcos:'caution',hypoplasia:'caution',low_supply:'avoid',relactation:'avoid',cardiac:'caution',diabetes:'caution'},
     notes_p:'Alcohol passes into breast milk. Timing of feeding relative to drinking is relevant. Chronic use is the primary supply concern.',
-    notes_m:'Alcohol does pass into breast milk. If you choose to drink, talk to your provider or IBCLC about timing to minimize exposure to your baby.',
+    notes_m:'Alcohol does pass into breast milk. Talk to your provider or IBCLC about timing to minimize exposure to your baby.',
     lactmed:null },
   { id:'nicotine', name:'Nicotine / smoking', type:'substance', evidence:3,
     short_p:'Well-documented galactofuge. Nicotine inhibits prolactin and reduces milk volume and fat content.',
-    short_m:'Smoking and nicotine products can reduce your milk supply and change the composition of your breast milk. Quitting or reducing is strongly encouraged.',
-    mechanism:'Nicotine inhibits prolactin release; smoking associated with reduced milk fat content and volume. Secondhand smoke a separate infant risk.',
+    short_m:'Smoking and nicotine products can reduce your milk supply and change the composition of your breast milk. Quitting is strongly encouraged.',
+    mechanism:'Nicotine inhibits prolactin release; smoking associated with reduced milk fat content and volume.',
     evidence_p:'Multiple studies document reduced milk volume and fat content in smokers. Nicotine replacement therapy considered preferable to continued smoking while breastfeeding.',
-    evidence_m:'Research clearly shows that smoking reduces milk supply and changes the nutritional quality of breast milk. Nicotine patches or gum are considered safer alternatives if you\'re working on quitting.',
+    evidence_m:'Research clearly shows that smoking reduces milk supply and changes the nutritional quality of breast milk. Nicotine patches or gum are safer alternatives if working on quitting.',
     dosing_p:'Nicotine replacement therapy preferred over continued smoking. Counsel on timing of NRT use relative to feeding.',
-    dosing_m:'If you smoke and want to quit, nicotine replacement therapy (patch, gum) is safer for your baby than continued smoking. Talk to your provider about support for quitting.',
+    dosing_m:'Nicotine replacement therapy (patch, gum) is safer for your baby than continued smoking. Talk to your provider about support for quitting.',
     safety:{preterm:'avoid',pcos:'caution',hypoplasia:'avoid',low_supply:'avoid',relactation:'avoid',cardiac:'avoid',diabetes:'caution'},
-    notes_p:'Counsel that continuing to breastfeed even while smoking provides infant benefits compared to formula, but cessation is strongly preferred.',
-    notes_m:'Even if you currently smoke, breastfeeding is still beneficial for your baby. But quitting or reducing is the best thing you can do for both your supply and your baby\'s health.',
-    lactmed:null }
+    notes_p:'Continuing to breastfeed even while smoking provides infant benefits compared to formula, but cessation is strongly preferred.',
+    notes_m:'Even if you currently smoke, breastfeeding is still beneficial for your baby. But quitting is the best thing for both your supply and your baby\'s health.',
+    lactmed:null },
+  { id:'bromocriptine', name:'Bromocriptine (Parlodel)', type:'pharma', evidence:4,
+    short_p:'Historically the standard pharmaceutical for lactation suppression. FDA withdrew this indication in 1994 due to serious maternal cardiovascular and neurological adverse events. Use with extreme caution.',
+    short_m:'A medication that was once commonly used to stop milk production but is now rarely used because of serious side effects including stroke and heart attack. Only used in very specific medical situations.',
+    mechanism:'Dopamine agonist — directly inhibits prolactin secretion from the pituitary. More effective than placebo for early lactation suppression. Rebound lactation common after cessation.',
+    evidence_p:'Strong historical evidence for lactation suppression (multiple RCTs, more effective than placebo in first postpartum week). FDA withdrew lactation suppression indication in 1994 due to reports of maternal stroke, seizures, myocardial infarction, severe hypertension, and deaths. Still used in some countries for compelling medical indications (stillbirth, HIV) at 2.5 mg twice daily for 14 days. Low-dose (2.5 mg once daily x 3 days) has been used for hypergalactia; drug undetectable in milk at this dose.',
+    evidence_m:'Strong evidence that it stops milk production, but it has very serious potential side effects including stroke, seizures, and heart attack. This is why it is rarely used today. Only a doctor can decide if it is appropriate in a specific medical situation.',
+    dosing_p:'If used: 2.5 mg twice daily for 14 days for lactation suppression. Low-dose use (2.5 mg once daily x 3 days) for hypergalactia has been described. ECG and blood pressure monitoring required. Not recommended for routine use.',
+    dosing_m:'This medication is not used routinely. If your doctor mentions it, make sure to ask about all potential risks and safer alternatives.',
+    safety:{preterm:'avoid',pcos:'avoid',hypoplasia:'avoid',low_supply:'avoid',relactation:'avoid',cardiac:'avoid',diabetes:'caution'},
+    notes_p:'Contraindicated: uncontrolled hypertension, hypertensive disorders of pregnancy, postpartum hypertension, history of CAD or severe cardiovascular disease, severe psychiatric disorders. Avoid with macrolides, azole antifungals, other ergot alkaloids. Blood pressure monitoring essential. Cabergoline is preferred if pharmacologic lactation suppression is needed.',
+    notes_m:'If your doctor has mentioned this medication, please ask about safer alternatives. It has very serious potential side effects. Never take this without direct medical supervision.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501306/' },
+  { id:'cabergoline', name:'Cabergoline (Dostinex)', type:'pharma', evidence:3,
+    short_p:'Currently preferred pharmacologic agent for intentional lactation suppression. Single dose highly effective. Better tolerated than bromocriptine. Off-label in US for this indication.',
+    short_m:'A medication used to stop milk production in specific medical situations (such as after a stillbirth or when breastfeeding is medically contraindicated). More effective and better tolerated than older alternatives. Requires a prescription.',
+    mechanism:'Long-acting dopamine D2 agonist and ergot derivative. Inhibits prolactin secretion. Single oral dose of 1 mg suppresses lactation as effectively as 14 days of bromocriptine.',
+    evidence_p:'Multiple RCTs show 78–100% success rates with a single 1 mg dose postpartum. Systematic reviews confirm safety and efficacy. Side effects (dizziness, nausea, headache) are generally mild and transient. Rare psychiatric symptoms possible — avoid in patients at high risk for postpartum psychosis. BHIVA recommends for HIV-positive patients not breastfeeding. Preferred over bromocriptine when pharmacologic suppression is needed.',
+    evidence_m:'Well-studied and more effective than older options for stopping milk production when medically needed. Most side effects are mild. There is a small risk of mood-related side effects — tell your doctor if you have a history of anxiety, depression, or bipolar disorder.',
+    dosing_p:'For lactation inhibition: 1 mg single oral dose on postpartum day 1. For suppression of established lactation: 0.25 mg every 12 hours for 2 days (1 mg total). Contraindicated with: uncontrolled hypertension, preeclampsia, valvulopathy, fibrotic diseases, hepatic disease, and combination with macrolides or methylergonovine.',
+    dosing_m:'Given as a single tablet or short course — your doctor will prescribe the right dose. Let your doctor know about any heart conditions, high blood pressure, or mental health history before taking this.',
+    safety:{preterm:'caution',pcos:'caution',hypoplasia:'avoid',low_supply:'avoid',relactation:'avoid',cardiac:'avoid',diabetes:'caution'},
+    notes_p:'Contraindicated with postpartum hypertension, psychosis, preeclampsia, valvulopathy, fibrotic or hepatic disease. Avoid with chlorpromazine, haloperidol, metoclopramide, macrolides, and methylergonovine. Blood pressure monitoring recommended. Psychiatric monitoring advisable in at-risk patients.',
+    notes_m:'This medication requires a prescription and careful medical supervision. Do not take it without your doctor\'s guidance.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501327/' },
+  { id:'aripiprazole', name:'Aripiprazole (Abilify)', type:'pharma', evidence:2,
+    short_p:'Atypical antipsychotic with unique partial dopamine agonist action that lowers prolactin — unlike most antipsychotics. Multiple case reports and a retrospective study document lactation suppression. Galactofuge effect is an unintended side effect, not the intended use. Shared decision-making essential.',
+    short_m:'Abilify is a psychiatric medication used for conditions like bipolar disorder and depression. Unlike most psychiatric medications, it can lower prolactin levels and reduce or even stop milk production. If you are breastfeeding and need this medication, this is an important conversation to have with your doctor.',
+    mechanism:'Partial dopamine D2 agonist — unlike full dopamine antagonists (which raise prolactin), aripiprazole lowers prolactin in a dose-dependent manner via partial agonism of the tuberoinfundibular dopaminergic system.',
+    evidence_p:'LactMed (updated Jan 2026): aripiprazole can lower serum prolactin in a dose-related manner; cases of poor milk supply and lactation cessation reported. Retrospective multicenter study (n=34): 73.5% of breastfeeding mothers ceased breastfeeding by last midwife appointment; only 1 of 34 exclusively breastfed. Effect appears dose-related. Case reports show supply decrease within 3 days of initiation. Galactofuge effect is an unintended consequence — not the indication.',
+    evidence_m:'Research shows that many parents who take aripiprazole while breastfeeding experience significant reductions in milk supply, and in some cases milk production stops completely — sometimes within just a few days of starting the medication. This seems to happen more at higher doses. This is not why the medication is prescribed, but it is an important side effect to know about.',
+    dosing_p:'No galactofuge dosing — this is an unintended side effect. Lower doses associated with less supply impact. If psychiatric stability allows, discuss alternative antipsychotics (risperidone, olanzapine) that do not lower prolactin if lactation maintenance is a priority. Shared decision-making required.',
+    dosing_m:'If you are prescribed aripiprazole while breastfeeding, talk with both your prescriber and an IBCLC about what to expect for your milk supply and how to monitor your baby\'s feeding and weight.',
+    safety:{preterm:'avoid',pcos:'caution',hypoplasia:'avoid',low_supply:'avoid',relactation:'avoid',cardiac:'may use',diabetes:'caution'},
+    notes_p:'Monitor for infant weight loss and dehydration in breastfed infants of mothers taking aripiprazole. Consider alternative antipsychotics that raise prolactin (risperidone, quetiapine) if supply maintenance is a priority and psychiatric condition allows. Document shared decision-making discussion.',
+    notes_m:'If you notice your milk supply dropping after starting this medication, contact your IBCLC or prescriber promptly. Do not stop psychiatric medication without consulting your doctor.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501016/' },
+  { id:'testosterone', name:'Testosterone (gender-affirming therapy)', type:'pharma', evidence:2,
+    short_p:'High-dose testosterone documented to suppress lactation. Low-dose and route-dependent effects. Important consideration in transgender and gender-diverse patients. Limited but growing evidence base.',
+    short_m:'Testosterone is a hormone used in gender-affirming care for transgender men and non-binary people. High doses can reduce or stop milk production by lowering prolactin. Low doses may have less impact on supply. This is a nuanced conversation to have with your provider and IBCLC.',
+    mechanism:'High doses of testosterone suppress prolactin and inhibit lactation. Effect is dose-dependent and route-dependent. Low-dose subcutaneous pellet implants may not significantly increase milk testosterone levels.',
+    evidence_p:'Per LactMed (updated 2022): high doses of testosterone can suppress lactation. Low-dose subcutaneous testosterone pellet did not markedly increase milk testosterone levels in one study. Breastfed infants appear not to be adversely affected by parental testosterone therapy at standard gender-affirming doses. One case study showed successful lactation maintenance with low-dose injectable testosterone in a transgender man. Limited data overall — individualized assessment required.',
+    evidence_m:'Research on testosterone and breastfeeding/chestfeeding is limited but growing. High doses are more likely to reduce milk production. Some transgender men have been able to continue chestfeeding while on low-dose testosterone with careful monitoring. This requires close collaboration between your prescribing provider, IBCLC, and ideally a breastfeeding medicine specialist.',
+    dosing_p:'Effect is dose- and route-dependent. If gender-affirming testosterone is desired during lactation: lowest effective dose, injectable preferred over topical (to minimize infant skin exposure), monitor infant testosterone levels and for signs of virilization. Coordinate with prescribing endocrinologist and IBCLC.',
+    dosing_m:'If you want to start or continue testosterone therapy while chestfeeding or breastfeeding, this is something to discuss carefully with your prescriber, a pediatric endocrinologist if possible, and your IBCLC. Monitoring your infant closely is important.',
+    safety:{preterm:'avoid',pcos:'caution',hypoplasia:'caution',low_supply:'avoid',relactation:'avoid',cardiac:'caution',diabetes:'caution'},
+    notes_p:'ABM Clinical Protocol #33 addresses lactation care for LGBTQ+ patients. Testosterone has low oral bioavailability — infant serum testosterone unlikely to be significantly elevated at standard doses. Topical preparations carry higher theoretical infant exposure risk than injectable. Document informed consent and monitoring plan.',
+    notes_m:'You do not have to choose between your gender identity and your feeding goals. Connect with an IBCLC and a breastfeeding medicine provider who has experience with transgender and gender-diverse patients to create a personalized plan.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501721/' },
+  { id:'furosemide', name:'Furosemide / loop diuretics', type:'pharma', evidence:2,
+    short_p:'High-dose furosemide historically used to suppress postpartum lactation. Low doses (20 mg daily) do not suppress lactation per LactMed. Dose-dependent galactofuge effect. Relevant in postpartum hypertension management.',
+    short_m:'Furosemide (Lasix) is a water pill used for conditions like high blood pressure and fluid retention. High doses can reduce milk production. Low doses used to treat postpartum high blood pressure do not appear to affect supply significantly.',
+    mechanism:'Intense diuresis at high doses may reduce overall fluid available for milk production. Historically combined with fluid restriction and breast binding for postpartum lactation suppression.',
+    evidence_p:'Per LactMed (updated Jan 2025): furosemide 20 mg intramuscularly on day 1 then 40 mg orally x4 days used with fluid restriction and breast binding for lactation suppression. Low doses (20 mg daily) do not suppress lactation per RCT data. High-dose diuresis historically used with chlorthalidone 200 mg/day and hydrochlorothiazide 100–150 mg/day for lactation suppression. Prefer alternative diuretics with established safety profiles during breastfeeding.',
+    evidence_m:'Studies show that the low doses used to treat postpartum high blood pressure do not significantly affect milk supply. High doses used specifically to stop milk production are rarely needed today. If you are prescribed furosemide, ask your doctor about the dose and whether it may affect your supply.',
+    dosing_p:'Low doses (20 mg daily) appear safe for lactation. High doses carry galactofuge risk — counsel patients accordingly. Monitor milk supply if higher doses required for medical management.',
+    dosing_m:'If you are prescribed furosemide (Lasix) while breastfeeding, let your doctor know that you are breastfeeding so they can use the lowest effective dose. Monitor your milk supply and let your IBCLC or provider know if you notice changes.',
+    safety:{preterm:'avoid',pcos:'may use',hypoplasia:'caution',low_supply:'avoid',relactation:'avoid',cardiac:'caution',diabetes:'caution'},
+    notes_p:'Dose-dependent effect. Low-dose use for postpartum hypertension management appears compatible with breastfeeding. High-dose use carries galactofuge risk. Prefer alternatives with established safety profiles (e.g., nifedipine, labetalol) for postpartum hypertension when possible.',
+    notes_m:'This medication is most often used safely at low doses in breastfeeding parents. Always let your doctor know you are breastfeeding.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK500810/' },
+  { id:'methylergonovine', name:'Methylergonovine (Methergine)', type:'pharma', evidence:2,
+    short_p:'Uterotonic ergot alkaloid used postpartum for hemorrhage prevention. LactMed notes it can decrease serum prolactin and milk production, especially with prolonged use. Short postpartum courses appear to have minimal lactation impact. Dose and duration dependent.',
+    short_m:'Methergine is a medication commonly given after delivery to help prevent heavy bleeding. Short courses given right after birth appear to have minimal effect on milk supply. However, longer use can reduce prolactin and affect supply.',
+    mechanism:'Ergot alkaloid — causes uterine smooth muscle contraction. Can reduce serum prolactin, particularly with injected doses and prolonged use. Effect on established lactation less clear than on early lactation.',
+    evidence_p:'Per LactMed (updated June 2025): results of several imperfect studies are mixed. Methylergonovine can decrease serum prolactin and possibly milk production, especially when used for several days postpartum. Effect dose- and route-dependent (injected > oral). One RCT (n=880): milk production significantly lower in treated group during first 6 days and at 4 weeks. Short courses during colostral phase appear to have minimal impact. FDA label recommends avoiding breastfeeding for 12 hours after last dose; Infant Risk Center and Hale note relative infant dose is far less than 2% — risk to infant low. Avoid cabergoline co-administration (risk of vasoconstriction).',
+    evidence_m:'Methergine is commonly and safely given after birth to prevent bleeding. A short course right after delivery is unlikely to significantly affect your milk supply. If you are given it for more than a few days, let your IBCLC know so they can monitor your supply.',
+    dosing_p:'Standard postpartum course (0.125–0.25 mg orally TID for 2–7 days): short courses appear low risk for lactation. Prolonged use more concerning. If longer courses needed, monitor milk supply. FDA recommends discarding milk and withholding breastfeeding for 12 hours after last dose — this is cautious but not universally required per Hale/Infant Risk Center data.',
+    dosing_m:'If you are given Methergine after birth, a short course is generally fine for your milk supply. If you need it for more than a few days, mention this to your IBCLC or lactation provider.',
+    safety:{preterm:'caution',pcos:'may use',hypoplasia:'caution',low_supply:'caution',relactation:'caution',cardiac:'avoid',diabetes:'may use'},
+    notes_p:'Avoid with cabergoline (risk of vasoconstriction and hypertensive crisis). Contraindicated in hypertension and vascular disease. Monitor supply with prolonged use. Short standard postpartum courses low risk.',
+    notes_m:'A short course after birth is routine and generally safe for breastfeeding. If you are concerned, speak with your IBCLC.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501342/' }
 ];
 
-// ── RESOURCES ──
 const resources_mother = [
   { name:'LactMed', desc:'A free, easy-to-search database from the National Library of Medicine with information on medications, herbs, and supplements during breastfeeding.', links:[{label:'Visit LactMed',url:'https://www.ncbi.nlm.nih.gov/books/NBK501922/'}], tag:'Free · NIH' },
   { name:'Infant Risk Center', desc:'Staffed by pharmacists and researchers at Texas Tech University. You can call them directly with questions about medications and breastfeeding — they are incredibly helpful!', links:[{label:'infantrisk.com',url:'https://www.infantrisk.com'},{label:'MommyMeds App',url:'https://www.infantrisk.com/mommymeds'}], phone:'(806) 352-2519', tag:'Free phone line' },
@@ -580,7 +634,6 @@ const resources_provider = [
   { name:'Dyad Health Collective', desc:'Physician-led breastfeeding medicine practice available for co-management and consultation. In-home and virtual visits in Nashville area.', links:[{label:'dyadhealthcollective.com',url:'https://dyadhealthcollective.com'}], tag:'Nashville · Virtual' }
 ];
 
-// ── PORTAL ──
 function selectPortal(p, btn) {
   portal = p;
   document.querySelectorAll('.portal-btn').forEach(b => b.classList.remove('selected'));
@@ -598,8 +651,7 @@ function handleAgree() {
 }
 
 function switchPortal() {
-  portal = null;
-  activeSituations = [];
+  portal = null; activeSituations = [];
   document.getElementById('main-app').style.display = 'none';
   document.getElementById('disclaimer-screen').classList.remove('hidden');
   document.querySelectorAll('.portal-btn').forEach(b => b.classList.remove('selected'));
@@ -634,12 +686,9 @@ function setupPortal() {
   ['about-label-story','about-label-dyad','about-label-cred','about-label-sources'].forEach(id => {
     document.getElementById(id).className = aboutLabelClass;
   });
-  populateSafetySelect();
-  renderCards();
-  renderResources();
+  populateSafetySelect(); renderCards(); renderResources();
 }
 
-// ── DOTS ──
 function dots(score) {
   let h = '<div class="evidence-dots">';
   for (let i = 1; i <= 4; i++) {
@@ -651,7 +700,6 @@ function dots(score) {
 }
 function evText(s) { return s>=4?'Strong (relative)':s===3?'Moderate':s===2?'Limited':'Very limited'; }
 
-// ── RENDER CARDS ──
 function renderCards() {
   const q = document.getElementById('search-input').value.toLowerCase();
   const isMother = portal === 'mother';
@@ -700,7 +748,6 @@ function renderCards() {
 
 function setFilter(f, btn) { activeFilter = f; renderCards(); }
 
-// ── DETAIL ──
 function openDetail(id, kind) {
   const isMother = portal === 'mother';
   const h4class = isMother ? 'detail-h4-m' : 'detail-h4-p';
@@ -734,7 +781,6 @@ function closeDetail() {
   document.getElementById('overlay').classList.remove('open');
 }
 
-// ── TABS ──
 function showTab(t, btn) {
   const isMother = portal === 'mother';
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -743,7 +789,6 @@ function showTab(t, btn) {
   btn.classList.add(isMother ? 'active-mother' : 'active-provider');
 }
 
-// ── SAFETY ──
 function populateSafetySelect() {
   const sel = document.getElementById('safety-select');
   sel.innerHTML = '<option value="">Choose one...</option>';
@@ -774,7 +819,6 @@ function showSafety() {
   </div>`;
 }
 
-// ── RECOMMEND ──
 function toggleSit(el, val) {
   const isMother = portal === 'mother';
   el.classList.toggle(isMother?'sel-m':'sel-p');
@@ -823,7 +867,6 @@ function runRecommend() {
   el.innerHTML = html;
 }
 
-// ── RESOURCES ──
 function renderResources() {
   const isMother = portal === 'mother';
   const resources = isMother ? resources_mother : resources_provider;
