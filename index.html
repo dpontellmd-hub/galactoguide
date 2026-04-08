@@ -748,6 +748,33 @@ function renderCards() {
 
 function setFilter(f, btn) { activeFilter = f; renderCards(); }
 
+const sourcesMap = {
+  "fenugreek": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501793/"},{"label":"ABM Protocol #9","url":"https://www.bfmed.org/protocols"},{"label":"Cochrane Review 2020","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC7388198/"}],
+  "moringa": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK551531/"},{"label":"Cochrane Review 2020","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC7388198/"}],
+  "silymarin": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501837/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"}],
+  "domperidone": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501064/"},{"label":"ABM Protocol #9","url":"https://www.bfmed.org/protocols"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"Cochrane Review 2020","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC7388198/"}],
+  "metoclopramide": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501086/"},{"label":"ABM Protocol #9","url":"https://www.bfmed.org/protocols"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"}],
+  "oats": [{"label":"ABM Protocol #9","url":"https://www.bfmed.org/protocols"},{"label":"e-lactancia","url":"https://e-lactancia.org"}],
+  "blessed-thistle": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501802/"},{"label":"ABM Protocol #9","url":"https://www.bfmed.org/protocols"}],
+  "goats-rue": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK582119/"},{"label":"ABM Protocol #9","url":"https://www.bfmed.org/protocols"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"}],
+  "brewers-yeast": [{"label":"ABM Protocol #9","url":"https://www.bfmed.org/protocols"},{"label":"e-lactancia","url":"https://e-lactancia.org"}],
+  "sage": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501809/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"e-lactancia","url":"https://e-lactancia.org"}],
+  "peppermint": [{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"e-lactancia","url":"https://e-lactancia.org"},{"label":"Breastfeeding Medicine Journal","url":"https://www.liebertpub.com/loi/bfm"}],
+  "parsley": [{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"e-lactancia","url":"https://e-lactancia.org"}],
+  "pseudoephedrine": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK500986/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"Infant Risk Center","url":"https://www.infantrisk.com"}],
+  "diphenhydramine": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501088/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"e-lactancia","url":"https://e-lactancia.org"}],
+  "antihistamines": [{"label":"LactMed — Chlorpheniramine","url":"https://www.ncbi.nlm.nih.gov/books/NBK501530/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"Infant Risk Center","url":"https://www.infantrisk.com"}],
+  "estrogen": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501922/"},{"label":"ABM Protocol #9","url":"https://www.bfmed.org/protocols"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"}],
+  "alcohol": [{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"e-lactancia","url":"https://e-lactancia.org"},{"label":"Breastfeeding Medicine Journal","url":"https://www.liebertpub.com/loi/bfm"}],
+  "nicotine": [{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"e-lactancia","url":"https://e-lactancia.org"},{"label":"Breastfeeding Medicine Journal","url":"https://www.liebertpub.com/loi/bfm"}],
+  "bromocriptine": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501306/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"FDA Drug Label","url":"https://www.accessdata.fda.gov/drugsatfda_docs/label/2012/006035s078lbl.pdf"},{"label":"EMA Safety Review","url":"https://www.ema.europa.eu/en/news/cmdh-endorses-restricted-use-bromocriptine-stopping-breast-milk-production"}],
+  "cabergoline": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501327/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"Systematic Review — PMC","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC7069562/"},{"label":"Infant Risk Center","url":"https://www.infantrisk.com"}],
+  "aripiprazole": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501016/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"Infant Risk Center","url":"https://www.infantrisk.com"},{"label":"Case Report — PMC","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC7995469/"}],
+  "testosterone": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501721/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"ABM Protocol #33","url":"https://www.bfmed.org/protocols"},{"label":"Trans Care BC","url":"https://www.transcarebc.ca/clinical-handbook/infant-feeding/testosterone-infant-feeding"}],
+  "furosemide": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK500810/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"e-lactancia","url":"https://www.e-lactation.com/en/furosemide-pr/"}],
+  "methylergonovine": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501342/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"Infant Risk Center","url":"https://www.infantrisk.com/content/use-methylergonovine-breastfeeding-mothers"},{"label":"FDA Drug Label","url":"https://www.accessdata.fda.gov/drugsatfda_docs/label/2012/006035s078lbl.pdf"}],
+};
+
 function openDetail(id, kind) {
   const isMother = portal === 'mother';
   const h4class = isMother ? 'detail-h4-m' : 'detail-h4-p';
@@ -771,7 +798,10 @@ function openDetail(id, kind) {
     <div class="detail-section"><h4 class="${h4class}">${isMother?'How it\'s typically used':'Typical dosing'}</h4><p>${isMother?d.dosing_m:d.dosing_p}</p></div>
     <div class="detail-section"><h4 class="${h4class}">${isMother?'What to know':'Safety / clinical notes'}</h4><p>${isMother?d.notes_m:d.notes_p}</p></div>
     <div class="detail-section"><h4 class="${h4class}">Situational profile</h4>${tags}</div>
-    ${d.lactmed?`<a class="detail-link" href="${d.lactmed}" target="_blank">View on LactMed ↗</a>`:''}`;
+    <div class="detail-section"><h4 class="${h4class}">References</h4>
+    <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:4px">
+    ${(sourcesMap[d.id]||[]).map(s=>`<a href="${s.url}" target="_blank" style="font-size:11px;color:var(--navy);background:var(--navy-light);padding:3px 8px;border-radius:6px;text-decoration:none;font-weight:500">${s.label} ↗</a>`).join('')}
+    </div></div>`;
   document.getElementById('detail-panel').classList.add('open');
   document.getElementById('overlay').classList.add('open');
 }
