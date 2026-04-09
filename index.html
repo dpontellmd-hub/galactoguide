@@ -283,7 +283,6 @@
             <div class="hero-badges">
               <span class="hero-badge">MD</span>
               <span class="hero-badge">IBCLC</span>
-              <span class="hero-badge">NAABLM candidate</span>
             </div>
           </div>
         </div>
@@ -688,8 +687,8 @@ function setupPortal() {
   const ac = isMother ? 'active-mother' : 'active-provider';
   document.getElementById('portal-badge').textContent = isMother ? 'Lactating Parent or Caregiver' : 'Healthcare Provider';
   document.getElementById('portal-badge').className = 'portal-badge ' + (isMother ? 'badge-mother' : 'badge-provider');
-  const tabs = ['browse','safety','recommend','resources','feedback','about'];
-  const tabLabels = ['Browse','Safety','Recommend','Resources','Feedback','About'];
+  const tabs = ['browse','safety','recommend','resources','about','feedback'];
+  const tabLabels = ['Browse','Safety','Recommend','Resources','About','Feedback'];
   document.getElementById('tab-bar').innerHTML = tabs.map((t,i) =>
     `<button class="tab${i===0?' '+ac:''}" onclick="showTab('${t}',this)">${tabLabels[i]}</button>`
   ).join('');
