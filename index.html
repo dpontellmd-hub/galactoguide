@@ -151,6 +151,25 @@
     .cred-year { font-size: 11px; color: var(--terra); font-weight: 600; margin-bottom: 2px; }
     .cred-title { font-size: 11px; color: #444; line-height: 1.4; }
     .footer-note { font-size: 10px; color: #aaa; text-align: center; padding: 6px 0 14px; line-height: 1.6; }
+    .feedback-card { background: #fff; border: 1px solid #eee; border-radius: 14px; padding: 16px; margin-bottom: 12px; }
+    .feedback-label { font-size: 13px; font-weight: 600; color: #1a1a1a; margin-bottom: 10px; }
+    .feedback-sub { font-size: 12px; color: #888; margin-bottom: 12px; line-height: 1.5; }
+    .star-row { display: flex; gap: 8px; margin-bottom: 14px; }
+    .star-btn { font-size: 24px; background: none; border: none; cursor: pointer; opacity: 0.3; transition: opacity 0.15s; padding: 0; }
+    .star-btn.active { opacity: 1; }
+    .reaction-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 14px; }
+    .reaction-btn { padding: 7px 14px; font-size: 12px; font-weight: 600; border-radius: 20px; border: 1.5px solid #eee; background: #fff; cursor: pointer; color: #888; transition: all 0.15s; }
+    .reaction-btn.sel-m { background: var(--terra-light); border-color: var(--terra); color: var(--brown); }
+    .reaction-btn.sel-p { background: var(--navy-light); border-color: var(--navy); color: var(--navy); }
+    .feedback-textarea { width: 100%; padding: 10px 12px; font-size: 13px; border: 1px solid #e0d8d0; border-radius: 10px; background: var(--cream); color: #1a1a1a; resize: vertical; min-height: 80px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin-bottom: 10px; }
+    .feedback-input { width: 100%; padding: 9px 12px; font-size: 13px; border: 1px solid #e0d8d0; border-radius: 10px; background: var(--cream); color: #1a1a1a; margin-bottom: 10px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+    .submit-btn-m { width: 100%; padding: 12px; font-size: 14px; font-weight: 600; border: none; border-radius: 12px; background: var(--terra); color: #fff; cursor: pointer; }
+    .submit-btn-p { width: 100%; padding: 12px; font-size: 14px; font-weight: 600; border: none; border-radius: 12px; background: var(--navy); color: #fff; cursor: pointer; }
+    .submit-btn-m:hover { background: #8a6050; }
+    .submit-btn-p:hover { background: #1e2340; }
+    .thanks-card { background: #eaf3de; border: 1px solid #c0dd97; border-radius: 14px; padding: 20px; text-align: center; margin-bottom: 12px; }
+    .thanks-card h3 { font-size: 16px; font-weight: 600; color: #3b6d11; margin-bottom: 6px; }
+    .thanks-card p { font-size: 13px; color: #27500a; line-height: 1.6; }
   </style>
 </head>
 <body>
@@ -250,6 +269,10 @@
       <div id="recommend-result"></div>
     </div>
     <div id="tab-resources" class="section"><div id="resources-content"></div></div>
+    <div id="tab-feedback" class="section">
+      <div class="info-badge" id="feedback-badge"><span id="feedback-badge-text"></span></div>
+      <div id="feedback-form-wrap"></div>
+    </div>
     <div id="tab-about" class="section">
       <div class="hero-card">
         <div class="hero-inner">
@@ -259,7 +282,8 @@
             <div class="hero-title">Pediatrician · IBCLC · Nashville, TN</div>
             <div class="hero-badges">
               <span class="hero-badge">MD</span>
-              <span class="hero-badge">IBCLC</span> 
+              <span class="hero-badge">IBCLC</span>
+              <span class="hero-badge">NAABLM candidate</span>
             </div>
           </div>
         </div>
@@ -270,7 +294,7 @@
       </div>
       <div class="about-card">
         <div class="about-label-m" id="about-label-story">My story</div>
-        <p>I first became interested in breastfeeding medicine after having my first child at the end of my pediatric residency. Despite years of medical training, I realized I had real gaps in the practical side of breastfeeding — what pump, what flange size, when to start, how often, what positions.</p>
+        <p>I first became interested in breastfeeding medicine after having my first child at the end of my pediatric residency. Despite years of medical training, I realized I had real gaps in the practical application of breastfeeding — Do I need to pump? Change my diet? How do I start? How do I maintain my supply?</p>
         <div class="quote-bar">
           <p>"I know through caring for my own patients that finding adequate breastfeeding support is not easy. Women often feel alone navigating their infant feeding goals among premature birth, medical complexities, mental health concerns, and the demands of work and family life."</p>
         </div>
@@ -514,7 +538,7 @@ const galactofuges = [
     notes_p:'IUDs (hormonal and copper), progestin-only implant, and DMPA are preferred contraceptive options for breastfeeding patients.',
     notes_m:'Always tell any provider prescribing birth control that you are breastfeeding so they can choose the right type for you.',
     lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501922/' },
-  { id:'alcohol', name:'Alcohol (large amounts)', type:'substance', evidence:2,
+  { id:'alcohol', name:'Alcohol (large amounts)', type:'substance', evidence:2, excludeFromRecommend:true,
     short_p:'Chronic or heavy alcohol use documented to reduce milk supply and inhibit let-down. Moderate use more nuanced.',
     short_m:'While an occasional drink is considered compatible with breastfeeding, regular or heavy drinking can reduce your milk supply and affect your let-down reflex.',
     mechanism:'Acutely stimulates prolactin but chronically inhibits oxytocin release and let-down reflex; chronic use impairs milk production.',
@@ -526,7 +550,7 @@ const galactofuges = [
     notes_p:'Alcohol passes into breast milk. Timing of feeding relative to drinking is relevant. Chronic use is the primary supply concern.',
     notes_m:'Alcohol does pass into breast milk. Talk to your provider or IBCLC about timing to minimize exposure to your baby.',
     lactmed:null },
-  { id:'nicotine', name:'Nicotine / smoking', type:'substance', evidence:3,
+  { id:'nicotine', name:'Nicotine / smoking', type:'substance', evidence:3, excludeFromRecommend:true,
     short_p:'Well-documented galactofuge. Nicotine inhibits prolactin and reduces milk volume and fat content.',
     short_m:'Smoking and nicotine products can reduce your milk supply and change the composition of your breast milk. Quitting is strongly encouraged.',
     mechanism:'Nicotine inhibits prolactin release; smoking associated with reduced milk fat content and volume.',
@@ -664,8 +688,8 @@ function setupPortal() {
   const ac = isMother ? 'active-mother' : 'active-provider';
   document.getElementById('portal-badge').textContent = isMother ? 'Lactating Parent or Caregiver' : 'Healthcare Provider';
   document.getElementById('portal-badge').className = 'portal-badge ' + (isMother ? 'badge-mother' : 'badge-provider');
-  const tabs = ['browse','safety','recommend','resources','about'];
-  const tabLabels = ['Browse','Safety','Recommend','Resources','About'];
+  const tabs = ['browse','safety','recommend','resources','feedback','about'];
+  const tabLabels = ['Browse','Safety','Recommend','Resources','Feedback','About'];
   document.getElementById('tab-bar').innerHTML = tabs.map((t,i) =>
     `<button class="tab${i===0?' '+ac:''}" onclick="showTab('${t}',this)">${tabLabels[i]}</button>`
   ).join('');
@@ -685,7 +709,7 @@ function setupPortal() {
   ['about-label-story','about-label-dyad','about-label-cred','about-label-sources'].forEach(id => {
     document.getElementById(id).className = aboutLabelClass;
   });
-  populateSafetySelect(); renderCards(); renderResources();
+  populateSafetySelect(); renderCards(); renderResources(); renderFeedback();
 }
 
 function dots(score) {
@@ -878,6 +902,7 @@ function runRecommend() {
     else avd.push(d.name);
   });
   galactofuges.forEach(d => {
+    if (d.excludeFromRecommend) return;
     let worst = 'recommend';
     activeSituations.forEach(s => {
       const v = d.safety[sitMap[s]];
@@ -894,6 +919,103 @@ function runRecommend() {
   if (gfuge_avoid.length) html += `<div class="result-card avd"><div class="result-title">Galactofuges — avoid for your situation</div><div class="result-items">${gfuge_avoid.join(', ')}</div></div>`;
   if (gfuge_cau.length) html += `<div class="result-card cau"><div class="result-title">Galactofuges — use with extra caution</div><div class="result-items">${gfuge_cau.join(', ')}</div></div>`;
   el.innerHTML = html;
+}
+
+function renderFeedback() {
+  const isMother = portal === 'mother';
+  const wrap = document.getElementById('feedback-form-wrap');
+  const badge = document.getElementById('feedback-badge');
+  const badgeText = document.getElementById('feedback-badge-text');
+  badge.className = 'info-badge ' + (isMother ? 'info-m' : 'info-p');
+  badgeText.textContent = isMother
+    ? 'Your feedback helps improve GalactoGuide for families everywhere. Thank you!'
+    : 'Your clinical feedback is invaluable. Help us improve accuracy and coverage.';
+
+  let selectedStars = 0;
+  let selectedReaction = '';
+
+  const motherReactions = ['Yes, very helpful', 'Somewhat helpful', 'Not helpful', 'Missing info I needed'];
+  const providerReactions = ['Clinically accurate', 'Needs more detail', 'Missing substances', 'Needs references'];
+
+  const reactions = isMother ? motherReactions : providerReactions;
+  const q1label = isMother ? 'Was this information helpful?' : 'How would you rate the clinical accuracy?';
+  const q2label = isMother ? 'What would you like to see added or improved?' : 'What substances or features should we add?';
+  const submitClass = isMother ? 'submit-btn-m' : 'submit-btn-p';
+  const starColor = isMother ? 'var(--terra)' : 'var(--navy)';
+  const selClass = isMother ? 'sel-m' : 'sel-p';
+
+  wrap.innerHTML = `
+    <div class="feedback-card">
+      <div class="feedback-label">Rate GalactoGuide™</div>
+      <div class="feedback-sub">Overall, how useful is this app to you?</div>
+      <div class="star-row" id="star-row">
+        ${[1,2,3,4,5].map(i => `<button class="star-btn" data-star="${i}" onclick="setStars(${i})">&#9733;</button>`).join('')}
+      </div>
+      <div class="feedback-label">${q1label}</div>
+      <div class="reaction-row" id="reaction-row">
+        ${reactions.map(r => `<button class="reaction-btn" onclick="setReaction(this,'${r.replace(/'/g,"\'")}','${selClass}')">${r}</button>`).join('')}
+      </div>
+      <div class="feedback-label">${q2label}</div>
+      <textarea class="feedback-textarea" id="feedback-text" placeholder="Share your thoughts..."></textarea>
+      <div class="feedback-label">Your name and email (optional)</div>
+      <input class="feedback-input" id="feedback-name" placeholder="Name" />
+      <input class="feedback-input" id="feedback-email" placeholder="Email" type="email" />
+      <button class="${submitClass}" onclick="submitFeedback()">Submit feedback</button>
+    </div>`;
+}
+
+function setStars(n) {
+  selectedStarsValue = n;
+  document.querySelectorAll('.star-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', i < n);
+  });
+}
+
+function setReaction(btn, val, selClass) {
+  selectedReactionValue = val;
+  document.querySelectorAll('.reaction-btn').forEach(b => b.className = 'reaction-btn');
+  btn.classList.add(selClass);
+}
+
+let selectedStarsValue = 0;
+let selectedReactionValue = '';
+
+async function submitFeedback() {
+  const isMother = portal === 'mother';
+  const stars = selectedStarsValue;
+  const reaction = selectedReactionValue;
+  const text = document.getElementById('feedback-text').value;
+  const name = document.getElementById('feedback-name').value;
+  const email = document.getElementById('feedback-email').value;
+
+  const body = {
+    portal: isMother ? 'Lactating Parent or Caregiver' : 'Healthcare Provider',
+    star_rating: stars ? stars + ' / 5' : 'Not rated',
+    reaction: reaction || 'Not selected',
+    comments: text || 'None',
+    name: name || 'Anonymous',
+    email: email || 'Not provided',
+    submitted_at: new Date().toLocaleString()
+  };
+
+  try {
+    const res = await fetch('https://formspree.io/f/xlgokjgl', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      document.getElementById('feedback-form-wrap').innerHTML = `
+        <div class="thanks-card">
+          <h3>Thank you for your feedback!</h3>
+          <p>Your input helps make GalactoGuide™ better for breastfeeding families and providers everywhere. We truly appreciate you taking the time.</p>
+        </div>`;
+    } else {
+      alert('Something went wrong. Please try again.');
+    }
+  } catch(e) {
+    alert('Could not submit — please check your connection and try again.');
+  }
 }
 
 function renderResources() {
