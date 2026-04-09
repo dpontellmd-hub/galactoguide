@@ -265,12 +265,12 @@
           <span class="sit-tag" onclick="toggleSit(this,'diabetes')">Diabetes / blood sugar issues</span>
         </div>
       </div>
-      <div style="display:flex;gap:8px;margin-bottom:12px;">
-  <button id="rec-filter-gogue" onclick="setRecFilter('gogue',this)" style="flex:1;padding:8px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #e0d8d0;background:#eaf3de;color:#3b6d11;cursor:pointer;">Galactogogues only</button>
-  <button id="rec-filter-both" onclick="setRecFilter('both',this)" style="flex:1;padding:8px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #272d4f;background:#272d4f;color:#fff;cursor:pointer;">Both</button>
-  <button id="rec-filter-fuge" onclick="setRecFilter('fuge',this)" style="flex:1;padding:8px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #e0d8d0;background:#fcebeb;color:#a32d2d;cursor:pointer;">Galactofuges only</button>
-</div>
-<button id="run-btn" onclick="runRecommend()">Show recommendations</button>
+      <div style="display:flex;gap:8px;margin:12px 0 4px;">
+        <button id="rec-filter-gogue" onclick="setRecFilter('gogue',this)" style="flex:1;padding:8px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #c0dd97;background:#eaf3de;color:#3b6d11;cursor:pointer;opacity:0.45;">Galactogogues only</button>
+        <button id="rec-filter-both" onclick="setRecFilter('both',this)" style="flex:1;padding:8px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #272d4f;background:#272d4f;color:#fff;cursor:pointer;opacity:1;">Both</button>
+        <button id="rec-filter-fuge" onclick="setRecFilter('fuge',this)" style="flex:1;padding:8px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #f7c1c1;background:#fcebeb;color:#a32d2d;cursor:pointer;opacity:0.45;">Galactofuges only</button>
+      </div>
+      <button id="run-btn" onclick="runRecommend()">Show recommendations</button>
       <div id="recommend-result"></div>
     </div>
     <div id="tab-resources" class="section"><div id="resources-content"></div></div>
@@ -288,6 +288,7 @@
             <div class="hero-badges">
               <span class="hero-badge">MD</span>
               <span class="hero-badge">IBCLC</span>
+              <span class="hero-badge">NAABLM candidate</span>
             </div>
           </div>
         </div>
@@ -692,8 +693,8 @@ function setupPortal() {
   const ac = isMother ? 'active-mother' : 'active-provider';
   document.getElementById('portal-badge').textContent = isMother ? 'Lactating Parent or Caregiver' : 'Healthcare Provider';
   document.getElementById('portal-badge').className = 'portal-badge ' + (isMother ? 'badge-mother' : 'badge-provider');
-  const tabs = ['browse','safety','recommend','resources','about','feedback'];
-  const tabLabels = ['Browse','Safety','Recommend','Resources','About','Feedback'];
+  const tabs = ['browse','safety','recommend','resources','feedback','about'];
+  const tabLabels = ['Browse','Safety','Recommend','Resources','Feedback','About'];
   document.getElementById('tab-bar').innerHTML = tabs.map((t,i) =>
     `<button class="tab${i===0?' '+ac:''}" onclick="showTab('${t}',this)">${tabLabels[i]}</button>`
   ).join('');
@@ -883,15 +884,18 @@ function toggleSit(el, val) {
   else activeSituations.push(val);
 }
 
+const sitMap = {preterm:'preterm',pcos:'pcos',hypoplasia:'hypoplasia','low-supply':'low_supply',relactation:'relactation',cardiac:'cardiac',diabetes:'diabetes'};
+
 let recFilter = 'both';
+
 function setRecFilter(f, btn) {
   recFilter = f;
-  document.querySelectorAll('#rec-filter-gogue,#rec-filter-both,#rec-filter-fuge').forEach(b => {
-    b.style.opacity = '0.4';
+  ['rec-filter-gogue','rec-filter-both','rec-filter-fuge'].forEach(id => {
+    const b = document.getElementById(id);
+    if (b) b.style.opacity = '0.45';
   });
   btn.style.opacity = '1';
 }
-const sitMap = {preterm:'preterm',pcos:'pcos',hypoplasia:'hypoplasia','low-supply':'low_supply',relactation:'relactation',cardiac:'cardiac',diabetes:'diabetes'};
 
 function runRecommend() {
   const el = document.getElementById('recommend-result');
@@ -925,7 +929,6 @@ function runRecommend() {
     else gfuge_cau.push(d.name);
   });
   let html = '';
-let html = '';
   if (recFilter !== 'fuge') {
     if (rec.length) html += `<div class="result-card rec"><div class="result-title">${isMother?'May be worth discussing with your provider':'Reasonable to consider'}</div><div class="result-items">${rec.join(', ')}</div></div>`;
     if (cau.length) html += `<div class="result-card cau"><div class="result-title">${isMother?'Use with caution — ask your provider':'Use with caution / counsel first'}</div><div class="result-items">${cau.join(', ')}</div></div>`;
@@ -935,6 +938,8 @@ let html = '';
     if (gfuge_avoid.length) html += `<div class="result-card avd"><div class="result-title">Galactofuges — avoid for your situation</div><div class="result-items">${gfuge_avoid.join(', ')}</div></div>`;
     if (gfuge_cau.length) html += `<div class="result-card cau"><div class="result-title">Galactofuges — use with extra caution</div><div class="result-items">${gfuge_cau.join(', ')}</div></div>`;
   }
+  if (!html) html = `<div class="empty-results">${isMother?'No results for your selection.':'No results for selected criteria.'}</div>`;
+  el.innerHTML = html;
 }
 
 function renderFeedback() {
