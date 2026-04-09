@@ -265,7 +265,12 @@
           <span class="sit-tag" onclick="toggleSit(this,'diabetes')">Diabetes / blood sugar issues</span>
         </div>
       </div>
-      <button id="run-btn" onclick="runRecommend()">Show recommendations</button>
+      <div style="display:flex;gap:8px;margin-bottom:12px;">
+  <button id="rec-filter-gogue" onclick="setRecFilter('gogue',this)" style="flex:1;padding:8px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #e0d8d0;background:#eaf3de;color:#3b6d11;cursor:pointer;">Galactogogues only</button>
+  <button id="rec-filter-both" onclick="setRecFilter('both',this)" style="flex:1;padding:8px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #272d4f;background:#272d4f;color:#fff;cursor:pointer;">Both</button>
+  <button id="rec-filter-fuge" onclick="setRecFilter('fuge',this)" style="flex:1;padding:8px;font-size:12px;font-weight:600;border-radius:20px;border:1.5px solid #e0d8d0;background:#fcebeb;color:#a32d2d;cursor:pointer;">Galactofuges only</button>
+</div>
+<button id="run-btn" onclick="runRecommend()">Show recommendations</button>
       <div id="recommend-result"></div>
     </div>
     <div id="tab-resources" class="section"><div id="resources-content"></div></div>
@@ -878,6 +883,14 @@ function toggleSit(el, val) {
   else activeSituations.push(val);
 }
 
+let recFilter = 'both';
+function setRecFilter(f, btn) {
+  recFilter = f;
+  document.querySelectorAll('#rec-filter-gogue,#rec-filter-both,#rec-filter-fuge').forEach(b => {
+    b.style.opacity = '0.4';
+  });
+  btn.style.opacity = '1';
+}
 const sitMap = {preterm:'preterm',pcos:'pcos',hypoplasia:'hypoplasia','low-supply':'low_supply',relactation:'relactation',cardiac:'cardiac',diabetes:'diabetes'};
 
 function runRecommend() {
@@ -912,12 +925,16 @@ function runRecommend() {
     else gfuge_cau.push(d.name);
   });
   let html = '';
-  if (rec.length) html += `<div class="result-card rec"><div class="result-title">${isMother?'May be worth discussing with your provider':'Reasonable to consider'}</div><div class="result-items">${rec.join(', ')}</div></div>`;
-  if (cau.length) html += `<div class="result-card cau"><div class="result-title">${isMother?'Use with caution — ask your provider':'Use with caution / counsel first'}</div><div class="result-items">${cau.join(', ')}</div></div>`;
-  if (avd.length) html += `<div class="result-card avd"><div class="result-title">${isMother?'Not recommended for your situation':'Avoid or requires specialist input'}</div><div class="result-items">${avd.join(', ')}</div></div>`;
-  if (gfuge_avoid.length) html += `<div class="result-card avd"><div class="result-title">Galactofuges — avoid for your situation</div><div class="result-items">${gfuge_avoid.join(', ')}</div></div>`;
-  if (gfuge_cau.length) html += `<div class="result-card cau"><div class="result-title">Galactofuges — use with extra caution</div><div class="result-items">${gfuge_cau.join(', ')}</div></div>`;
-  el.innerHTML = html;
+let html = '';
+  if (recFilter !== 'fuge') {
+    if (rec.length) html += `<div class="result-card rec"><div class="result-title">${isMother?'May be worth discussing with your provider':'Reasonable to consider'}</div><div class="result-items">${rec.join(', ')}</div></div>`;
+    if (cau.length) html += `<div class="result-card cau"><div class="result-title">${isMother?'Use with caution — ask your provider':'Use with caution / counsel first'}</div><div class="result-items">${cau.join(', ')}</div></div>`;
+    if (avd.length) html += `<div class="result-card avd"><div class="result-title">${isMother?'Not recommended for your situation':'Avoid or requires specialist input'}</div><div class="result-items">${avd.join(', ')}</div></div>`;
+  }
+  if (recFilter !== 'gogue') {
+    if (gfuge_avoid.length) html += `<div class="result-card avd"><div class="result-title">Galactofuges — avoid for your situation</div><div class="result-items">${gfuge_avoid.join(', ')}</div></div>`;
+    if (gfuge_cau.length) html += `<div class="result-card cau"><div class="result-title">Galactofuges — use with extra caution</div><div class="result-items">${gfuge_cau.join(', ')}</div></div>`;
+  }
 }
 
 function renderFeedback() {
