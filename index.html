@@ -780,18 +780,19 @@ function renderCards() {
   const isMother = portal === 'mother';
   const ac = isMother ? 'active-m' : 'active-p';
   const fr = document.getElementById('filter-row');
+  const sortName = (a, b) => a.name.localeCompare(b.name);
   fr.innerHTML = ['all','herbal','pharma','food','substance'].map((f,i) => {
     const labels = ['All','Herbal','Pharmaceutical','Food/dietary','Substances'];
     return `<button class="filter-btn${activeFilter===f?' '+ac:''}" onclick="setFilter('${f}',this)">${labels[i]}</button>`;
   }).join('');
   const list = document.getElementById('card-list');
   let html = '';
-  const filteredG = galactogogues.filter(d => {
+  const filteredG = galactogogues.slice().sort(sortName).filter(d => {
     if (activeFilter !== 'all' && d.type !== activeFilter) return false;
     if (q && !d.name.toLowerCase().includes(q) && !(isMother?d.short_m:d.short_p).toLowerCase().includes(q)) return false;
     return true;
   });
-  const filteredF = galactofuges.filter(d => {
+  const filteredF = galactofuges.slice().sort(sortName).filter(d => {
     if (activeFilter !== 'all' && d.type !== activeFilter) return false;
     if (q && !d.name.toLowerCase().includes(q) && !(isMother?d.short_m:d.short_p).toLowerCase().includes(q)) return false;
     return true;
