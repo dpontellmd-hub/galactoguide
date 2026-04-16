@@ -288,6 +288,7 @@
             <div class="hero-badges">
               <span class="hero-badge">MD</span>
               <span class="hero-badge">IBCLC</span>
+              <span class="hero-badge">NAABLM candidate</span>
             </div>
           </div>
         </div>
@@ -435,7 +436,7 @@ const galactogogues = [
     short_p:"Contains galegin — the compound metformin was derived from. Useful in PCOS and hypoplasia.",
     short_m:"A herb that may be particularly helpful if you have PCOS or underdeveloped breast tissue.",
     mechanism:'Galegin has insulin-sensitizing properties and may stimulate mammary gland development.',
-    evidence_p:"Limited RCTs but mechanistically plausible. Recommended by West & Marasco for insulin resistance, PCOS, and breast hypoplasia.",
+    evidence_p:"Limited RCTs but mechanistically plausible. Particularly relevant for insulin resistance, PCOS, and breast hypoplasia given its galegin content.",
     evidence_m:"More limited research than some other options, but may help especially if supply issues are related to hormones or breast tissue development.",
     dosing_p:'300–400 mg standardized extract twice daily.',
     dosing_m:'Usually taken as capsules, twice a day. Make sure you\'re using a standardized extract.',
@@ -454,6 +455,54 @@ const galactogogues = [
     safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
     notes_p:"May interact with MAOIs. Possible GI gas. Generally safe.",
     notes_m:"May cause gas or bloating when you first start. If you take antidepressants, check with your doctor first.",
+    lactmed:null },
+  { id:'torbangun', name:"Torbangun (Coleus amboinicus)", type:'herbal', evidence:2,
+    short_p:'Traditional Indonesian galactogogue with promising RCT data. Used by the Bataknese people for centuries. Outperformed fenugreek in one head-to-head trial.',
+    short_m:'A leafy herb used for hundreds of years in Indonesia to support milk supply after birth. One small study showed better results than fenugreek. Less commonly available in the US but worth knowing about.',
+    mechanism:'Exact mechanism unclear. May stimulate prolactin secretion. Rich in calcium, magnesium, potassium, and vitamin C. Structurally related to plants with known galactogogue properties.',
+    evidence_p:'One RCT (n=67) compared torbangun soup, fenugreek, and a vitamin B12 control. Torbangun group showed 33% increase in milk volume at day 28; fenugreek group showed 20%. Residual effect persisted one month after supplementation ended. However, baseline milk volumes differed between groups, limiting interpretation. LactMed: human studies of poor quality; studies inadequate to establish activity. No data on excretion into breastmilk. Used safely in Indonesia for hundreds of years.',
+    evidence_m:'A small study found it may boost milk supply more than fenugreek, with effects lasting even after stopping. The research is small and not perfect, but the tradition of use is long. Not yet widely available in the US — usually found as capsules or leaf-based teas.',
+    dosing_p:'No established standardized dose. In studies, given as leaf-based soup (150 g fresh leaves/day for 30 days) or leaf-based capsules. Follow product directions. Standardization not yet established.',
+    dosing_m:'Usually available as capsules or teas. Follow package directions. If you find it in leaf form, it has traditionally been prepared as a soup with chicken or fish.',
+    safety:{preterm:'caution',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'caution'},
+    notes_p:'No major adverse events in small trials. Long-term safety data lacking. No data on milk transfer. Caution with diabetes (possible blood glucose effects). Generally considered safe based on centuries of traditional use.',
+    notes_m:'Generally considered safe based on centuries of use in Indonesia. Always discuss with your provider before starting. If you have diabetes, use with caution as it may affect blood sugar.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501874/' },
+  { id:'shatavari', name:'Shatavari (Asparagus racemosus)', type:'herbal', evidence:2,
+    short_p:'Ayurvedic herb with long traditional use as galactogogue. Multiple RCTs show increased prolactin and milk volume vs placebo. Results are mixed overall but include some well-designed trials.',
+    short_m:'A traditional herb from Ayurvedic medicine used for thousands of years in India to support milk supply. Several small studies show it may increase milk production and prolactin levels.',
+    mechanism:'Contains steroidal saponins (shatavarins I-V) and phytoestrogens that may stimulate prolactin secretion and mammary gland development. May also act via corticosteroid pathways. Rich in folic acid, vitamins A, C, K, and tryptophan.',
+    evidence_p:'Per LactMed (updated Nov 2025): results of many clinical studies are mixed. One small well-done RCT found serum prolactin and infant weight increased more with shatavari than placebo (33% prolactin increase vs 10% in placebo, p<0.05; infant weight 16% vs 6%). A 2025 double-blind RCT (n=120) found greater milk volumes and shorter time to breast fullness at 72 hours postpartum vs placebo. An earlier double-blind RCT (n=78) confirmed greater expressed milk volumes (64.74 mL vs 49.69 mL, p=0.008). Overall evidence is limited and methodologically variable but more promising than most herbal galactogogues.',
+    evidence_m:'Several studies — including some well-designed ones — found it increased prolactin levels and milk volume compared to placebo. The evidence is mixed across studies but among the better-supported herbal options alongside moringa.',
+    dosing_p:'Per clinical trials: 300–600 mg root extract daily. Commonly available as powder (1–2 tsp daily), capsules, or tablets. Follow product directions. Look for standardized root extract preparations.',
+    dosing_m:'Usually taken as capsules or powder. Can be added to warm milk or smoothies. Follow package directions. Note: the raw herb is quite bitter — most prefer capsules.',
+    safety:{preterm:'may use',pcos:'may use',hypoplasia:'may use',low_supply:'may use',relactation:'may use',cardiac:'may use',diabetes:'may use'},
+    notes_p:'Generally well tolerated in trials. Phytoestrogenic — theoretical caution in estrogen-sensitive conditions. Avoid if allergic to asparagus. Contains saponins — may cause mild GI upset at high doses. Diuretic properties — use caution if already on diuretics. No significant adverse events reported in RCTs.',
+    notes_m:'Generally considered safe. Avoid if you have an asparagus allergy. May cause increased urination. If you take any diuretic medications, check with your provider first.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501813/' },
+  { id:'metformin', name:'Metformin (Glucophage)', type:'pharma', evidence:1,
+    short_p:'Biguanide diabetes medication sometimes used off-label as galactogogue in insulin-resistant patients with low supply. LactMed explicitly states no evidence of effectiveness. One pilot RCT did not show significant benefit. Mechanistically plausible but unproven.',
+    short_m:'Metformin is a diabetes medication sometimes discussed for low milk supply in parents with PCOS or insulin resistance. While the idea behind it is reasonable, there is currently no proof that it actually increases milk supply.',
+    mechanism:'Improves insulin sensitivity — hypothesized to support lactation by addressing insulin-mediated mammary gland dysfunction. Insulin plays a role in mammary epithelial cell function and lactogenesis. Mechanistically plausible particularly in PCOS and insulin-resistant patients with delayed lactogenesis.',
+    evidence_p:'Per LactMed (updated Oct 2023): metformin is sometimes used as a galactogogue but there is no evidence it is effective. One pilot RCT (Nommsen-Rivers et al., n=15) in women with low supply and insulin resistance: no significant difference in milk output vs placebo at day 28. GI side effects common (diarrhea 56%, nausea 44%). Milk levels low (<0.5% of maternal weight-adjusted dose). One sizeable prospective study found no adverse effects in breastfed infants. Use with caution in nursing newborns and preterm infants. Currently under investigation in larger trials.',
+    evidence_m:'Although some providers discuss metformin for low milk supply related to PCOS or insulin resistance, current research has not shown it works for this purpose. It is safe to take while breastfeeding in terms of infant exposure, but effectiveness for milk supply is unproven.',
+    dosing_p:'No established galactogogue dosing. If used: 500–2000 mg daily per pilot study protocol. GI side effects dose-dependent — start low and titrate. Use with caution in preterm and newborn infants. Discuss with prescribing provider.',
+    dosing_m:'This is a prescription medication. If your provider mentions metformin for low supply, ask about current evidence and alternatives like domperidone. Do not start metformin specifically for milk supply without medical guidance.',
+    safety:{preterm:'caution',pcos:'may use',hypoplasia:'may use',low_supply:'caution',relactation:'caution',cardiac:'may use',diabetes:'may use'},
+    notes_p:'LactMed explicitly states no evidence of effectiveness as galactogogue. Mechanistically plausible in insulin-resistant patients. GI side effects common. Milk transfer low (<0.5% weight-adjusted dose). Use with caution in preterm and newborn infants. Await results of larger trials before routine recommendation.',
+    notes_m:'Currently no proven benefit for milk supply. If you are already taking metformin for diabetes or PCOS, it is safe to continue while breastfeeding. Do not start it specifically for milk supply.',
+    lactmed:'https://www.ncbi.nlm.nih.gov/books/NBK501020/' },
+  { id:'myo-inositol', name:'Myo-inositol', type:'pharma', evidence:1,
+    short_p:'Naturally occurring polyol with insulin-sensitizing properties. Increasingly used in PCOS management. No direct RCT evidence as galactogogue, but mechanistically plausible in insulin-resistant patients. e-lactancia rates as compatible/low risk. Myo-inositol is a component of human milk.',
+    short_m:'A natural supplement used for PCOS and insulin resistance. There are no formal studies proving it increases milk supply, but it may help indirectly if hormone imbalance or insulin resistance is contributing to low supply. It is found naturally in human breast milk.',
+    mechanism:'Natural polyol that acts as an insulin sensitizer, similar in mechanism to metformin. Involved in glucose uptake signaling and cellular function. PCOS patients may have impaired myo-inositol to D-chiro-inositol conversion, contributing to insulin resistance and potentially impaired lactation. Myo-inositol is a component of human breast milk, most abundant in early lactation; plays a role in infant brain development.',
+    evidence_p:'No direct RCTs evaluating myo-inositol as a galactogogue. Mechanistic rationale exists for insulin-resistant patients with low supply (PCOS, delayed lactogenesis II). e-lactancia rates as compatible/low risk during lactation. No LactMed monograph specific to galactogogue use. Myo-inositol is a natural human milk component (PNAS 2023). Well-established safety in PCOS literature. Considered a reasonable adjunct in the PCOS and low supply setting pending direct trials.',
+    evidence_m:'No formal studies have tested myo-inositol specifically for milk supply. However, it is a natural supplement already found in breast milk, widely used for PCOS, and considered safe during breastfeeding. It may help if PCOS or insulin resistance is contributing to supply issues.',
+    dosing_p:'No established galactogogue dosing. Based on PCOS literature: myo-inositol 2000–4000 mg/day, often with D-chiro-inositol in 40:1 ratio. Well tolerated. Follow product directions.',
+    dosing_m:'Usually taken as capsules or powder, often combined with D-chiro-inositol in a 40:1 ratio. Follow package directions. Widely available as an OTC supplement.',
+    safety:{preterm:'may use',pcos:'recommend',hypoplasia:'may use',low_supply:'caution',relactation:'caution',cardiac:'may use',diabetes:'may use'},
+    notes_p:'No direct galactogogue RCTs. Reasonable mechanistic basis in PCOS/insulin resistance. e-lactancia: compatible/low risk. Natural human milk component. Well-tolerated in PCOS trials. Suitable as adjunct support while awaiting direct lactation evidence.',
+    notes_m:'Generally considered safe during breastfeeding. Best evidence is for PCOS support rather than milk supply directly. If you have PCOS or insulin resistance, discuss with your provider whether this might help your overall hormonal environment.',
     lactmed:null }
 ];
 
@@ -692,8 +741,8 @@ function setupPortal() {
   const ac = isMother ? 'active-mother' : 'active-provider';
   document.getElementById('portal-badge').textContent = isMother ? 'Lactating Parent or Caregiver' : 'Healthcare Provider';
   document.getElementById('portal-badge').className = 'portal-badge ' + (isMother ? 'badge-mother' : 'badge-provider');
-  const tabs = ['browse','safety','recommend','resources','about','feedback'];
-  const tabLabels = ['Browse','Safety','Recommend','Resources','About','Feedback'];
+  const tabs = ['browse','safety','recommend','resources','feedback','about'];
+  const tabLabels = ['Browse','Safety','Recommend','Resources','Feedback','About'];
   document.getElementById('tab-bar').innerHTML = tabs.map((t,i) =>
     `<button class="tab${i===0?' '+ac:''}" onclick="showTab('${t}',this)">${tabLabels[i]}</button>`
   ).join('');
@@ -800,6 +849,10 @@ const sourcesMap = {
   "testosterone": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501721/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"ABM Protocol #33","url":"https://www.bfmed.org/protocols"},{"label":"Trans Care BC","url":"https://www.transcarebc.ca/clinical-handbook/infant-feeding/testosterone-infant-feeding"}],
   "furosemide": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK500810/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"e-lactancia","url":"https://www.e-lactation.com/en/furosemide-pr/"}],
   "methylergonovine": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501342/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"Infant Risk Center","url":"https://www.infantrisk.com/content/use-methylergonovine-breastfeeding-mothers"},{"label":"FDA Drug Label","url":"https://www.accessdata.fda.gov/drugsatfda_docs/label/2012/006035s078lbl.pdf"}],
+  "torbangun": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501874/"},{"label":"Damanik RCT — PubMed","url":"https://pubmed.ncbi.nlm.nih.gov/16672214/"},{"label":"ABM Protocol #9","url":"https://www.bfmed.org/protocols"}],
+  "shatavari": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501813/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"Gupta & Shaw RCT — PMC","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC3869575/"},{"label":"Birla et al. RCT — PMC","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC9375125/"}],
+  "metformin": [{"label":"LactMed","url":"https://www.ncbi.nlm.nih.gov/books/NBK501020/"},{"label":"Hale's Medications & Mothers' Milk","url":"https://halesmeds.com"},{"label":"Nommsen-Rivers Pilot RCT","url":"https://pmc.ncbi.nlm.nih.gov/articles/PMC8992687/"},{"label":"Infant Risk Center","url":"https://www.infantrisk.com"}],
+  "myo-inositol": [{"label":"e-lactancia","url":"https://e-lactancia.org"},{"label":"PNAS Human Milk Study","url":"https://www.pnas.org/doi/10.1073/pnas.2221413120"},{"label":"Breastfeeding Support — PCOS","url":"https://breastfeeding.support/polycystic-ovary-syndrome-breastfeeding/"}],
 };
 
 function openDetail(id, kind) {
