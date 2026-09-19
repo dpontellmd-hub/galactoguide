@@ -1,0 +1,22 @@
+import type { Resource } from './types';
+
+export const resourcesMother: Resource[] = [
+  { name:'LactMed', desc:'A free, easy-to-search database from the National Library of Medicine with information on medications, herbs, and supplements during breastfeeding.', links:[{label:'Visit LactMed',url:'https://www.ncbi.nlm.nih.gov/books/NBK501922/'}], tag:'Free · NIH' },
+  { name:'Infant Risk Center', desc:'Staffed by pharmacists and researchers at Texas Tech University. You can call them directly with questions about medications and breastfeeding — they are incredibly helpful!', links:[{label:'infantrisk.com',url:'https://www.infantrisk.com'},{label:'MommyMeds App',url:'https://www.infantrisk.com/mommymeds'}], phone:'(806) 352-2519', tag:'Free phone line' },
+  { name:'MotherToBaby', desc:'Evidence-based information on medications, supplements, vaccines, and exposures during pregnancy and breastfeeding. Run by teratology specialists.', links:[{label:'mothertobaby.org',url:'https://mothertobaby.org'}], tag:'Free' },
+  { name:'e-lactancia', desc:'A Spanish and English database covering drug and herb compatibility with breastfeeding. Clear safety ratings and easy to navigate.', links:[{label:'e-lactancia.org',url:'https://e-lactancia.org'}], tag:'Free · Spanish/English' },
+  { name:'Find a Breastfeeding Medicine Provider', desc:'The LactED world lactation map helps you find certified breastfeeding medicine providers in North America and beyond.', links:[{label:'Find a provider near you',url:'https://lacted.org/providers-world-lactation-map/'}], tag:'Provider directory' },
+  { name:'Dyad Health Collective', desc:'Book a consultation with Dr. Diana Pontell, MD, IBCLC for personalized breastfeeding medicine support in Nashville or virtually.', links:[{label:'Book a visit',url:'https://dyadhealthcollective.com'}], tag:'Nashville · Virtual' }
+];
+
+export const resourcesProvider: Resource[] = [
+  { name:'LactMed (NLM)', desc:'NIH Drugs and Lactation Database. Evidence-based monographs on drugs, herbs, and dietary supplements. Essential clinical reference.', links:[{label:'nlm.nih.gov/lactmed',url:'https://www.ncbi.nlm.nih.gov/books/NBK501922/'}], tag:'Free · NIH' },
+  { name:"Hale's Medications and Mothers' Milk", desc:'The gold standard clinical reference for medication use during lactation. Available in print and via the HalesMeds online platform.', links:[{label:'HalesMeds App',url:'https://halesmeds.com'}], tag:'Subscription' },
+  { name:'Infant Risk Center — Texas Tech', desc:'Pharmacist-staffed consultation line for complex medication and lactation questions. Invaluable for unusual or high-risk cases.', links:[{label:'infantrisk.com',url:'https://www.infantrisk.com'},{label:'Infant Risk HCP App',url:'https://www.infantrisk.com/infantriskcenter'}], phone:'(806) 352-2519', tag:'HCP line available' },
+  { name:'e-lactancia', desc:'Spanish/English drug and herb compatibility database with clear risk ratings. Particularly useful for international or herbal queries.', links:[{label:'e-lactancia.org',url:'https://e-lactancia.org'}], tag:'Free' },
+  { name:'MotherToBaby', desc:'Teratogen information service providing evidence-based information on medication and supplement exposures during lactation.', links:[{label:'mothertobaby.org',url:'https://mothertobaby.org'}], tag:'Free' },
+  { name:'ABM Clinical Protocol #9', desc:'Academy of Breastfeeding Medicine protocol on use of galactogogues in initiating or augmenting maternal milk production (2018 second revision).', links:[{label:'Read Protocol',url:'https://www.bfmed.org/assets/DOCUMENTS/PROTOCOLS/9-galactogogues-protocol-english.pdf'}], tag:'Clinical guideline' },
+  { name:'LactED World Lactation Provider Map', desc:'Certified directory of breastfeeding medicine providers in North America. Useful for referrals and co-management.', links:[{label:'Find providers',url:'https://lacted.org/providers-world-lactation-map/'}], tag:'Provider directory' },
+  { name:'Breastfeeding Medicine Journal', desc:'Peer-reviewed journal of the Academy of Breastfeeding Medicine. Primary literature source for lactation medicine research.', links:[{label:'liebertpub.com/bfm',url:'https://www.liebertpub.com/loi/bfm'}], tag:'Peer-reviewed' },
+  { name:'Dyad Health Collective', desc:'Physician-led breastfeeding medicine practice available for co-management and consultation. In-home and virtual visits in Nashville area.', links:[{label:'dyadhealthcollective.com',url:'https://dyadhealthcollective.com'}], tag:'Nashville · Virtual' }
+];
