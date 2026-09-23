@@ -58,6 +58,7 @@ export default function OnboardingScreen() {
   const { situations, toggleSituation } = useSituations();
   const { user, configured } = useAuth();
   const [step, setStep] = useState(0);
+  const [verificationPending, setVerificationPending] = useState(false);
   const { colors, isDark } = useTheme();
   const { isDesktop } = useResponsiveLayout();
   const windowSize = useWindowDimensions();
@@ -333,7 +334,8 @@ export default function OnboardingScreen() {
               </View>
             </View>
           ) : (
-            <AuthForm accent={accent.main} hideHeader style={styles.authForm} />
+            <AuthForm accent={accent.main} hideHeader style={styles.authForm}
+              onVerificationPendingChange={setVerificationPending} />
           ))}
         </View>}
         {isWelcome && isDesktop && (
@@ -396,9 +398,10 @@ export default function OnboardingScreen() {
           ) : null}
           <Pressable
             onPress={next}
+            disabled={!!current.auth && verificationPending && !user}
             accessibilityRole="button"
             accessibilityLabel={isLast ? 'Review disclaimer' : 'Next'}
-            style={[styles.nextBtn, { backgroundColor: accent.main }]}
+            style={[styles.nextBtn, { backgroundColor: accent.main }, !!current.auth && verificationPending && !user && { opacity: 0.5 }]}
           >
             <Text style={styles.nextText}>{isLast ? 'Review disclaimer' : 'Next'}</Text>
           </Pressable>

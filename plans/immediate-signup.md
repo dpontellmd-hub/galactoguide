@@ -1,25 +1,7 @@
-# Immediate signup with deferred email verification
+# Superseded: immediate signup with deferred email verification
 
-## Goal
-Create an account and continue immediately; verify email later from a small reminder.
+The user chose in-place signup code verification on 2026-09-23. Do not disable Supabase Confirm email. Follow `plans/signup-code.md` and `docs/signup-code-rollout.md` instead.
 
-## Work
-- [x] Add server-owned verification records separate from Supabase auto-confirmation.
-- [x] Send verification through existing Supabase magic-link email delivery, with resend and nonblocking failures.
-- [x] Add a compact reminder; handle account switching and stale requests.
-- [x] Test database authorization, signup/session behavior, and web build.
-- [ ] Publish the reviewed code, apply migration and email template, then disable blocking confirmation and test live.
+The earlier client design was pushed to draft PR #2 at `83e2a20925c17a127f578efb0fa5b2c959b15837`. Its additive `email_verifications` migration was installed in live Supabase but is unused by the replacement flow. Leave the table in place during cutover; do not rerun its backfill or remove it as part of this signup change.
 
-## Decisions
-- User explicitly selected immediate signed-in access, including saved favorites and syncing.
-- Verification is informational; existing account permissions remain unchanged.
-- Use server-validated email-link authentication evidence, never editable user metadata or the auto-confirmed email timestamp for new accounts.
-- Preserve already-confirmed accounts with a one-time migration before disabling Confirm email.
-- Do not change production settings until the new client is ready. Commit/push still requires explicit user instruction.
-
-## Validation / resume point
-- Passed TypeScript, focused ESLint, production web export (27 routes), auth callback regression tests, disposable PostgreSQL verification tests, and actual React provider signup/delivery tests.
-- No commits, pushes, live database migration, template edits, or auth-setting changes made for this feature yet.
-- Next: publish to the existing preview branch with explicit push authorization, then follow `docs/immediate-signup-rollout.md`. Live signup and email-link proof still require user testing.
-
-TLDR: Built and tested locally; publish and activate before users can use the new flow.
+TLDR: The immediate-access design is abandoned; account access now waits for the email code.

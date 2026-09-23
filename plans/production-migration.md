@@ -77,7 +77,12 @@ Replace the old app in `dpontellmd-hub/galactoguide`, preserve its history and a
 - Prepared local `legacy-website-2026-09-19` tag and `codex/legacy-website-2026-09-19` branch. Created source ZIP and a full-history bundle in `.tmp/production-migration/`; `git bundle verify` passed. These refs have not been pushed.
 - Prepared local `codex/website-replacement` from destination main. Source provenance is in `docs/migration-provenance.md`; a SHA-256 copy manifest is stored outside the replacement checkout. Local environment/editor files and the pre-existing untracked breastfeeding-log specification are excluded. The original source checkout remains intact.
 - All 164 copied files matched their source hashes. A web export from the isolated replacement checkout passed (27 static routes), using the existing installed dependency runtime and without copying the local `.env`. This verifies the prepared source export; fresh CI dependency installation and Vercel hosting remain unverified.
-- Prepared Resend/Supabase SMTP settings, now using proposed sending subdomain `auth.galactoguide.com` after the user confirmed ownership of that domain. User must complete Resend account creation; Danielle or the domain administrator can apply the exact generated DNS records. Verisign RDAP identifies the registrar as Squarespace Domains LLC, with `ns-cloud-b1` through `ns-cloud-b4.googledomains.com` nameservers. No DNS or auth configuration was changed. Setup details are in `docs/website-launch.md`.
+- Prepared Resend/Supabase SMTP settings, now using proposed sending subdomain `auth.galactoguide.com` after the user confirmed ownership of that domain. User must complete Resend account creation; Diana or the domain administrator can apply the exact generated DNS records. Verisign RDAP identifies the registrar as Squarespace Domains LLC, with `ns-cloud-b1` through `ns-cloud-b4.googledomains.com` nameservers. No DNS or auth configuration was changed. Setup details are in `docs/website-launch.md`.
+
+## Signup experience change — 2026-09-23
+- The user replaced the earlier immediate-access design with in-place email-code verification. Supabase Confirm email is enabled and was rechecked after saving.
+- The code-entry form and Confirm sign up email template are prepared; see `plans/signup-code.md` and `docs/signup-code-rollout.md`. The old immediate-access reminder is removed. The earlier additive `email_verifications` table remains in live Supabase but is unused by this flow.
+- Keep Confirm email enabled. Publish the client to draft PR #2 only after explicit commit/push instruction; update the shared signup template when its preview is ready to test. Production cutover remains separate.
 
 ## Resend domain setup — 2026-09-19
 - User completed Resend signup and explicitly asked to perform the domain setup. Created `auth.galactoguide.com` in the signed-in `adamjlof` account, region `us-east-1`, ID `501592f0-6758-412a-9520-e7256a6fdc1a`.
@@ -109,7 +114,7 @@ Replace the old app in `dpontellmd-hub/galactoguide`, preserve its history and a
 ## Status / resume point
 The user has authorized GitHub publication while arranging DNS and Vercel access. Publish the replacement branch and draft PR without changing `main`. Once hosting access is available, verify the existing project's settings, both working domains, production branch, rollback target, and hosted preview. Finish Resend verification/SMTP and exact callback URLs before real signup/recovery tests. Change the default Site URL with the approved production cutover.
 
-**TLDR:** GitHub branch publication is authorized now; legacy refs are preserved remotely. Hosting access and email verification still gate preview approval and production cutover.
+**TLDR:** Draft PR #2 already contains the superseded immediate-access design. The new code-entry flow is prepared locally; preview testing and production cutover remain pending.
 
 ## References
 - [Old repository](https://github.com/dpontellmd-hub/galactoguide)

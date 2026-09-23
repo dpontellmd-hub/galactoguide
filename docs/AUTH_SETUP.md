@@ -50,8 +50,10 @@ Dashboard → **Authentication → URL Configuration**:
     `http://localhost:8081/auth` and `http://localhost:8081/reset-password`.
   - `galactoguide://**` — native (iOS/Android)
   - Retain existing Pages/native URLs while those clients remain in use.
-- Confirmation/recovery templates must preserve `{{ .ConfirmationURL }}`. Recovery
-  uses PKCE: request and open the email link in the same browser/profile.
+- The Confirm sign up template must include `{{ .Token }}` for the in-place
+  six-digit signup flow. Keep `{{ .ConfirmationURL }}` as a fallback while older
+  clients remain in use. Recovery must preserve its `{{ .ConfirmationURL }}` link;
+  it uses PKCE, so open that link in the same browser/profile.
 
 ## 4. Google Cloud Console
 

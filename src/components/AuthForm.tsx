@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -22,17 +22,19 @@ import {
   type ThemeColors,
 } from '@/theme';
 
-type Mode = 'signin' | 'signup' | 'reset';
+type Mode = 'signin' | 'signup' | 'verify' | 'reset';
 
 const TITLES: Record<Mode, string> = {
   signin: 'Welcome back',
   signup: 'Create an account',
+  verify: 'Check your email',
   reset: 'Reset password',
 };
 
 const SUBTITLES: Record<Mode, string> = {
   signin: 'Sign in to sync your saved substances and preferences across devices.',
   signup: 'Optional — accounts let you sync saved substances and preferences across devices.',
+  verify: 'Enter the six-digit code we emailed you to finish creating your account.',
   reset: "Enter your email, then open the reset link in this same browser.",
 };
 
@@ -44,6 +46,8 @@ interface AuthFormProps {
   hideHeader?: boolean;
   /** Optional wrapper style override. */
   style?: StyleProp<ViewStyle>;
+  /** Lets the onboarding deck hold Next until account verification finishes. */
+  onVerificationPendingChange?: (pending: boolean) => void;
 }
 
 /**
@@ -51,7 +55,7 @@ interface AuthFormProps {
  * onboarding welcome deck. Performs the auth calls but does no navigation — hosts
  * react to `useAuth().user` to decide what to do on success.
  */
-export function AuthForm({ accent, hideHeader, style, initialMode = 'signin' }: AuthFormProps) {
+export function AuthForm({ accent, hideHeader, style, initialMode = 'signin', onVerificationPendingChange }: AuthFormProps) {
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
 
@@ -60,27 +64,68 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin' }: 
   const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [pendingEmail, setPendingEmail] = useState('');
+  const [code, setCode] = useState('');
+  const [resendAvailableAt, setResendAvailableAt] = useState(0);
+  const [resendSeconds, setResendSeconds] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
-  const submitLabel =
-    mode === 'signin' ? 'Sign in' : mode === 'signup' ? 'Create account' : 'Send reset link';
+  useEffect(() => {
+    onVerificationPendingChange?.(mode === 'verify');
+    return () => onVerificationPendingChange?.(false);
+  }, [mode, onVerificationPendingChange]);
+
+  useEffect(() => {
+    if (mode !== 'verify' || !resendAvailableAt) return;
+    const update = () => setResendSeconds(Math.max(0, Math.ceil((resendAvailableAt - Date.now()) / 1000)));
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [mode, resendAvailableAt]);
+
+  const switchMode = (next: Mode) => {
+    setError(null);
+    setNotice(null);
+    setMode(next);
+  };
+
+  const submitLabel = mode === 'signin' ? 'Sign in' : mode === 'signup' ? 'Create account'
+    : mode === 'verify' ? 'Verify email' : 'Send reset link';
 
   const onSubmit = async () => {
     setError(null);
     setNotice(null);
+    if (mode === 'verify') {
+      if (!/^\d{6}$/.test(code)) {
+        setError('Enter the six-digit code from your email.');
+        return;
+      }
+      const result = await signIn.verifySignupCode(pendingEmail, code);
+      if (result.error) setError(result.error);
+      else setNotice('Email verified. Tap Next to continue.');
+      return;
+    }
     const action =
       mode === 'signin'
         ? signIn.password(email, password)
         : mode === 'signup'
           ? signIn.signUp(email, password)
           : signIn.reset(email);
-    const { error: err, message } = await action;
+    const { error: err, message, sessionStarted } = await action;
     if (err) {
       setError(err);
       return;
     }
     if (message) setNotice(message);
+    if (mode === 'signup' && !sessionStarted) {
+      setPendingEmail(email.trim());
+      setPassword('');
+      setCode('');
+      setResendAvailableAt(Date.now() + 60_000);
+      setResendSeconds(60);
+      switchMode('verify');
+    }
     // On a successful session the host (modal / deck) reacts to useAuth().user.
   };
 
@@ -89,6 +134,20 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin' }: 
     setNotice(null);
     const { error: err } = await signIn.google();
     if (err) setError(err);
+  };
+
+  const onResend = async () => {
+    if (Date.now() < resendAvailableAt) return;
+    setError(null);
+    setNotice(null);
+    const result = await signIn.resendSignupCode(pendingEmail);
+    if (result.error) setError(result.error);
+    else {
+      setCode('');
+      setNotice('A new code is on its way. Use the most recent email.');
+      setResendAvailableAt(Date.now() + 60_000);
+      setResendSeconds(60);
+    }
   };
 
   return (
@@ -100,6 +159,13 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin' }: 
         </>
       )}
 
+      {hideHeader && mode === 'verify' && (
+        <>
+          <Text style={styles.title}>{TITLES.verify}</Text>
+          <Text style={styles.subtitle}>{SUBTITLES.verify}</Text>
+        </>
+      )}
+
       {!configured && (
         <View style={styles.banner}>
           <Text style={styles.bannerText}>
@@ -108,12 +174,12 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin' }: 
         </View>
       )}
 
-      {mode !== 'reset' && <Text style={styles.subtitle}>
+      {mode !== 'reset' && mode !== 'verify' && <Text style={styles.subtitle}>
         Signing in syncs your saved entries, selected situations, and preferences with your account.
       </Text>}
 
       {/* Google */}
-      {mode !== 'reset' && (
+      {mode !== 'reset' && mode !== 'verify' && (
         <Pressable
           onPress={onGoogle}
           disabled={busy || !configured}
@@ -126,7 +192,7 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin' }: 
         </Pressable>
       )}
 
-      {mode !== 'reset' && (
+      {mode !== 'reset' && mode !== 'verify' && (
         <View style={styles.dividerRow}>
           <View style={styles.dividerLine} />
           <Text style={styles.dividerText}>or</Text>
@@ -134,23 +200,45 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin' }: 
         </View>
       )}
 
-      {/* Email */}
-      <Text style={styles.fieldLabel}>Email</Text>
-      <TextInput
-        value={email}
-        onChangeText={setEmail}
-        placeholder="you@example.com"
-        placeholderTextColor={colors.textFaint}
-        autoCapitalize="none"
-        autoComplete="email"
-        keyboardType="email-address"
-        inputMode="email"
-        style={styles.input}
-        editable={!busy && configured}
-      />
+      {mode === 'verify' ? (
+        <>
+          <Text style={styles.codeEmail}>{pendingEmail}</Text>
+          <Text style={styles.fieldLabel}>Verification code</Text>
+          <TextInput
+            value={code}
+            onChangeText={(value) => setCode(value.replace(/\D/g, '').slice(0, 6))}
+            placeholder="6-digit code"
+            placeholderTextColor={colors.textFaint}
+            autoComplete="one-time-code"
+            keyboardType="number-pad"
+            inputMode="numeric"
+            maxLength={6}
+            style={styles.input}
+            editable={!busy && configured}
+            onSubmitEditing={onSubmit}
+            accessibilityLabel="Verification code"
+          />
+        </>
+      ) : (
+        <>
+          <Text style={styles.fieldLabel}>Email</Text>
+          <TextInput
+            value={email}
+            onChangeText={setEmail}
+            placeholder="you@example.com"
+            placeholderTextColor={colors.textFaint}
+            autoCapitalize="none"
+            autoComplete="email"
+            keyboardType="email-address"
+            inputMode="email"
+            style={styles.input}
+            editable={!busy && configured}
+          />
+        </>
+      )}
 
       {/* Password (not in reset mode) */}
-      {mode !== 'reset' && (
+      {mode !== 'reset' && mode !== 'verify' && (
         <>
           <Text style={styles.fieldLabel}>Password</Text>
           <TextInput
@@ -185,40 +273,61 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin' }: 
         )}
       </Pressable>
 
+      {mode === 'verify' && (
+        <View style={styles.verifyActions}>
+          <Pressable
+            onPress={onResend}
+            disabled={busy || resendSeconds > 0}
+            accessibilityRole="button"
+            accessibilityLabel="Resend verification code"
+          >
+            <Text style={[styles.switchLink, { color: accent }, (busy || resendSeconds > 0) && styles.btnDisabled]}>
+              {resendSeconds > 0 ? `Resend code in ${resendSeconds}s` : 'Resend code'}
+            </Text>
+          </Pressable>
+          <Pressable onPress={() => switchMode('signup')} accessibilityRole="button">
+            <Text style={[styles.switchLink, { color: accent }]}>Use a different email</Text>
+          </Pressable>
+          <Pressable onPress={() => switchMode('signin')} accessibilityRole="button">
+            <Text style={[styles.switchLink, { color: accent }]}>Already have an account? Sign in</Text>
+          </Pressable>
+        </View>
+      )}
+
       {/* Mode switches */}
-      <View style={styles.switchRow}>
+      {mode !== 'verify' && <View style={styles.switchRow}>
         {mode === 'signin' && (
-          <Pressable onPress={() => setMode('reset')} accessibilityRole="button">
+          <Pressable onPress={() => switchMode('reset')} accessibilityRole="button">
             <Text style={[styles.switchLink, { color: accent }]}>Forgot password?</Text>
           </Pressable>
         )}
         {mode !== 'signin' && (
-          <Pressable onPress={() => setMode('signin')} accessibilityRole="button">
+          <Pressable onPress={() => switchMode('signin')} accessibilityRole="button">
             <Text style={[styles.switchLink, { color: accent }]}>Back to sign in</Text>
           </Pressable>
         )}
-      </View>
+      </View>}
 
-      <View style={styles.footerRow}>
+      {mode !== 'verify' && <View style={styles.footerRow}>
         <Text style={styles.footerText}>
           {mode === 'signup' ? 'Already have an account?' : "Don't have an account?"}
         </Text>
         <Pressable
-          onPress={() => setMode(mode === 'signup' ? 'signin' : 'signup')}
+          onPress={() => switchMode(mode === 'signup' ? 'signin' : 'signup')}
           accessibilityRole="button"
         >
           <Text style={[styles.footerLink, { color: accent }]}>
             {mode === 'signup' ? 'Sign in' : 'Create one'}
           </Text>
         </Pressable>
-      </View>
+      </View>}
       <LegalLinks />
     </View>
   );
 }
 
 /** Uniform result for the form's actions. */
-type ActionResult = { error?: string; message?: string };
+type ActionResult = { error?: string; message?: string; sessionStarted?: boolean };
 
 /** Small adapter that maps AuthContext methods to a uniform `{ error, message }` result. */
 function useAuthActions() {
@@ -236,12 +345,10 @@ function useAuthActions() {
         if (!email || !password) return { error: 'Enter your email and password.' };
         if (password.length < 6) return { error: 'Password must be at least 6 characters.' };
         const res = await auth.signUp(email, password);
-        if (res.error) return res;
-        if (res.sessionStarted) return {};
-        // Compatibility while the staged client is deployed before the server
-        // switches to immediate signup. Never pretend a session exists.
-        return { message: 'Your account is awaiting email confirmation. You can continue browsing while you wait.' };
+        return res;
       },
+      verifySignupCode: (email: string, code: string): Promise<ActionResult> => auth.verifySignupCode(email, code),
+      resendSignupCode: (email: string): Promise<ActionResult> => auth.resendSignupCode(email),
       reset: async (email: string): Promise<ActionResult> => {
         if (!email) return { error: 'Enter your email.' };
         const res = await auth.resetPassword(email);
@@ -316,6 +423,7 @@ const makeStyles = (colors: ThemeColors) =>
       color: colors.text,
       marginBottom: spacing.lg,
     },
+    codeEmail: { ...font.semibold, fontSize: fontSize.body, color: colors.text, marginBottom: spacing.xl },
     error: {
       ...font.regular,
       fontSize: fontSize.body,
@@ -338,6 +446,7 @@ const makeStyles = (colors: ThemeColors) =>
     },
     submitText: { ...font.bold, fontSize: fontSize.base, color: colors.onAccent },
     switchRow: { alignItems: 'center', marginTop: spacing.lg },
+    verifyActions: { alignItems: 'center', gap: spacing.lg, marginTop: spacing.lg },
     switchLink: { ...font.semibold, fontSize: fontSize.body },
     footerRow: {
       flexDirection: 'row',
