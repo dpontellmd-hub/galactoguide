@@ -204,8 +204,8 @@ try {
   await switchTo('alice');
   assert.deepEqual(saved(), ['fenugreek'], 'Account data survives remount');
   assert.deepEqual(situations(), ['alice-newer']);
-  // Exercise the actual onboarding screen and shared form through the same
-  // provider hydration gate as RootNavigator, not only isolated auth callbacks.
+  // Exercise the actual onboarding screen and shared form through a forced
+  // hydration remount. The separate browser test covers the real navigator.
   const colors = new Proxy({}, { get: () => '#123456' });
   const numbers = new Proxy({}, { get: () => 10 });
   Object.assign(modules, {

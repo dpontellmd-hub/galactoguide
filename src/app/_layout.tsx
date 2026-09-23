@@ -8,7 +8,7 @@ import {
 import { Stack, usePathname, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { AppFrame } from '@/components/app-frame';
@@ -41,6 +41,8 @@ function RootNavigator() {
   });
 
   const ready = hydrated && situationsHydrated && themeHydrated && fontsLoaded;
+  const [navigatorStarted, setNavigatorStarted] = useState(false);
+  if (ready && !navigatorStarted) setNavigatorStarted(true);
 
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => {});
@@ -51,13 +53,16 @@ function RootNavigator() {
     if (ready && passwordRecovery && pathname !== '/reset-password') router.replace('/reset-password');
   }, [ready, passwordRecovery, pathname, router]);
 
-  if (!ready) return null;
+  // Unmounting Stack resets its navigation state to the initial route. Wait for
+  // the first load only; later account hydration hides screens, not the navigator.
+  if (!ready && !navigatorStarted) return null;
 
   return (
     <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <AppFrame>
         <Stack
+          screenLayout={({ children }) => <>{ready ? children : null}</>}
           screenOptions={{
             headerShown: false,
             contentStyle: { backgroundColor: colors.appBg },
