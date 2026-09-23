@@ -1,11 +1,11 @@
 # Signup code rollout
 
-Supabase **Confirm email must stay enabled**. After account creation, the app shows a six-digit code field on the same signup screen. `verifyOtp` with type `email` confirms the address and starts the session. The user then continues through onboarding or returns to the app from the auth modal.
+Supabase **Confirm email must stay enabled**. After account creation, the app shows a code field on the same signup screen. The live Supabase Email OTP length is eight digits; the field accepts the full code without truncation. `verifyOtp` with type `email` confirms the address and starts the session. The user then continues through onboarding or returns to the app from the auth modal.
 
 1. Publish the reviewed client change to the draft replacement PR only after explicit commit/push instruction. Confirm the Vercel preview build succeeded and `/auth` loads.
 2. In Supabase → Authentication → Emails → **Confirm sign up**, set the subject to `Your GalactoGuide verification code` and paste `supabase/templates/confirm-signup-code.html` as the body. Keep the link fallback while older clients may be open. This is a shared live-project template, so change it only when the new preview is ready for testing.
-3. Use a fresh approved test address in the preview. The user enters their password. Confirm that Create account shows the code field and does not sign in yet. The email must contain a six-digit code. Enter it on the same page and tap Verify email; the account should become signed in, with onboarding Next available.
+3. Use a fresh approved test address in the preview. The user enters their password. Confirm that Create account shows the code field and does not sign in yet. The email must contain an eight-digit code. Enter all eight digits on the same page and tap Verify email; the account should become signed in, with onboarding Next available.
 4. Check a wrong code remains on the code screen, resend works after the cooldown, and sign-out/sign-in with the new account succeeds. Check password recovery and Google sign-in still work.
 5. Keep the production Site URL, live main branch, and old website unchanged until the separate website cutover. Do not rerun or drop the earlier `email_verifications` migration during this rollout.
 
-The current live Confirm sign up template contains a link only. Do not switch it to code-only before the new client is deployed: old clients cannot accept a code. The Magic link/OTP template is separate and is not the signup email.
+The live Confirm sign up template contains the code and a link fallback. Keep the link while older clients may be open. The Magic link/OTP template is separate and is not the signup email.

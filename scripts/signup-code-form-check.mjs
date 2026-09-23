@@ -11,10 +11,14 @@ const { act, create } = require('react-test-renderer');
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 const colors = new Proxy({}, { get: () => '#123456' });
 const numbers = new Proxy({}, { get: () => 10 });
+const verifyAttempts = [];
 const auth = {
   user: null, busy: false, configured: true,
   signUp: async () => ({ sessionStarted: false }),
-  verifySignupCode: async (_email, code) => code === '123456' ? { sessionStarted: true } : { error: 'Invalid code' },
+  verifySignupCode: async (_email, code) => {
+    verifyAttempts.push(code);
+    return code === '12345678' ? { sessionStarted: true } : { error: 'Invalid code' };
+  },
   resendSignupCode: async () => ({}),
 };
 const modules = {
@@ -58,17 +62,20 @@ assert.match(visibleText(), /Check your email/);
 assert.match(visibleText(), /new@example.test/);
 assert.equal(inputs().length, 1, 'Password field must be replaced with the code field');
 assert.equal(inputs()[0].props.accessibilityLabel, 'Verification code');
+assert.equal(inputs()[0].props.maxLength, undefined, 'The field must not truncate the configured eight-digit code');
 assert.equal(pending.at(-1), true, 'Onboarding Next is held during verification');
 assert.equal(button('Resend verification code').props.disabled, true, 'Resend waits for the first email');
 
-await act(async () => { inputs()[0].props.onChangeText('000000'); });
+await act(async () => { inputs()[0].props.onChangeText('00000000'); });
 await act(async () => { await button('Verify email').props.onPress(); });
 assert.match(visibleText(), /Invalid code/);
+assert.equal(verifyAttempts.at(-1), '00000000', 'The full eight-digit code reaches verification');
 assert.equal(pending.at(-1), true, 'Wrong code must remain on the verification step');
 
-await act(async () => { inputs()[0].props.onChangeText('123456'); });
+await act(async () => { inputs()[0].props.onChangeText('12345678'); });
 await act(async () => { await button('Verify email').props.onPress(); });
 assert.match(visibleText(), /Email verified/);
+assert.equal(verifyAttempts.at(-1), '12345678');
 await act(async () => { root.unmount(); });
 assert.equal(pending.at(-1), false);
 console.log('PASS: account creation shows code entry; wrong code stays put; correct code can continue');

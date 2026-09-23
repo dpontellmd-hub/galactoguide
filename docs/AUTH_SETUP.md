@@ -51,8 +51,10 @@ Dashboard → **Authentication → URL Configuration**:
   - `galactoguide://**` — native (iOS/Android)
   - Retain existing Pages/native URLs while those clients remain in use.
 - The Confirm sign up template must include `{{ .Token }}` for the in-place
-  six-digit signup flow. Keep `{{ .ConfirmationURL }}` as a fallback while older
-  clients remain in use. Recovery must preserve its `{{ .ConfirmationURL }}` link;
+  signup code flow. The current Supabase Email OTP length is eight digits; the
+  app accepts the full code without truncating it. Keep `{{ .ConfirmationURL }}`
+  as a fallback while older clients remain in use. Recovery must preserve its
+  `{{ .ConfirmationURL }}` link;
   it uses PKCE, so open that link in the same browser/profile.
 
 ## 4. Google Cloud Console

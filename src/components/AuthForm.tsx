@@ -34,7 +34,7 @@ const TITLES: Record<Mode, string> = {
 const SUBTITLES: Record<Mode, string> = {
   signin: 'Sign in to sync your saved substances and preferences across devices.',
   signup: 'Optional — accounts let you sync saved substances and preferences across devices.',
-  verify: 'Enter the six-digit code we emailed you to finish creating your account.',
+  verify: 'Enter the code we emailed you to finish creating your account.',
   reset: "Enter your email, then open the reset link in this same browser.",
 };
 
@@ -97,8 +97,8 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin', on
     setError(null);
     setNotice(null);
     if (mode === 'verify') {
-      if (!/^\d{6}$/.test(code)) {
-        setError('Enter the six-digit code from your email.');
+      if (!/^\d+$/.test(code)) {
+        setError('Enter the code from your email.');
         return;
       }
       const result = await signIn.verifySignupCode(pendingEmail, code);
@@ -206,13 +206,12 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin', on
           <Text style={styles.fieldLabel}>Verification code</Text>
           <TextInput
             value={code}
-            onChangeText={(value) => setCode(value.replace(/\D/g, '').slice(0, 6))}
-            placeholder="6-digit code"
+            onChangeText={(value) => setCode(value.replace(/\D/g, ''))}
+            placeholder="Email code"
             placeholderTextColor={colors.textFaint}
             autoComplete="one-time-code"
             keyboardType="number-pad"
             inputMode="numeric"
-            maxLength={6}
             style={styles.input}
             editable={!busy && configured}
             onSubmitEditing={onSubmit}
