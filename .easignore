@@ -1,0 +1,54 @@
+# Keep this file aligned with .gitignore. EAS uses it instead of .gitignore
+# when preparing cloud-build archives.
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# UI smoke-test screenshots (scripts/ui-smoke.mjs output)
+scripts/ui-shots/
+
+example
+
+# generated native folders
+/ios
+/android
+
+# local development-only files
+.tmp/
+.claude/
+.codex-remote-attachments/
+design_handoff_galactoguide/
