@@ -9,3 +9,9 @@ Supabase **Confirm email must stay enabled**. After account creation, the app sh
 5. Keep the production Site URL, live main branch, and old website unchanged until the separate website cutover. Do not rerun or drop the earlier `email_verifications` migration during this rollout.
 
 The live Confirm sign up template contains the code and a link fallback. Keep the link while older clients may be open. The Magic link/OTP template is separate and is not the signup email.
+
+## Onboarding continuity regression
+
+Verification changes the preference storage owner from guest to the new account. RootNavigator temporarily unmounts while that account's preferences load. Onboarding now keeps the slide number in its route and prepares the pending signup's empty preference cache before calling verification. Only the chosen view and situations explicitly selected in this tour are handed off; guest caches, bookmarks, disclaimer acceptance, and existing account caches are not copied or overwritten.
+
+`node scripts/account-isolation-check.mjs` exercises the actual onboarding screen and AuthForm with delayed account storage and a navigator remount. It verifies wrong-code retry, step 6 returning with Signed in and Next, step 7 and notices, cloud preference reconciliation, and account isolation. The hosted acceptance check must wait for account hydration after verification; a momentary Signed in message alone is insufficient evidence.

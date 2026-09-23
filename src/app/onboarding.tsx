@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { Image } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Redirect, useRouter } from 'expo-router';
+import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
   Pressable,
@@ -20,7 +20,8 @@ import { usePortal } from '@/context/PortalContext';
 import { useSituations } from '@/context/SituationsContext';
 import { useResponsiveLayout } from '@/hooks/use-responsive-layout';
 import { getSubstanceById } from '@/data/repository';
-import type { SubstanceWithKind } from '@/data/types';
+import type { Situation, SubstanceWithKind } from '@/data/types';
+import { prepareSignupOnboarding } from '@/lib/signup-onboarding';
 import { situationOrder, situationSelectorLabels } from '@/lib/format';
 import {
   font,
@@ -57,7 +58,13 @@ export default function OnboardingScreen() {
   const { portal, isMother } = usePortal();
   const { situations, toggleSituation } = useSituations();
   const { user, configured } = useAuth();
-  const [step, setStep] = useState(0);
+  // Auth hydration temporarily unmounts the navigator. Keep progress in the route
+  // so the verified account resumes the same slide when it mounts again.
+  const { step: stepParam } = useLocalSearchParams<{ step?: string }>();
+  const parsedStep = Number(stepParam ?? 0);
+  const step = Number.isInteger(parsedStep) && parsedStep >= 0 && parsedStep < (configured ? 7 : 6) ? parsedStep : 0;
+  // Only explicit choices in this tour may seed a new account, not an old guest cache.
+  const [signupSituations, setSignupSituations] = useState<Situation[]>([]);
   const [verificationPending, setVerificationPending] = useState(false);
   const { colors, isDark } = useTheme();
   const { isDesktop } = useResponsiveLayout();
@@ -172,8 +179,8 @@ export default function OnboardingScreen() {
   const flowerHeight = Math.min(fullFlowerHeight, Math.max(60, flowerSpace));
   const fadeFlowers = height < 600 && flowerHeight < fullFlowerHeight;
 
-  const next = () => (isLast ? goDisclaimer() : setStep((s) => s + 1));
-  const back = () => setStep((s) => Math.max(0, s - 1));
+  const next = () => (isLast ? goDisclaimer() : router.setParams({ step: String(step + 1) }));
+  const back = () => router.setParams({ step: String(Math.max(0, step - 1)) });
 
   return (
     <View
@@ -306,7 +313,10 @@ export default function OnboardingScreen() {
               return (
                 <Pressable
                   key={s}
-                  onPress={() => toggleSituation(s)}
+                  onPress={() => {
+                    toggleSituation(s);
+                    setSignupSituations((previous) => active ? previous.filter((item) => item !== s) : [...previous, s]);
+                  }}
                   accessibilityRole="checkbox"
                   accessibilityLabel={situationSelectorLabels[s]}
                   accessibilityState={{ checked: active }}
@@ -335,6 +345,7 @@ export default function OnboardingScreen() {
             </View>
           ) : (
             <AuthForm accent={accent.main} hideHeader style={styles.authForm}
+              onBeforeSignupVerification={(id) => prepareSignupOnboarding(id, portal, signupSituations)}
               onVerificationPendingChange={setVerificationPending} />
           ))}
         </View>}

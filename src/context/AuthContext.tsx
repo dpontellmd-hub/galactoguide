@@ -35,6 +35,7 @@ interface AuthResult {
   /** User-facing error message, or undefined on success. */
   error?: string;
   sessionStarted?: boolean;
+  signupUserId?: string;
 }
 
 interface AuthContextValue {
@@ -162,7 +163,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             password,
             options: { emailRedirectTo: authRedirectTo() },
           });
-          return { error: error?.message, sessionStarted: !!data?.session };
+          return { error: error?.message, sessionStarted: !!data?.session, signupUserId: data?.user?.id };
         } catch {
           return { error: 'Could not create your account. Check your connection and try again.' };
         } finally {

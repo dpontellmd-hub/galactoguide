@@ -48,6 +48,8 @@ interface AuthFormProps {
   style?: StyleProp<ViewStyle>;
   /** Lets the onboarding deck hold Next until account verification finishes. */
   onVerificationPendingChange?: (pending: boolean) => void;
+  /** Finish the host's account handoff before verification emits an auth event. */
+  onBeforeSignupVerification?: (signupUserId: string) => Promise<void>;
 }
 
 /**
@@ -55,7 +57,7 @@ interface AuthFormProps {
  * onboarding welcome deck. Performs the auth calls but does no navigation — hosts
  * react to `useAuth().user` to decide what to do on success.
  */
-export function AuthForm({ accent, hideHeader, style, initialMode = 'signin', onVerificationPendingChange }: AuthFormProps) {
+export function AuthForm({ accent, hideHeader, style, initialMode = 'signin', onVerificationPendingChange, onBeforeSignupVerification }: AuthFormProps) {
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
 
@@ -65,6 +67,7 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin', on
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [pendingEmail, setPendingEmail] = useState('');
+  const [pendingUserId, setPendingUserId] = useState<string>();
   const [code, setCode] = useState('');
   const [resendAvailableAt, setResendAvailableAt] = useState(0);
   const [resendSeconds, setResendSeconds] = useState(0);
@@ -101,6 +104,12 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin', on
         setError('Enter the code from your email.');
         return;
       }
+      try {
+        if (pendingUserId) await onBeforeSignupVerification?.(pendingUserId);
+      } catch {
+        setError('Could not save your place. Please try verifying again.');
+        return;
+      }
       const result = await signIn.verifySignupCode(pendingEmail, code);
       if (result.error) setError(result.error);
       else setNotice('Email verified. Tap Next to continue.');
@@ -112,7 +121,7 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin', on
         : mode === 'signup'
           ? signIn.signUp(email, password)
           : signIn.reset(email);
-    const { error: err, message, sessionStarted } = await action;
+    const { error: err, message, sessionStarted, signupUserId } = await action;
     if (err) {
       setError(err);
       return;
@@ -120,6 +129,7 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin', on
     if (message) setNotice(message);
     if (mode === 'signup' && !sessionStarted) {
       setPendingEmail(email.trim());
+      setPendingUserId(signupUserId);
       setPassword('');
       setCode('');
       setResendAvailableAt(Date.now() + 60_000);
@@ -326,7 +336,7 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin', on
 }
 
 /** Uniform result for the form's actions. */
-type ActionResult = { error?: string; message?: string; sessionStarted?: boolean };
+type ActionResult = { error?: string; message?: string; sessionStarted?: boolean; signupUserId?: string };
 
 /** Small adapter that maps AuthContext methods to a uniform `{ error, message }` result. */
 function useAuthActions() {

@@ -58,6 +58,7 @@ await act(async () => { root = create(React.createElement(AuthProvider, null, Re
 let result;
 await act(async () => { result = await value.signUp(' new@example.test ', 'test-password'); });
 assert.equal(result.sessionStarted, false);
+assert.equal(result.signupUserId, 'pending', 'The host needs the pending signup identity before verification emits a session');
 assert.equal(value.user, null, 'Signup alone must not grant account access');
 assert.equal(calls.signUp[0].email, 'new@example.test');
 assert.equal(calls.signUp[0].options.emailRedirectTo, 'https://preview.example.test/auth');
