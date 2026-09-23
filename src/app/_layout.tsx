@@ -13,6 +13,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { KeyboardProvider } from 'react-native-keyboard-controller';
 import { AppFrame } from '@/components/app-frame';
 import { UpdateBanner } from '@/components/UpdateBanner';
+import { EmailVerificationReminder } from '@/components/EmailVerificationReminder';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { FavoritesProvider } from '@/context/FavoritesContext';
 import { ForumProvider } from '@/context/ForumContext';
@@ -57,6 +58,7 @@ function RootNavigator() {
     <>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <AppFrame>
+        {!['/auth', '/reset-password'].includes(pathname) && <EmailVerificationReminder />}
         <Stack
           screenOptions={{
             headerShown: false,

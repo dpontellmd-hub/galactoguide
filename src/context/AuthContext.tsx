@@ -4,13 +4,15 @@ import * as QueryParams from 'expo-auth-session/build/QueryParams';
 import * as WebBrowser from 'expo-web-browser';
 import {
   createContext,
+  useCallback,
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from 'react';
-import { Platform } from 'react-native';
+import { AppState, Platform } from 'react-native';
 import { supabase, supabaseConfigured } from '@/lib/supabase';
 import { webPath } from '@/lib/site';
 
@@ -34,6 +36,7 @@ function authRedirectTo(path: 'auth' | 'reset-password' = 'auth'): string {
 interface AuthResult {
   /** User-facing error message, or undefined on success. */
   error?: string;
+  sessionStarted?: boolean;
 }
 
 interface AuthContextValue {
@@ -56,6 +59,12 @@ interface AuthContextValue {
   authCallbackError: string | null;
   dismissPasswordRecovery: () => void;
   updatePassword: (password: string) => Promise<AuthResult>;
+  emailVerified: boolean | null;
+  emailVerificationUnavailable: boolean;
+  verificationSending: boolean;
+  verificationNotice: string | null;
+  sendVerification: () => Promise<void>;
+  refreshVerification: () => void;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -94,6 +103,67 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [busy, setBusy] = useState(false);
   const [passwordRecovery, setPasswordRecovery] = useState(false);
   const [authCallbackError, setAuthCallbackError] = useState<string | null>(null);
+  const identity = session?.user ? `${session.user.id}:${session.user.email ?? ''}` : '';
+  const currentIdentity = useRef(identity);
+  useEffect(() => { currentIdentity.current = identity; }, [identity]);
+  const [verification, setVerification] = useState<{ identity: string; verified: boolean | null }>({ identity: '', verified: null });
+  const [verificationMessage, setVerificationMessage] = useState<{ identity: string; text: string } | null>(null);
+  const [sendingFor, setSendingFor] = useState('');
+  const inFlight = useRef(new Set<string>());
+  const lastSent = useRef(new Map<string, number>());
+  const [verificationRevision, setVerificationRevision] = useState(0);
+  const refreshVerification = useCallback(() => setVerificationRevision(n => n + 1), []);
+
+  // Session changes include consuming a verification link in this browser or
+  // another tab. Never carry one user's status into another user's account.
+  useEffect(() => {
+    let active = true;
+    if (!identity || !supabaseConfigured) return;
+    (async () => {
+      try {
+        const { data, error } = await supabase.rpc('email_verification_status');
+        if (active) setVerification({ identity, verified: error ? null : data === true });
+      } catch {
+        if (active) setVerification({ identity, verified: null });
+      }
+    })();
+    return () => { active = false; };
+  }, [identity, session?.access_token, verificationRevision]);
+
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', state => {
+      if (state === 'active') refreshVerification();
+    });
+    if (Platform.OS === 'web') window.addEventListener('focus', refreshVerification);
+    return () => {
+      sub.remove();
+      if (Platform.OS === 'web') window.removeEventListener('focus', refreshVerification);
+    };
+  }, [refreshVerification]);
+
+  const sendVerificationFor = useCallback(async (owner: string, email: string) => {
+    if (inFlight.current.has(owner)) return;
+    if (Date.now() - (lastSent.current.get(owner) ?? 0) < 60_000) {
+      setVerificationMessage({ identity: owner, text: 'A verification email is already on its way. Please wait a minute before resending.' });
+      return;
+    }
+    inFlight.current.add(owner);
+    setSendingFor(owner);
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { shouldCreateUser: false, emailRedirectTo: authRedirectTo() },
+      });
+      if (error) throw error;
+      lastSent.current.set(owner, Date.now());
+      if (currentIdentity.current === owner) setVerificationMessage({ identity: owner, text: 'Verification email sent. You can keep using your account.' });
+    } catch {
+      if (currentIdentity.current === owner) setVerificationMessage({ identity: owner, text: 'Your account is ready, but the verification email could not be sent. Try again when convenient.' });
+    } finally {
+      inFlight.current.delete(owner);
+      setSendingFor(value => value === owner ? '' : value);
+    }
+  }, []);
 
   // supabase-js owns session persistence; we just mirror it into React state.
   useEffect(() => {
@@ -148,6 +218,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       configured: supabaseConfigured,
       passwordRecovery,
       authCallbackError,
+      emailVerified: verification.identity === identity ? verification.verified : null,
+      emailVerificationUnavailable: !!identity && verification.identity === identity && verification.verified === null,
+      verificationSending: !!identity && sendingFor === identity,
+      verificationNotice: verificationMessage?.identity === identity ? verificationMessage.text : null,
+      refreshVerification,
+      sendVerification: async () => {
+        if (session?.user.email) await sendVerificationFor(identity, session.user.email);
+      },
       dismissPasswordRecovery: () => setPasswordRecovery(false),
 
       signUp: async (email, password) => {
@@ -155,12 +233,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (blocked) return blocked;
         setBusy(true);
         try {
-          const { error } = await supabase.auth.signUp({
+          const { data, error } = await supabase.auth.signUp({
             email: email.trim(),
             password,
             options: { emailRedirectTo: authRedirectTo() },
           });
-          return { error: error?.message };
+          if (!error && data?.session && data.user?.email) {
+            // Account access never waits for email delivery.
+            void sendVerificationFor(`${data.user.id}:${data.user.email}`, data.user.email);
+          }
+          return { error: error?.message, sessionStarted: !!data?.session };
+        } catch {
+          return { error: 'Could not create your account. Check your connection and try again.' };
         } finally {
           setBusy(false);
         }
@@ -257,7 +341,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       },
     };
-  }, [session, hydrated, busy, passwordRecovery, authCallbackError]);
+  }, [session, hydrated, busy, passwordRecovery, authCallbackError, identity, verification, sendingFor, verificationMessage, refreshVerification, sendVerificationFor]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

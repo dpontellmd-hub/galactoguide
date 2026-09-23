@@ -5,7 +5,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
 
-const browserWindow = { location: { origin: 'https://preview.example.invalid', href: 'https://preview.example.invalid/auth' } };
+const browserWindow = { addEventListener() {}, removeEventListener() {}, location: { origin: 'https://preview.example.invalid', href: 'https://preview.example.invalid/auth' } };
 function load(file, modules = {}) {
   const compiled = ts.transpileModule(readFileSync(file, 'utf8'), {
     compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2022 },
@@ -83,9 +83,11 @@ const { AuthProvider } = load('src/context/AuthContext.tsx', {
     },
     useEffect: (effect) => { if (!mounted) effect(); },
     useMemo: (factory) => factory(),
+    useCallback: (callback) => callback,
+    useRef: (value) => ({ current: value }),
   },
   'react/jsx-runtime': { jsx: (_type, props) => props },
-  'react-native': { Platform: platform },
+  'react-native': { Platform: platform, AppState: { addEventListener: () => ({ remove() {} }) } },
   'expo-auth-session': { makeRedirectUri: (options) => {
     assert.equal(options?.scheme, 'galactoguide');
     assert.ok(['auth', 'reset-password'].includes(options?.path));

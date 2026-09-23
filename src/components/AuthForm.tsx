@@ -237,7 +237,10 @@ function useAuthActions() {
         if (password.length < 6) return { error: 'Password must be at least 6 characters.' };
         const res = await auth.signUp(email, password);
         if (res.error) return res;
-        return { message: 'Check your inbox to confirm your email, then sign in.' };
+        if (res.sessionStarted) return {};
+        // Compatibility while the staged client is deployed before the server
+        // switches to immediate signup. Never pretend a session exists.
+        return { message: 'Your account is awaiting email confirmation. You can continue browsing while you wait.' };
       },
       reset: async (email: string): Promise<ActionResult> => {
         if (!email) return { error: 'Enter your email.' };
