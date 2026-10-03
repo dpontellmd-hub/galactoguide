@@ -53,7 +53,11 @@ function NavigationLink({ label, href, icon, active, compact = false }: {
             <Path d="M4 21v-2a8 8 0 0 1 16 0v2" stroke={color} strokeWidth={1.8} fill="none" />
           </Svg>
         )}
-        <Text style={[styles.linkText, compact && styles.railLinkText, { color }, active && font.extrabold]}>{label}</Text>
+        <Text
+          style={[styles.linkText, compact && styles.railLinkText, { color }, active && font.extrabold]}
+          numberOfLines={compact ? undefined : 1}
+          ellipsizeMode="tail"
+        >{label}</Text>
       </Pressable>
     </Link>
   );
@@ -143,7 +147,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
     paddingHorizontal: 14, paddingVertical: 12, borderRadius: 15,
     borderWidth: 1.5, borderColor: 'transparent',
   },
-  linkText: { ...font.semibold, fontSize: fontSize.base, flex: 1 },
+  linkText: { ...font.semibold, fontSize: fontSize.base, flex: 1, minWidth: 0 },
   hovered: { backgroundColor: colors.surface },
   active: { backgroundColor: colors.terraLight },
   pressed: { opacity: 0.75 },
