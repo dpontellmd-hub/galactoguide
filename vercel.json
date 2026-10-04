@@ -1,0 +1,21 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": null,
+  "installCommand": "npm ci",
+  "buildCommand": "npm run build:web",
+  "outputDirectory": "dist",
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/substance/:id", "destination": "/substance/[id]" },
+    { "source": "/threads/:id", "destination": "/threads/[id]" }
+  ],
+  "headers": [
+    { "source": "/reset-password", "headers": [
+      { "key": "Referrer-Policy", "value": "no-referrer" },
+      { "key": "Cache-Control", "value": "no-store" }
+    ] },
+    { "source": "/auth", "headers": [
+      { "key": "Referrer-Policy", "value": "no-referrer" }
+    ] }
+  ]
+}
