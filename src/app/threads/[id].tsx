@@ -22,7 +22,6 @@ import { useAuth } from '@/context/AuthContext';
 import { useForum } from '@/context/ForumContext';
 import { usePortal } from '@/context/PortalContext';
 import { type ForumReply } from '@/data/forum';
-import { sendCommentReport } from '@/lib/forum-report';
 import { font, fontSize, radius, spacing, useTheme, useThemedStyles, type ThemeColors } from '@/theme';
 
 function forumMention(name: string): string {
@@ -52,30 +51,6 @@ export default function ThreadDetailScreen() {
   const [replyingTo, setReplyingTo] = useState<ForumReply | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [reportNoticeId, setReportNoticeId] = useState<string | null>(null);
-  const [reportReason, setReportReason] = useState('');
-  const [reportError, setReportError] = useState<string | null>(null);
-  const [reportBusy, setReportBusy] = useState(false);
-  const reportPending = useRef(false);
-  const [reportedIds, setReportedIds] = useState<Set<string>>(() => new Set());
-
-  const submitReport = async (reply: ForumReply) => {
-    if (!thread || reportPending.current || reportedIds.has(reply.id)) return;
-    reportPending.current = true;
-    setReportBusy(true);
-    setReportError(null);
-    try {
-      await sendCommentReport(thread, reply, reportReason);
-      setReportedIds((current) => new Set(current).add(reply.id));
-      setReportReason('');
-    } catch (cause) {
-      setReportError(cause instanceof Error ? cause.message : 'Could not send your report. Please try again.');
-    } finally {
-      reportPending.current = false;
-      setReportBusy(false);
-    }
-  };
-
   const replyIds = useMemo(() => new Set(replies.map((reply) => reply.id)), [replies]);
   const rootReplies = useMemo(
     () => replies.filter((reply) => !reply.parentReplyId || !replyIds.has(reply.parentReplyId)),
@@ -242,7 +217,7 @@ export default function ThreadDetailScreen() {
                       {mention && <Text style={styles.replyMention}>{mention}</Text>}
                       {rest}
                     </Text>
-                    <ForumPostActions kind="reply" id={item.id} userId={item.userId} isSample={item.isSample}
+                    {!item.deletedAt && <ForumPostActions kind="reply" id={item.id} userId={item.userId} isSample={item.isSample}
                       onDeleted={() => { if (replyingTo?.id === item.id) cancelReply(); }}>
                         <Pressable
                           onPress={() => startReplyTo(item)}
@@ -253,63 +228,7 @@ export default function ThreadDetailScreen() {
                           <Ionicons name="arrow-undo-outline" size={14} style={styles.replyIcon} />
                           <Text style={styles.replyActionText}>Reply</Text>
                         </Pressable>
-                        <Pressable
-                          onPress={() => {
-                            if (reportPending.current) return;
-                            setReportNoticeId(item.id);
-                            setReportReason('');
-                            setReportError(null);
-                          }}
-                          disabled={reportBusy || reportedIds.has(item.id)}
-                          accessibilityRole="button"
-                          accessibilityLabel={`Report comment by ${item.authorName}`}
-                          accessibilityState={{ disabled: reportBusy || reportedIds.has(item.id) }}
-                          style={({ pressed }) => [styles.reportButton, pressed && styles.pressed]}
-                        >
-                          <Ionicons name="flag-outline" size={14} style={styles.reportIcon} />
-                          <Text style={styles.reportText}>{reportedIds.has(item.id) ? 'Reported' : 'Report'}</Text>
-                        </Pressable>
-                    </ForumPostActions>
-                    {(reportNoticeId === item.id || reportedIds.has(item.id)) && (
-                      <View style={styles.reportNotice} accessibilityLiveRegion="polite">
-                        {reportedIds.has(item.id) ? (
-                          <Text style={styles.reportNoticeText}>
-                            Report submitted. Thank you for letting us know.
-                          </Text>
-                        ) : (
-                          <>
-                            <Text style={styles.reportNoticeText}>
-                              Send this comment and its thread details to the GalactoGuide team for review?
-                            </Text>
-                            <TextInput
-                              value={reportReason}
-                              onChangeText={setReportReason}
-                              placeholder="Why are you reporting this? (optional)"
-                              placeholderTextColor={colors.textFaint}
-                              accessibilityLabel="Reason for reporting (optional)"
-                              multiline
-                              maxLength={1000}
-                              editable={!reportBusy}
-                              style={styles.input}
-                            />
-                            {reportError && <Text style={styles.error} accessibilityRole="alert" selectable>{reportError}</Text>}
-                            <View style={styles.reportActions}>
-                              <Pressable onPress={() => { setReportNoticeId(null); setReportError(null); setReportReason(''); }}
-                                disabled={reportBusy} accessibilityRole="button" accessibilityLabel="Cancel report"
-                                accessibilityState={{ disabled: reportBusy }} style={styles.reportButton}>
-                                <Text style={styles.reportText}>Cancel</Text>
-                              </Pressable>
-                              <Pressable onPress={() => void submitReport(item)} disabled={reportBusy}
-                                accessibilityRole="button" accessibilityLabel="Send report"
-                                accessibilityState={{ disabled: reportBusy, busy: reportBusy }}
-                                style={[styles.postButton, reportBusy && styles.disabled]}>
-                                <Text style={styles.postButtonText}>{reportBusy ? 'Sending…' : 'Send report'}</Text>
-                              </Pressable>
-                            </View>
-                          </>
-                        )}
-                      </View>
-                    )}
+                    </ForumPostActions>}
                   </View>
                 );
               };

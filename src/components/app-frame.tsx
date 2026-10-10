@@ -20,7 +20,7 @@ export function AppFrame({ children }: { children: ReactNode }) {
   const rail = hasNavigationRail && !!portal && disclaimerAccepted && !isWelcome;
   const isWorkspace = ['/home', '/browse', '/a-z', '/safety', '/threads', '/about'].includes(pathname) ||
     pathname.startsWith('/substance/');
-  const isForm = ['/account', '/auth', '/reset-password', '/feedback', '/threads/new'].includes(pathname);
+  const isForm = ['/account', '/auth', '/reset-password', '/delete-account', '/feedback', '/threads/new'].includes(pathname);
   const maxWidth = desktopWelcome ? 1120 : desktop ? layout.desktopMaxWidth : rail ? undefined :
     isTablet && !isWelcome ? layout.tabletContentWidth : layout.maxContentWidth;
 

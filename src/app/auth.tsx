@@ -15,17 +15,17 @@ export default function AuthScreen() {
   const styles = useThemedStyles(makeStyles);
   const accent = colors.accent;
 
-  const { user, passwordRecovery } = useAuth();
+  const { user, passwordRecovery, hydrated, authCallbackPending, authCallbackError } = useAuth();
 
   // Close automatically once signed in. On a normal in-app sign-in we can just
   // go back; after the web OAuth redirect the app reloads fresh on this screen
   // with nothing to go back to, so send them to the app entry instead.
   useEffect(() => {
-    if (!user) return;
+    if (!user || !hydrated || authCallbackPending || authCallbackError) return;
     if (passwordRecovery) { router.replace('/reset-password'); return; }
     if (router.canGoBack()) router.back();
     else router.replace('/');
-  }, [user, passwordRecovery, router]);
+  }, [user, passwordRecovery, hydrated, authCallbackPending, authCallbackError, router]);
 
   return (
     <View style={styles.root}>

@@ -25,6 +25,7 @@ export interface ForumThread {
 }
 
 export interface ForumReply {
+  deletedAt?: string | null;
   id: string;
   threadId: string;
   parentReplyId: string | null;

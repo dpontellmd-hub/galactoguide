@@ -32,6 +32,7 @@ const helpfulRows = () => [...votes].map(([key, voters]) => {
 const supabase = {
   rpc: async (name, input) => {
     calls.push({ name, input });
+    if (name === 'get_forum_safety') return { data: { is_moderator: false, is_suspended: false, blocked_users: [] } };
     if (name === 'get_forum_helpful') return { data: helpfulRows() };
     if (name === 'set_forum_helpful') {
       const voter = user.id;
@@ -44,6 +45,13 @@ const supabase = {
       votes.set(key, voters);
       return { data: [{ target_kind: input.p_kind, target_id: input.p_id,
         helpful_count: voters.size, marked_helpful: voters.has(voter) }] };
+    }
+    if (name === 'delete_forum_reply') {
+      if (failDelete) return { error: { message: 'Offline' } };
+      Object.assign(remoteReplies.find((row) => row.id === input.p_id), {
+        body: 'This reply was deleted by its author.', user_id: null, author_name: 'Deleted author', deleted_at: new Date().toISOString(),
+      });
+      return { data: input.p_id };
     }
     if (name === 'delete_forum_thread') {
       if (failDelete) return { error: { message: 'Offline' } };
@@ -92,6 +100,7 @@ const mockModules = {
   '@expo/vector-icons': { Ionicons: 'Icon' },
   '@/context/AuthContext': { useAuth: () => ({ user }) },
   '@/lib/supabase': { supabase, supabaseConfigured: true },
+  '@/components/forum-safety-actions': { ForumSafetyActions: 'SafetyActions' },
   '@/components/forum-auth-prompt': { ForumAuthPrompt: (props) => React.createElement('AuthPrompt', props) },
   '@/theme': { font: {}, fontSize: {}, radius: {}, spacing: {}, useTheme: () => ({ colors }), useThemedStyles: (make) => make(colors) },
 };
@@ -116,7 +125,7 @@ function Harness() {
   const thread = api.getThread('thread');
   return React.createElement('Screen', null,
     thread && !thread.deletedAt && React.createElement(ForumPostActions, { kind: 'thread', id: thread.id, userId: thread.userId, isSample: false }),
-    ...api.getReplies('thread').map((reply) => React.createElement(ForumPostActions,
+    ...api.getReplies('thread').filter((reply) => !reply.deletedAt).map((reply) => React.createElement(ForumPostActions,
       { key: reply.id, kind: 'reply', id: reply.id, userId: reply.userId, isSample: false })));
 }
 const app = () => React.createElement(ForumProvider, null, React.createElement(Harness));
@@ -168,9 +177,10 @@ try {
   assert.ok(api.getThread('thread').deletedAt, 'Placeholder survives reload');
   await click('reply', 'Delete reply');
   await click('reply', 'Confirm delete reply');
-  assert.equal(api.getReplies('thread').length, 1);
-  assert.equal(api.getReplies('thread')[0].parentReplyId, null);
-  assert.equal(api.getThread('thread').replyCount, 1);
+  assert.equal(api.getReplies('thread').length, 2);
+  assert.ok(api.getReplies('thread')[0].deletedAt);
+  assert.equal(api.getReplies('thread')[1].parentReplyId, 'reply');
+  assert.equal(api.getThread('thread').replyCount, 2);
   // An old account's in-flight vote must not replace the new viewer's selection.
   holdVote = true;
   await act(async () => { button('nested', 'Undo helpful vote').props.onPress(); });
@@ -180,6 +190,8 @@ try {
   holdVote = false;
   assert.equal(api.getHelpful('reply', 'nested').marked, false);
   await act(async () => { user = null; renderer.update(app()); });
+  assert.equal(api.threads.length, 0, 'Account switch hides previous feed until refreshed');
+  await act(async () => { await new Promise((resolve) => setTimeout(resolve, 20)); });
   await click('nested', 'Was this helpful?');
   assert.equal(renderer.root.findAllByType('AuthPrompt').length, 1);
   assert.ok((await api.setHelpful('reply', 'nested', true)).error);

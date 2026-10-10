@@ -1,0 +1,28 @@
+# Account deletion: review implementation, not deployed
+
+The app's My Account screen links to `/delete-account`. The public, no-login request page is `/account-deletion.html` (a distinct filename so it cannot overwrite Expo's exported route). Both include a manual request path to the existing contact `adam@dyadhealthcollective.com`. No request or live deletion has been sent. Confirm that Adam will own this inbox workflow; moderation staffing does not automatically establish deletion-request staffing.
+
+## Decisions required before enabling
+
+- Approve `erase_owned_content_v1`: permanently erase the departing user's account, saved substances, selected situations/preferences, votes, forum text/title/author identity. Preserve placeholders and other people's responses. Erase reports by/about them, report reasons and associated moderation audit through moderation FKs. This favors erasure over retaining abuse evidence. Confirm whether any narrow, disclosed retention obligation changes that choice; do not enable until resolved.
+- Set an approved duration/handling policy for support emails, existing Formspree reports, provider logs and backups. The SQL does not reach those systems, erase other people's copies, or erase caches on other devices. No universal immediate-erasure promise is made.
+- Confirm manual request owner, response expectations and ownership verification. A matching email address in a request alone is never authority to delete. Verify through an authenticated channel or reviewed recovery process; do not ask users for passwords/codes.
+- Apple-linked accounts are hard-blocked automatically pending a separately approved server-side Apple code exchange/token storage/revocation implementation. A UI login identity token is not a revocation token. Complete revocation via Apple's endpoint with approved server-only credentials, make it retry-safe, then connect its successful receipt to deletion. Do not merely remove the SQL gate. Manual requests need the same revocation requirement. This remains a release blocker for full Apple account deletion.
+
+## Server design and isolated setup
+
+Apply the existing `schema.sql`, `20261010_forum_moderation.sql`, then `20261011_account_deletion.sql` to a disposable local/isolated project only. No deployment or live DB changes are authorized. The deletion function is `SECURITY DEFINER` with an empty search path and no caller-supplied user ID. Supabase/PostgREST verifies the bearer JWT; `auth.uid()` determines the sole target. The client pins that exact session's token to the request to prevent an account-switch race.
+
+The server requires exact `DELETE` confirmation and a signed AMR password/oauth/otp authentication timestamp within five minutes; a recent token refresh is insufficient. Unknown/missing AMR fails closed. Confirm actual provider AMR claims against an isolated Supabase environment before enabling. Test fixture values are not a claim that live providers are configured.
+
+Deletion takes a lock on the auth user and executes account-data cleanup and `auth.users` deletion in one database transaction. Supabase auth-table cascades remove identity/session rows; all constraints must be checked against the target isolated schema/version. Any failure rolls back the entire deletion. The old access token can remain cryptographically valid until expiry; the auth user is gone and protected mutation functions must check active membership/user existence. Do not use JWT validity alone for privileged authorization.
+
+`private.account_deletion_config` is inaccessible to anon/authenticated clients. It defaults disabled, even after migration. Only after explicit approval and isolated validation, an authorized operator may set `enabled=true, retention_strategy='erase_owned_content_v1'` on its singleton row. This document does not authorize doing so. Apple blocking is independent and cannot be toggled off by that config.
+
+The UI offers inline password/Google/Apple identity verification where applicable. Google web returns to the allowlisted `/delete-account` route; add that exact callback only in an approved isolated provider setup. It resets confirmation after verification and account changes, never auto-deletes from a callback, prevents duplicate clicks, and clears local account caches after successful deletion and local sign-out. An ephemeral in-memory receipt created only after server success preserves the completion message across account-provider hydration/remounts; it is not read from a URL or persisted storage and is cleared when acknowledged. Recovery errors prevent deletion. Cancellation does not call the deletion RPC.
+
+## Verification
+
+`scripts/account-deletion-check.mjs` runs actual client helper/screen behavior with mocked auth/network/storage. `scripts/account-deletion-database-check.mjs` executes SQL in disposable PGlite PostgreSQL: grants, off-by-default config, confirmation, stale/missing/future authentication, Apple gate, transactional rollback, self-only erasure, cascades, preserved other-user responses and replay denial. No test connects to Supabase.
+
+Still required after review: real isolated Supabase Auth/PostgREST verification, cache clearing on devices, native/web reauthentication paths and account switches, failure/retry behavior, and Apple revocation integration. Public pages are review copy, not a finalized retention policy or a deployed customer promise.

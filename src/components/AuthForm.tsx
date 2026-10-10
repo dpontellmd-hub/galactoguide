@@ -1,7 +1,9 @@
 import { Ionicons } from '@expo/vector-icons';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -35,7 +37,7 @@ const SUBTITLES: Record<Mode, string> = {
   signin: 'Sign in to sync your saved substances and preferences across devices.',
   signup: 'Optional — accounts let you sync saved substances and preferences across devices.',
   verify: 'Enter the code we emailed you to finish creating your account.',
-  reset: "Enter your email, then open the reset link in this same browser.",
+  reset: 'Enter your email, then open the reset link on this device in the same app or browser.',
 };
 
 interface AuthFormProps {
@@ -61,7 +63,7 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin', on
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
 
-  const { busy, configured, signIn } = useAuthActions();
+  const { busy, configured, appleAvailable, signOutError, retrySignOut, signIn } = useAuthActions();
 
   const [mode, setMode] = useState<Mode>(initialMode);
   const [email, setEmail] = useState('');
@@ -184,11 +186,39 @@ export function AuthForm({ accent, hideHeader, style, initialMode = 'signin', on
         </View>
       )}
 
+      {signOutError && (
+        <View style={styles.banner}>
+          <Text style={styles.error} accessibilityRole="alert">{signOutError}</Text>
+          <Pressable accessibilityRole="button" accessibilityLabel="Retry sign out" disabled={busy}
+            onPress={async () => { try { await retrySignOut(); } catch { /* Error stays visible above. */ } }}>
+            <Text style={styles.googleText}>Retry sign out</Text>
+          </Pressable>
+        </View>
+      )}
+
       {mode !== 'reset' && mode !== 'verify' && <Text style={styles.subtitle}>
         Signing in syncs your saved entries, selected situations, and preferences with your account.
       </Text>}
 
       {/* Google */}
+      {Platform.OS === 'ios' && appleAvailable && mode !== 'reset' && mode !== 'verify' && (
+        <View pointerEvents={busy || !configured ? 'none' : 'auto'}
+          accessibilityElementsHidden={busy || !configured} style={{ marginBottom: spacing.md }}>
+          <AppleAuthentication.AppleAuthenticationButton
+            buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
+            buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+            cornerRadius={radius.xl}
+            style={{ height: 48, width: '100%' }}
+            onPress={async () => {
+              if (busy || !configured) return;
+              setError(null);
+              setNotice(null);
+              const result = await signIn.apple();
+              if (result.error) setError(result.error);
+            }}
+          />
+        </View>
+      )}
       {mode !== 'reset' && mode !== 'verify' && (
         <Pressable
           onPress={onGoogle}
@@ -345,6 +375,9 @@ function useAuthActions() {
     user: auth.user,
     busy: auth.busy,
     configured: auth.configured,
+    appleAvailable: auth.appleAvailable,
+    signOutError: auth.signOutError,
+    retrySignOut: auth.signOut,
     signIn: {
       password: async (email: string, password: string): Promise<ActionResult> => {
         if (!email || !password) return { error: 'Enter your email and password.' };
@@ -365,6 +398,7 @@ function useAuthActions() {
         return { message: 'If that email has an account, a reset link is on its way.' };
       },
       google: (): Promise<ActionResult> => auth.signInWithGoogle(),
+      apple: (): Promise<ActionResult> => auth.signInWithApple(),
     },
   };
 }
