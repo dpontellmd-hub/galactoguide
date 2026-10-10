@@ -9,7 +9,7 @@ import { font, fontSize, radius, spacing, useTheme, useThemedStyles, type ThemeC
 
 export default function ResetPasswordScreen() {
   const router = useRouter();
-  const { user, hydrated, busy, authCallbackError, updatePassword, dismissPasswordRecovery } = useAuth();
+  const { user, hydrated, busy, passwordRecovery, authCallbackPending, authCallbackError, updatePassword, dismissPasswordRecovery } = useAuth();
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
   const [password, setPassword] = useState('');
@@ -40,7 +40,7 @@ export default function ResetPasswordScreen() {
     <View style={styles.root}>
       <ScreenHeader title="Reset password" onBack={leave} />
       <FormScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        {!hydrated ? <ActivityIndicator accessibilityLabel="Checking reset link" color={colors.accent} />
+        {!hydrated || authCallbackPending ? <ActivityIndicator accessibilityLabel="Checking reset link" color={colors.accent} />
           : complete ? (
             <View style={styles.section} accessibilityLiveRegion="polite">
               <Text style={styles.title}>Password updated</Text>
@@ -49,7 +49,7 @@ export default function ResetPasswordScreen() {
                 <Text style={styles.buttonText}>Continue to GalactoGuide</Text>
               </Pressable>
             </View>
-          ) : authCallbackError || !user ? (
+          ) : authCallbackError || !user || !passwordRecovery ? (
             <View style={styles.section}>
               <Text style={styles.copy} accessibilityRole="alert">
                 {authCallbackError ?? 'Open a password reset link to choose a new password. If your link expired or was already used, request another below.'}

@@ -4,6 +4,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -31,6 +32,7 @@ interface ForumThreadRow {
 }
 
 interface ForumReplyRow {
+  deleted_at?: string | null;
   id: string;
   thread_id: string;
   parent_reply_id: string | null;
@@ -44,6 +46,11 @@ interface ForumReplyRow {
 interface ForumMutationResult<T> {
   data?: T;
   error?: string;
+}
+
+export interface ForumSafety {
+  is_moderator: boolean; is_suspended: boolean;
+  blocked_users: { user_id: string; author_name: string; reference: string }[];
 }
 
 export type ForumTargetKind = 'thread' | 'reply';
@@ -65,6 +72,9 @@ interface ForumContextValue {
   loading: boolean;
   refreshing: boolean;
   liveAvailable: boolean;
+  safety: ForumSafety | null;
+  setBlocked: (userId: string, blocked: boolean) => Promise<ForumMutationResult<boolean>>;
+  reportPost: (kind: ForumTargetKind, id: string, category: string, reason: string) => Promise<ForumMutationResult<boolean>>;
   getHelpful: (kind: ForumTargetKind, id: string) => ForumHelpfulState | undefined;
   setHelpful: (kind: ForumTargetKind, id: string, helpful?: boolean) => Promise<ForumMutationResult<boolean>>;
   deletePost: (kind: ForumTargetKind, id: string) => Promise<ForumMutationResult<boolean>>;
@@ -113,6 +123,7 @@ function mapReply(row: ForumReplyRow): ForumReply {
   return {
     id: row.id,
     threadId: row.thread_id,
+    deletedAt: row.deleted_at,
     parentReplyId: row.parent_reply_id,
     userId: row.user_id,
     authorName: row.author_name,
@@ -123,6 +134,10 @@ function mapReply(row: ForumReplyRow): ForumReply {
 }
 
 function friendlyForumError(message?: string): string {
+  if (message?.includes('content_filter')) return 'Please revise your post to follow the community rules. Threats, abusive language, and sharing private contact details are not allowed.';
+  if (message?.includes('suspended')) return 'Posting on this account is suspended. Contact the community team to request a review.';
+  if (message?.includes('rate_limit')) return 'Please wait a little before posting again.';
+  if (message?.includes('blocked')) return 'You cannot interact with this member while a block is in place.';
   if (message?.includes('forum_threads') || message?.includes('forum_replies')) {
     return 'Posting is not available until the forum database setup is complete.';
   }
@@ -144,6 +159,21 @@ export function ForumProvider({ children }: { children: ReactNode }) {
   const forumRequest = useRef(0);
   const pendingActions = useRef(new Set<string>());
   const viewerId = user?.id ?? null;
+  const activeViewer = useRef(viewerId);
+  useLayoutEffect(() => { activeViewer.current = viewerId; }, [viewerId]);
+  const [forumViewer, setForumViewer] = useState<string | null | undefined>(undefined);
+  const [safety, setSafety] = useState<ForumSafety | null>(null);
+  const [safetyViewer, setSafetyViewer] = useState<string | null | undefined>(undefined);
+  const loadSafety = useCallback(async () => {
+    if (!supabaseConfigured) return;
+    try {
+      const { data, error } = await supabase.rpc('get_forum_safety');
+      if (activeViewer.current !== viewerId) return;
+      setSafety(error ? null : data as ForumSafety);
+      setSafetyViewer(viewerId);
+    } catch { if (activeViewer.current === viewerId) setSafety(null); }
+  }, [viewerId]);
+  useEffect(() => { const timer = setTimeout(() => { void loadSafety(); }, 0); return () => clearTimeout(timer); }, [loadSafety]);
 
   const loadHelpful = useCallback(async () => {
     const request = ++helpfulRequest.current;
@@ -187,11 +217,11 @@ export function ForumProvider({ children }: { children: ReactNode }) {
           .order('created_at', { ascending: false }),
         supabase
           .from('forum_replies')
-          .select('id, thread_id, parent_reply_id, user_id, author_name, body, created_at, is_sample')
+          .select('id, thread_id, parent_reply_id, user_id, author_name, body, created_at, is_sample, deleted_at')
           .order('created_at', { ascending: true }),
       ]);
 
-      if (request !== forumRequest.current) return;
+      if (request !== forumRequest.current || activeViewer.current !== viewerId) return;
       if (threadResult.error || replyResult.error) {
         setLiveAvailable(false);
         return;
@@ -219,6 +249,7 @@ export function ForumProvider({ children }: { children: ReactNode }) {
         .filter((row): row is ForumThread => row !== null)
         .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
 
+      setForumViewer(viewerId);
       setThreads(remoteThreads);
       setReplies(visibleReplies);
       setLiveAvailable(true);
@@ -230,9 +261,10 @@ export function ForumProvider({ children }: { children: ReactNode }) {
         setRefreshing(false);
       }
     }
-  }, []);
+  }, [viewerId]);
 
   useEffect(() => {
+    const requestRef = forumRequest;
     const timer = setTimeout(() => {
       loadForum().catch(() => {
         setLoading(false);
@@ -240,7 +272,7 @@ export function ForumProvider({ children }: { children: ReactNode }) {
         setLiveAvailable(false);
       });
     }, 0);
-    return () => clearTimeout(timer);
+    return () => { clearTimeout(timer); requestRef.current++; };
   }, [loadForum]);
 
   const createThread = useCallback(
@@ -265,6 +297,7 @@ export function ForumProvider({ children }: { children: ReactNode }) {
         .select('id, user_id, author_name, title, body, topic, created_at, is_sample')
         .single();
 
+      if (activeViewer.current !== user.id) return { error: 'Your account changed. Refresh before posting again.' };
       if (error || !data) return { error: friendlyForumError(error?.message) };
       const created = mapThread(data as ForumThreadRow, 0);
       if (!created) return { error: 'The forum returned an unsupported topic.' };
@@ -300,9 +333,10 @@ export function ForumProvider({ children }: { children: ReactNode }) {
           body: cleanBody,
           is_sample: false,
         })
-        .select('id, thread_id, parent_reply_id, user_id, author_name, body, created_at, is_sample')
+        .select('id, thread_id, parent_reply_id, user_id, author_name, body, created_at, is_sample, deleted_at')
         .single();
 
+      if (activeViewer.current !== user.id) return { error: 'Your account changed. Refresh before posting again.' };
       if (error || !data) return { error: friendlyForumError(error?.message) };
       const created = mapReply(data as ForumReplyRow);
       forumRequest.current++;
@@ -330,6 +364,7 @@ export function ForumProvider({ children }: { children: ReactNode }) {
       if (kind === 'thread') {
         const { data, error } = await supabase.rpc('delete_forum_thread', { p_id: id });
         if (error || !data) return { error: 'Could not delete this thread. Please try again.' };
+        if (activeViewer.current !== user.id) return { data: true };
         forumRequest.current++;
         setThreads((current) => current.map((item) => item.id === id ? {
           ...item, title: 'Deleted thread', body: 'This thread was deleted by its author.',
@@ -337,17 +372,15 @@ export function ForumProvider({ children }: { children: ReactNode }) {
         } : item));
         return { data: true };
       }
-      const { data, error } = await supabase.from('forum_replies')
-        .delete().eq('id', id).eq('user_id', user.id).eq('is_sample', false).select('id');
-      if (error) return { error: 'Could not delete this post. Check your connection and try again.' };
-      if (!data?.length) return { error: 'This post is no longer available or you do not have permission to delete it.' };
+      const { data, error } = await supabase.rpc('delete_forum_reply', { p_id: id });
+      if (error || !data) return { error: 'Could not delete this reply. Please try again.' };
+      if (activeViewer.current !== user.id) return { data: true };
       forumRequest.current++;
-      // Matches the database's ON DELETE SET NULL: other people's responses survive.
-      setReplies((current) => current.filter((item) => item.id !== id).map((item) =>
-        item.parentReplyId === id ? { ...item, parentReplyId: null } : item));
-      const threadId = (post as ForumReply).threadId;
-      setThreads((current) => current.map((item) => item.id === threadId
-        ? { ...item, replyCount: Math.max(0, item.replyCount - 1) } : item));
+      // A tombstone preserves responses and report references without retaining the content.
+      setReplies((current) => current.map((item) => item.id === id ? {
+        ...item, body: 'This reply was deleted by its author.', authorName: 'Deleted author',
+        userId: null, deletedAt: new Date().toISOString(),
+      } : item));
       return { data: true };
     } catch {
       return { error: 'Could not delete this post. Check your connection and try again.' };
@@ -389,10 +422,37 @@ export function ForumProvider({ children }: { children: ReactNode }) {
     } finally { pendingActions.current.delete(key); }
   }, [user, helpfulViewer]);
 
+  const setBlocked = useCallback(async (targetId: string, blocked: boolean) => {
+    if (!user || targetId === user.id) return { error: 'Sign in to block another member.' };
+    try {
+      const { error } = await supabase.rpc('set_forum_block', { p_user_id: targetId, p_blocked: blocked });
+      if (error) return { error: 'Could not update your blocked members. Please try again.' };
+      if (activeViewer.current !== user.id) return { error: 'Your account changed. Please refresh.' };
+      // Hide cached content before fetching the server-filtered feed.
+      forumRequest.current++;
+      setThreads([]); setReplies([]);
+      await Promise.all([loadForum(true), loadSafety()]);
+      return { data: true };
+    } catch { return { error: 'Could not update your blocked members. Please try again.' }; }
+  }, [user, loadForum, loadSafety]);
+
+  const reportPost = useCallback(async (kind: ForumTargetKind, id: string, category: string, reason: string) => {
+    if (!user) return { error: 'Sign in to send a report, or use the contact address in Community rules.' };
+    try {
+      const { error } = await supabase.rpc('report_forum_post', {
+        p_kind: kind, p_id: id, p_category: category, p_reason: reason.trim(),
+      });
+      if (activeViewer.current !== user.id) return { error: 'Your account changed. Please refresh.' };
+      return error ? { error: 'Could not confirm your report. Try again or use the community contact address.' } : { data: true };
+    } catch { return { error: 'Could not confirm your report. Please try again.' }; }
+  }, [user]);
+
   const value = useMemo<ForumContextValue>(
     () => ({
-      threads,
-      replies,
+      threads: forumViewer === viewerId ? threads : [],
+      replies: forumViewer === viewerId ? replies : [],
+      safety: safetyViewer === viewerId ? safety : null,
+      setBlocked, reportPost,
       loading,
       refreshing,
       liveAvailable,
@@ -400,14 +460,15 @@ export function ForumProvider({ children }: { children: ReactNode }) {
         ? (helpful[`${kind}:${id}`] ?? (helpfulLoaded ? { count: 0, marked: false } : undefined)) : undefined,
       setHelpful,
       deletePost,
-      refresh: async () => { await Promise.all([loadForum(true), loadHelpful()]); },
-      getThread: (id) => threads.find((thread) => thread.id === id),
-      getReplies: (threadId) => replies.filter((reply) => reply.threadId === threadId),
+      refresh: async () => { await Promise.all([loadForum(true), loadHelpful(), loadSafety()]); },
+      getThread: (id) => forumViewer === viewerId ? threads.find((thread) => thread.id === id) : undefined,
+      getReplies: (threadId) => forumViewer === viewerId ? replies.filter((reply) => reply.threadId === threadId) : [],
       createThread,
       addReply,
     }),
     [threads, replies, loading, refreshing, liveAvailable, loadForum, loadHelpful, createThread, addReply,
-      helpful, helpfulLoaded, helpfulViewer, viewerId, setHelpful, deletePost],
+      helpful, helpfulLoaded, helpfulViewer, viewerId, setHelpful, deletePost,
+      forumViewer, safety, safetyViewer, setBlocked, reportPost, loadSafety],
   );
 
   return <ForumContext.Provider value={value}>{children}</ForumContext.Provider>;

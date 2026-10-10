@@ -73,6 +73,9 @@ function RootNavigator() {
           <Stack.Screen name="notices" />
           <Stack.Screen name="(tabs)" />
           <Stack.Screen name="account" />
+          <Stack.Screen name="delete-account" options={{ title: 'Delete account' }} />
+          <Stack.Screen name="community-rules" options={{ title: 'Community rules' }} />
+          <Stack.Screen name="moderation" options={{ title: 'Moderation' }} />
           <Stack.Screen name="resources" />
           <Stack.Screen name="release-notes" options={{ title: 'Release notes' }} />
           <Stack.Screen name="essentials" />

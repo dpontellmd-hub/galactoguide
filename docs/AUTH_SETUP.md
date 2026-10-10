@@ -1,6 +1,8 @@
 # Auth & sync setup (Supabase)
 
 GalactoGuide supports **optional** accounts: email/password + "Continue with Google".
+Prepared native recovery and gated iOS Apple support are documented in
+[native authentication release readiness](native-auth-release-readiness.md).
 Reference content is available without an account. Saved entries and community
 participation require sign-in. Portal and situation choices also work locally
 while signed out.

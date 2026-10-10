@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import { useRef, useState, type ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ForumSafetyActions } from '@/components/forum-safety-actions';
 import { ForumAuthPrompt } from '@/components/forum-auth-prompt';
 import { useAuth } from '@/context/AuthContext';
 import { useForum, type ForumTargetKind } from '@/context/ForumContext';
@@ -66,6 +67,7 @@ export function ForumPostActions({ kind, id, userId, isSample, onDeleted, childr
           </Pressable>
         )}
       </View>
+      {!isSample && userId && <ForumSafetyActions kind={kind} id={id} userId={userId} />}
       {helpfulCount > 0 && (
         <Text style={styles.secondary} accessibilityLiveRegion="polite">{helpfulCountLabel(helpfulCount)}</Text>
       )}

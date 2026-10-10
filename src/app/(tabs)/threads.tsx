@@ -65,7 +65,7 @@ export default function ThreadsScreen() {
   const insets = useSafeAreaInsets();
   const { user } = useAuth();
   const { colors } = useTheme();
-  const { threads, replies, loading, refreshing, refresh, liveAvailable } = useForum();
+  const { threads, replies, loading, refreshing, refresh, liveAvailable, safety } = useForum();
   const [sort, setSort] = useState<ForumSort>('New');
   const [topic, setTopic] = useState<TopicFilter>('All');
   const styles = useThemedStyles(makeStyles);
@@ -85,6 +85,12 @@ export default function ThreadsScreen() {
   );
   const controls = (
     <View style={styles.sidebarContent}>
+      <Pressable onPress={() => router.push('/community-rules')} accessibilityRole="link" style={styles.newThreadButton}>
+        <Text style={styles.newThreadText}>Community rules & safety</Text>
+      </Pressable>
+      {safety?.is_moderator && <Pressable onPress={() => router.push('/moderation')} accessibilityRole="link" style={styles.newThreadButton}>
+        <Text style={styles.newThreadText}>Moderator review queue</Text>
+      </Pressable>}
       {user ? (
         <Pressable
           onPress={() => router.push('/threads/new')}

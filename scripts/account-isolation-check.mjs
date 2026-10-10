@@ -210,6 +210,7 @@ try {
   const numbers = new Proxy({}, { get: () => 10 });
   Object.assign(modules, {
     '@expo/vector-icons': { Ionicons: () => null },
+    'expo-apple-authentication': {},
     'expo-image': { Image: 'Image' },
     'expo-linear-gradient': { LinearGradient: 'LinearGradient' },
     'expo-router': {
@@ -220,6 +221,7 @@ try {
       }),
     },
     'react-native': {
+      Platform: { OS: 'web' },
       ActivityIndicator: 'ActivityIndicator', Pressable: 'Pressable', Text: 'Text',
       TextInput: 'TextInput', View: 'View', StyleSheet: { create: value => value },
       useWindowDimensions: () => ({ width: 1280, height: 900, fontScale: 1 }),

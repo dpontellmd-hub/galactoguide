@@ -1,15 +1,21 @@
 // Test a local production export. Every auth/database request is intercepted;
 // no email, account change, or other live write is sent.
 import assert from 'node:assert/strict';
+import { Buffer } from 'node:buffer';
 import { createServer } from 'node:http';
-import { readFile, stat, mkdir } from 'node:fs/promises';
+import { readFile, stat, mkdir, readdir } from 'node:fs/promises';
 import path from 'node:path';
 import { chromium } from 'playwright';
 
 const root = path.resolve(process.env.WEB_EXPORT_DIR ?? '.tmp/website-launch-web');
 const config = JSON.parse(await readFile('vercel.json', 'utf8'));
-const app = JSON.parse(await readFile('app.json', 'utf8'));
-const storageKey = `sb-${new URL(app.expo.extra.supabaseUrl).hostname.split('.')[0]}-auth-token`;
+// Export with GALACTOGUIDE_ISOLATED_QA=1. Never contact a shared backend.
+const fixtureOrigin = 'https://release-fixture.invalid';
+const storageKey = 'sb-release-fixture-auth-token';
+const bundleDirectory = path.join(root, '_expo/static/js/web');
+const bundles = await Promise.all((await readdir(bundleDirectory)).filter(name => name.endsWith('.js')).map(name => readFile(path.join(bundleDirectory, name), 'utf8')));
+assert.ok(bundles.some(bundle => bundle.includes(fixtureOrigin)), 'Re-export with GALACTOGUIDE_ISOLATED_QA=1 and --clear: fixture backend missing from bundle');
+assert.ok(bundles.every(bundle => !bundle.includes('https://axxuefnkoxfifftjnuxo.supabase.co')), 'Live backend must not be embedded in the QA bundle');
 const output = 'scripts/ui-shots/launch';
 await mkdir(output, { recursive: true });
 const mime = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.png': 'image/png', '.svg': 'image/svg+xml', '.ttf': 'font/ttf', '.woff2': 'font/woff2', '.ico': 'image/x-icon' };
@@ -41,7 +47,7 @@ let browser;
 const pageErrors = [];
 try {
   assert.equal(config.outputDirectory, 'dist');
-  for (const route of ['/', '/auth', '/reset-password', '/privacy.html', '/terms.html', '/threads/new', '/substance/fenugreek?kind=gogue', '/threads/test-thread']) {
+  for (const route of ['/', '/auth', '/reset-password', '/delete-account', '/account-deletion.html', '/community-rules', '/moderation', '/privacy.html', '/terms.html', '/threads/new', '/substance/fenugreek?kind=gogue', '/threads/test-thread']) {
     const response = await fetch(origin + route);
     assert.equal(response.status, 200, route);
     assert.match(response.headers.get('content-type'), /text\/html/);
@@ -51,11 +57,11 @@ try {
   assert.equal((await fetch(origin + '/reset-password')).headers.get('referrer-policy'), 'no-referrer');
   browser = await chromium.launch();
   const user = { id: '00000000-0000-4000-8000-000000000001', aud: 'authenticated', role: 'authenticated',
-    email: 'test@example.invalid', app_metadata: { provider: 'email' }, user_metadata: {}, identities: [], created_at: '2026-09-19T00:00:00Z' };
+    email: 'test@example.invalid', app_metadata: { provider: 'email' }, user_metadata: {}, identities: [{ provider: 'email' }], created_at: '2026-09-19T00:00:00Z' };
   const jwt = ['eyJhbGciOiJIUzI1NiJ9', Buffer.from(JSON.stringify({ sub: user.id, exp: Math.floor(Date.now() / 1000) + 3600, role: 'authenticated' })).toString('base64url'), 'fixture'].join('.');
   const session = { access_token: jwt, refresh_token: 'fixture-refresh', token_type: 'bearer', expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, user };
-  async function profile({ expired = false, existingSession = false, verifier = true } = {}) {
-    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce' });
+  async function profile({ expired = false, existingSession = false, verifier = true, moderator = false } = {}) {
+    const context = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: 'reduce', serviceWorkers: 'block' });
     await context.addInitScript(({ storageKey, existingSession, session, verifier }) => {
       const prefs = JSON.stringify({ portal: 'mother', disclaimerAccepted: true });
       localStorage.setItem('galactoguide.session.v2:guest', prefs);
@@ -64,10 +70,12 @@ try {
       if (existingSession) localStorage.setItem(storageKey, JSON.stringify(session));
     }, { storageKey, existingSession, session, verifier });
     const requests = [];
-    const state = { failUpdate: false, holdUpdate: false, release: null };
-    await context.route('https://**.supabase.co/**', async (route) => {
+    const state = { failUpdate: false, holdUpdate: false, release: null, allowDeletion: false, reportResolved: false };
+    await context.route('**/*', async (route) => {
       const request = route.request();
       const url = new URL(request.url());
+      if (url.origin === origin) return route.continue();
+      if (url.origin !== fixtureOrigin) return route.abort();
       requests.push({ method: request.method(), url, body: request.postDataJSON() });
       if (url.pathname.endsWith('/token')) {
         if (expired) return route.fulfill({ status: 400, json: { code: 'flow_state_expired', msg: 'Reset link expired' } });
@@ -82,10 +90,24 @@ try {
       if (url.pathname.endsWith('/user')) return route.fulfill({ json: user });
       if (url.pathname.endsWith('/recover')) return route.fulfill({ json: {} });
       if (url.pathname.endsWith('/user_prefs')) return route.fulfill({ json: null });
+      if (url.pathname.endsWith('/get_forum_safety')) return route.fulfill({ json: { is_moderator: moderator, is_suspended: false, blocked_users: [] } });
+      if (url.pathname.endsWith('/moderation_queue')) {
+        assert.equal(moderator, true);
+        return route.fulfill({ json: state.reportResolved ? [] : [{ id: 'fixture-report', thread_id: 'fixture-thread', target_kind: 'thread', target_id: 'fixture-thread', category: 'harassment', reason: 'Fixture report for review', status: 'open', created_at: '2026-10-10T00:00:00Z', author_id: 'fixture-author', author_name: 'Fixture member', title: 'Fixture discussion', body: 'Fixture post awaiting review', resolution: null }] });
+      }
+      if (url.pathname.endsWith('/moderate_forum_report')) {
+        assert.equal(moderator, true);
+        assert.deepEqual(request.postDataJSON(), { p_report_id: 'fixture-report', p_action: 'remove', p_note: '' });
+        state.reportResolved = true;
+        return route.fulfill({ json: true });
+      }
+      if (url.pathname.endsWith('/delete_own_account')) {
+        assert.deepEqual(request.postDataJSON(), { p_confirmation: 'DELETE' }, 'No client-selected account ID');
+        assert.equal(request.headers().authorization, `Bearer ${jwt}`);
+        return state.allowDeletion ? route.fulfill({ json: true }) : route.fulfill({ status: 403, json: { message: 'deletion_disabled', code: '42501' } });
+      }
       return route.fulfill({ json: [] });
     });
-    // Fail closed if the app attempts to use an unexpected external endpoint.
-    await context.route('https://formspree.io/**', (route) => route.abort());
     const page = await context.newPage();
     page.on('pageerror', (error) => pageErrors.push(String(error)));
     return { context, page, requests, state };
@@ -136,7 +158,8 @@ try {
   await legacy.page.getByLabel('New password', { exact: true }).waitFor();
   assert.equal(new URL(legacy.page.url()).pathname, '/reset-password', 'Older callback routes enter recovery');
   await legacy.page.reload();
-  await legacy.page.getByLabel('New password', { exact: true }).waitFor();
+  await legacy.page.getByRole('alert').filter({ hasText: 'Open a password reset link' }).waitFor();
+  assert.equal(await legacy.page.getByLabel('New password', { exact: true }).count(), 0, 'A restored session without fresh recovery proof cannot reset a password');
   await legacy.context.close();
 
   const wrongBrowser = await profile({ verifier: false, existingSession: true });
@@ -147,6 +170,56 @@ try {
   await wrongBrowser.context.close();
 
   const guest = await profile({ verifier: false });
+  await guest.page.goto(origin + '/delete-account');
+  await guest.page.getByRole('button', { name: 'Sign in', exact: true }).waitFor();
+  assert.equal(await guest.page.getByRole('button', { name: 'Permanently delete my account' }).count(), 0);
+  const deletion = await profile({ existingSession: true, verifier: false });
+  await deletion.page.goto(origin + '/delete-account');
+  const deleteButton = deletion.page.getByRole('button', { name: 'Permanently delete my account' });
+  await deleteButton.waitFor();
+  assert.equal(await deleteButton.getAttribute('aria-disabled'), 'true');
+  await deletion.page.getByLabel('Type DELETE to confirm permanent account deletion').fill('DELETE');
+  await deletion.page.getByRole('button', { name: 'Cancel / Keep my account' }).click();
+  await deletion.page.waitForURL('**/account');
+  assert.equal(deletion.requests.filter((r) => r.url.pathname.endsWith('/delete_own_account')).length, 0);
+  await deletion.page.goto(origin + '/delete-account');
+  await deletion.page.getByLabel('Type DELETE to confirm permanent account deletion').fill('DELETE');
+  await deletion.page.getByRole('button', { name: 'Permanently delete my account' }).click();
+  await deletion.page.getByRole('alert').filter({ hasText: 'Automatic deletion is not available yet' }).waitFor();
+  assert.equal(await deletion.page.getByLabel('Type DELETE to confirm permanent account deletion').inputValue(), '', 'Failure clears consent before retry');
+  deletion.state.allowDeletion = true;
+  await deletion.page.getByLabel('Type DELETE to confirm permanent account deletion').fill('DELETE');
+  await deletion.page.getByRole('button', { name: 'Permanently delete my account' }).click();
+  await deletion.page.getByRole('alert').filter({ hasText: 'Your confirmed account was deleted' }).waitFor();
+  await deletion.page.getByRole('alert').filter({ hasText: 'saved sign-in was not cleared automatically' }).waitFor();
+  await deletion.page.getByRole('alert').filter({ hasText: 'Clear GalactoGuide site data in your browser settings' }).waitFor();
+  assert.equal(await deletion.page.getByRole('button', { name: 'Permanently delete my account' }).count(), 0);
+  assert.equal(JSON.parse(await deletion.page.evaluate((key) => localStorage.getItem(key), storageKey)).access_token, jwt, 'Web deletion must not clear shared browser sign-in storage automatically');
+  assert.equal(deletion.requests.filter((request) => request.url.pathname.endsWith('/logout')).length, 0, 'Deletion cannot issue generic web sign-out that could clear another tab account');
+  await deletion.page.screenshot({ path: `${output}/deletion-complete-phone.png`, fullPage: true });
+  await deletion.context.close();
+  await guest.page.goto(origin + '/moderation');
+  await guest.page.getByText('Moderator access is required.', { exact: false }).waitFor();
+  assert.equal(guest.requests.filter((r) => r.url.pathname.endsWith('/moderation_queue')).length, 0, 'Guests never request private queue data');
+  const member = await profile({ existingSession: true, verifier: false });
+  await member.page.goto(origin + '/moderation');
+  await member.page.getByText('Moderator access is required.', { exact: false }).waitFor();
+  assert.equal(member.requests.filter((r) => r.url.pathname.endsWith('/moderation_queue')).length, 0, 'Members without roles never request private queue data');
+  await member.context.close();
+  const reviewer = await profile({ existingSession: true, verifier: false, moderator: true });
+  await reviewer.page.goto(origin + '/moderation');
+  await reviewer.page.getByText('Fixture post awaiting review', { exact: true }).waitFor();
+  await reviewer.page.getByRole('button', { name: 'Remove post', exact: true }).click();
+  await reviewer.page.getByRole('button', { name: 'Cancel', exact: true }).click();
+  assert.equal(reviewer.requests.filter((r) => r.url.pathname.endsWith('/moderate_forum_report')).length, 0, 'Cancelling moderator action performs no mutation');
+  await reviewer.page.getByRole('button', { name: 'Remove post', exact: true }).click();
+  await reviewer.page.screenshot({ path: `${output}/moderation-confirm-phone.png`, fullPage: true });
+  await reviewer.page.getByRole('button', { name: 'Confirm action', exact: true }).click();
+  await reviewer.page.getByText('No reports in this view.', { exact: true }).waitFor();
+  assert.equal(reviewer.requests.filter((r) => r.url.pathname.endsWith('/moderate_forum_report')).length, 1);
+  await reviewer.context.close();
+  await guest.page.goto(origin + '/community-rules');
+  await guest.page.getByRole('heading', { name: 'Community rules & safety', exact: true }).waitFor();
   await guest.page.goto(origin + '/reset-password');
   await guest.page.getByRole('alert').filter({ hasText: 'Open a password reset link' }).waitFor();
   await guest.page.goto(origin + '/auth');
@@ -154,7 +227,7 @@ try {
   assert.equal(await guest.page.getByRole('link', { name: 'Privacy Policy', exact: true }).getAttribute('href'), '/privacy.html');
   for (const width of [390, 1440]) {
     await guest.page.setViewportSize({ width, height: 900 });
-    for (const [route, title] of [['privacy.html', 'Privacy Policy'], ['terms.html', 'Terms of Use']]) {
+    for (const [route, title] of [['privacy.html', 'Privacy Policy'], ['terms.html', 'Terms of Use'], ['account-deletion.html', 'Delete your GalactoGuide account']]) {
       await guest.page.goto(origin + '/' + route);
       await guest.page.getByRole('heading', { name: title, exact: true }).waitFor();
       assert.equal(await guest.page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
@@ -171,12 +244,19 @@ try {
   await guest.page.getByRole('heading', { name: 'Start a thread', exact: true }).waitFor();
   await guest.context.close();
   assert.deepEqual(pageErrors, []);
-  console.log('PASS: root hosting/assets, static/dynamic deep links, legacy legal URLs, responsive policies, PKCE recovery, old callbacks, refresh, validation, retry, expiration with/without an existing session, success, and reset-email redirect. All remote I/O mocked.');
+  console.log('PASS: root hosting/assets, deep links, responsive policies, PKCE recovery, validation/retry/expiration, reset-email redirect, deletion consent/cancel/server gate/manual browser cleanup, moderator role gate/cancel/confirmed removal. All remote I/O mocked on a reserved .invalid backend.');
   if (process.env.CHECK_DESKTOP === '1') {
     process.env.APP_URL = origin;
     await import('./desktop-pages-smoke.mjs');
     await import('./desktop-smoke.mjs');
   }
+} catch (error) {
+  // All pages use fixture data; capture the rendered failure for diagnosis.
+  for (const [index, page] of (browser?.contexts().flatMap(context => context.pages()) ?? []).entries()) {
+    await page.screenshot({ path: `${output}/failure-${index}.png`, fullPage: true }).catch(() => {});
+    console.error('Fixture failure page:', new URL(page.url()).pathname, await page.getByRole('alert').allTextContents());
+  }
+  throw error;
 } finally {
   if (browser) await browser.close();
   server.closeAllConnections();

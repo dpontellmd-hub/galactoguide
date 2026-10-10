@@ -36,7 +36,7 @@ export default function AccountScreen() {
   const router = useRouter();
   const { portal, resetPortal } = usePortal();
   const { colors, preference, setPreference } = useTheme();
-  const { user, configured, signOut } = useAuth();
+  const { user, configured, signOut, signOutError, busy } = useAuth();
   const notifications = useNotifications();
   const styles = useThemedStyles(makeStyles);
   const labelColor = colors.accent;
@@ -61,6 +61,12 @@ export default function AccountScreen() {
         {configured && (
           <View style={styles.aboutCard}>
             <Text style={[styles.aboutLabel, { color: labelColor }]}>ACCOUNT</Text>
+            {signOutError && <View>
+              <Text accessibilityRole="alert" style={styles.accountSub}>{signOutError}</Text>
+              <Pressable accessibilityRole="button" disabled={busy} onPress={() => void signOut()} style={styles.signOutBtn}>
+                <Text style={styles.signOutText}>Retry sign out</Text>
+              </Pressable>
+            </View>}
             {user ? (
               <View style={styles.accountRow}>
                 <View style={styles.accountText}>
@@ -80,7 +86,7 @@ export default function AccountScreen() {
                   <Text style={styles.signOutText}>Sign out</Text>
                 </Pressable>
               </View>
-            ) : (
+            ) : signOutError ? null : (
               <>
                 <Text style={styles.accountSub}>
                   Browse the guide without an account. Sign in or create an account to save
@@ -96,6 +102,14 @@ export default function AccountScreen() {
                 </Pressable>
               </>
             )}
+            <Pressable
+              onPress={() => router.push('/delete-account')}
+              style={styles.signOutBtn}
+              accessibilityRole="button"
+              accessibilityLabel="Delete account or request deletion"
+            >
+              <Text style={styles.signOutText}>Delete account / Request deletion</Text>
+            </Pressable>
           </View>
         )}
 

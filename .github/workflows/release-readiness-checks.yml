@@ -1,0 +1,55 @@
+name: Release readiness checks (no deployment)
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-checks-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  isolated-checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CI: '1'
+      GALACTOGUIDE_ISOLATED_QA: '1'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Types and lint
+        run: |
+          npx tsc --noEmit
+          npm run lint
+      - name: Client and isolation fixtures
+        env:
+          FORUM_TEST_RUNTIME: ${{ github.workspace }}
+        run: |
+          node scripts/release-isolation-check.cjs
+          for check in auth-callback signup-code signup-code-form account-isolation account-deletion forum-interactions forum-report navigation-layout; do
+            node "scripts/${check}-check.mjs"
+          done
+      - name: Disposable SQL fixtures
+        run: |
+          npm install --prefix "$RUNNER_TEMP/galactoguide-pg-fixture" @electric-sql/pglite@0.3.15 --ignore-scripts --no-audit --no-fund
+          export FORUM_TEST_RUNTIME="$RUNNER_TEMP/galactoguide-pg-fixture"
+          node scripts/forum-database-check.mjs
+          node scripts/forum-moderation-database-check.mjs
+          node scripts/account-deletion-database-check.mjs
+      - name: Isolated web export and browser fixtures
+        env:
+          WEB_EXPORT_DIR: .tmp/release-readiness-ci
+        run: |
+          npx playwright install --with-deps chromium
+          npx expo export --clear --platform web --output-dir "$WEB_EXPORT_DIR"
+          node scripts/web-launch-check.mjs
