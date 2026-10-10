@@ -50,7 +50,7 @@ interface ForumMutationResult<T> {
 
 export interface ForumSafety {
   is_moderator: boolean; is_suspended: boolean;
-  blocked_users: { user_id: string; author_name: string }[];
+  blocked_users: { user_id: string; author_name: string; reference: string }[];
 }
 
 export type ForumTargetKind = 'thread' | 'reply';

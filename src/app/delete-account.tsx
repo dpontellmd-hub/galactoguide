@@ -23,8 +23,6 @@ export default function DeleteAccountScreen() {
   }, [storedReceipt, auth.user]);
   const deleted = !!receipt;
   const inFlight = useRef(false);
-  const currentUserId = useRef(auth.user?.id);
-  useEffect(() => { currentUserId.current = auth.user?.id; }, [auth.user?.id]);
   const providers = auth.user?.identities?.map((identity) => identity.provider) ?? [];
 
   // Switching accounts or returning from a provider never carries deletion consent.
@@ -60,7 +58,7 @@ export default function DeleteAccountScreen() {
       // Capture the account being confirmed. A concurrent account switch must not
       // turn consent for one account into a deletion request for another account.
       const { data } = await supabase.auth.getSession();
-      if (data.session?.user.id !== owner || currentUserId.current !== owner) {
+      if (data.session?.user.id !== owner) {
         setMessage('The signed-in account changed. Review it and confirm again.');
         return;
       }
@@ -68,14 +66,12 @@ export default function DeleteAccountScreen() {
       if (!result.deleted) { setMessage(result.error ?? 'Deletion was not confirmed.'); return; }
       serverDeleted = true;
       setDeletionReceipt({ ownerId: owner, phase: 'clearing' });
-      // A deleted server user cannot sign out remotely. Local scope still clears
-      // persisted tokens and emits SIGNED_OUT to reset account-scoped providers.
-      if (currentUserId.current === owner) {
-        const { error } = await supabase.auth.signOut({ scope: 'local' });
-        if (error) throw error;
-      }
+      // The provider outlives this route. It serializes auth operations and
+      // checks the live SDK session before clearing only the deleted account.
+      // A stale screen ref after unmount must never sign out a newer account.
+      const cleanup = await auth.finalizeDeletedAccount(owner);
       await clearDeletedAccountCache(owner);
-      setDeletionReceipt({ ownerId: owner, phase: 'complete' });
+      setDeletionReceipt({ ownerId: owner, phase: cleanup.manualCleanupRequired ? 'manual_cleanup' : 'complete' });
     } catch {
       if (serverDeleted) setDeletionReceipt({ ownerId: owner, phase: 'local_cleanup_failed' });
       else setMessage('Deletion was not confirmed. Check your connection and try again.');
@@ -85,6 +81,7 @@ export default function DeleteAccountScreen() {
   const disabled = working || auth.busy || !auth.hydrated;
   const receiptMessage = receipt?.phase === 'complete'
     ? 'Your confirmed account and its saved data were deleted. Your discussion text and author identity were removed; other people’s replies remain.'
+    : receipt?.phase === 'manual_cleanup' ? 'Your confirmed account was deleted. This browser’s saved sign-in was not cleared automatically. Clear GalactoGuide site data in your browser settings before sharing this device. This also signs out any other GalactoGuide account in this browser.'
     : receipt?.phase === 'clearing' ? 'Account deletion confirmed. Clearing this device’s account data…'
     : receipt?.phase === 'local_cleanup_failed' ? 'Deletion completed, but this device could not finish clearing local data. Clear this app’s storage or this website’s site data before sharing the device.' : '';
   return (

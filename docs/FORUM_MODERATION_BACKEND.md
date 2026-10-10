@@ -11,6 +11,7 @@
 - `dismiss` closes a report; `remove` replaces only the reported post with a placeholder; `suspend` removes that post and stops the target account from posting/editing/voting. Existing other posts remain. Replies by other people and reply relationships remain intact. A repeated identical action is safe; a conflicting stale action fails and requires refresh. Moderator accounts cannot be suspended through a report. Restoration removes a suspension and is audited.
 - Suspended users retain safety reporting, block/unblock, reading, and their own content/account-deletion controls. A suspension applies to that account, not to new accounts or anonymous browsing. The app has no direct/private messaging.
 - Blocks are private to the blocker; both signed-in accounts stop seeing or interacting with one another's posts. A blocked root hides all its replies. Anonymous public reading cannot enforce an account-specific block. Unblocking restores visibility. Replies to a hidden parent and helpful-vote RPC/table bypasses are denied.
+- The blocked-members list shows the name from each member's newest nondeleted public thread/reply, with `Blocked member` as the fallback after public content is erased. It never consults private auth profile fields or stores another name snapshot. A stable 12-character reference derived from the blocked UUID distinguishes people using the same public name and stays the same after content deletion. It is a display reference, not an access token or anonymization guarantee. Lists sort by block creation time and UUID so reloads and duplicate names do not reorder the choices; unblocking always targets the exact UUID.
 
 ## Deterministic content checks and abuse bounds
 
@@ -44,7 +45,7 @@ Coverage includes repeated migration, anonymous/member denials, metadata self-gr
 
 | RPC | Result |
 | --- | --- |
-| `get_forum_safety()` | JSON `{ is_moderator, is_suspended, blocked_users: [{ user_id, author_name }] }` |
+| `get_forum_safety()` | JSON `{ is_moderator, is_suspended, blocked_users: [{ user_id, author_name, reference }] }`; `reference` is 12 uppercase hexadecimal characters |
 | `set_forum_block(p_user_id, p_blocked)` | `boolean` |
 | `report_forum_post(p_kind, p_id, p_category, p_reason)` | report UUID; kind `thread`/`reply`; categories `harassment`, `hate`, `threat`, `privacy`, `spam`, `medical`, `other` |
 | `moderation_queue(p_status = 'open')` | rows: id, target_kind, target_id, thread_id, reason, category, status, created_at, author_id, author_name, title, body, resolution; status `open`/`resolved`/`all` |

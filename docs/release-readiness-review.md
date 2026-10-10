@@ -39,6 +39,14 @@ These are local JavaScript export checks, not signed builds or EAS submissions. 
 
 These results do not validate Apple/Supabase production configuration or establish a staffed moderation service. Existing dependency audit findings were not addressed by blanket upgrades in this change.
 
+## Review follow-up and PR checks
+
+Delayed deletion cleanup now runs through the auth provider, drains existing auth operations, and checks the live SDK account while new sign-ins and links are barred. A deletion response for account A after its screen unmounts cannot sign out account B. Native cleanup signs out only the deleted owner. Web deletion deliberately does not issue generic SDK sign-out or remove shared browser auth storage: another tab can replace that account, and the SDK has no atomic conditional-owner sign-out API. The deleted owner is suppressed locally, only its account caches are cleared, and the receipt explicitly explains manual browser cleanup. Regression fixtures cover the unmounted screen, provider serialization, cross-tab auth events, failures, and retry.
+
+Blocked members show their current public display name and a stable account reference, in deterministic order. Unblocking requires confirmation for that exact account. SQL and UI regressions cover duplicate names, reordered lists, deleted public posts, cancellation, retry, and removing only the selected block.
+
+`.github/workflows/release-readiness-checks.yml` runs on PRs targeting `main`, with only `contents: read` and no persisted checkout credential. It installs dependencies, checks types/lint, runs client and disposable SQL fixtures, then creates an isolated web export for mocked browser checks. It has no deployment, EAS build, signing, secret, or live migration step. Local passes are separate from the GitHub Actions result; inspect the PR checks for that result.
+
 ## Decisions before deployment
 
 1. Approve or revise deletion retention: erase owned forum text/identity and reports by/about the departing account while preserving other people's replies. Decide whether a narrowly defined abuse-evidence retention exception is needed, and set support-email, provider-log and backup retention. Do not enable the deletion configuration before that review.

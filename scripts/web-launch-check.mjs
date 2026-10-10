@@ -1,6 +1,7 @@
 // Test a local production export. Every auth/database request is intercepted;
 // no email, account change, or other live write is sent.
 import assert from 'node:assert/strict';
+import { Buffer } from 'node:buffer';
 import { createServer } from 'node:http';
 import { readFile, stat, mkdir, readdir } from 'node:fs/promises';
 import path from 'node:path';
@@ -189,9 +190,12 @@ try {
   deletion.state.allowDeletion = true;
   await deletion.page.getByLabel('Type DELETE to confirm permanent account deletion').fill('DELETE');
   await deletion.page.getByRole('button', { name: 'Permanently delete my account' }).click();
-  await deletion.page.getByRole('alert').filter({ hasText: 'Your confirmed account and its saved data were deleted' }).waitFor();
+  await deletion.page.getByRole('alert').filter({ hasText: 'Your confirmed account was deleted' }).waitFor();
+  await deletion.page.getByRole('alert').filter({ hasText: 'saved sign-in was not cleared automatically' }).waitFor();
+  await deletion.page.getByRole('alert').filter({ hasText: 'Clear GalactoGuide site data in your browser settings' }).waitFor();
   assert.equal(await deletion.page.getByRole('button', { name: 'Permanently delete my account' }).count(), 0);
-  assert.equal(await deletion.page.evaluate((key) => localStorage.getItem(key), storageKey), null, 'Local session cleared after confirmed deletion');
+  assert.equal(JSON.parse(await deletion.page.evaluate((key) => localStorage.getItem(key), storageKey)).access_token, jwt, 'Web deletion must not clear shared browser sign-in storage automatically');
+  assert.equal(deletion.requests.filter((request) => request.url.pathname.endsWith('/logout')).length, 0, 'Deletion cannot issue generic web sign-out that could clear another tab account');
   await deletion.page.screenshot({ path: `${output}/deletion-complete-phone.png`, fullPage: true });
   await deletion.context.close();
   await guest.page.goto(origin + '/moderation');

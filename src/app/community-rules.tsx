@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useRouter } from 'expo-router';
 import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { ScreenHeader } from '@/components/ScreenHeader';
@@ -8,16 +8,26 @@ import { font, fontSize, radius, spacing, useThemedStyles, type ThemeColors } fr
 
 export default function CommunityRulesScreen() {
   const { user } = useAuth();
+  return <CommunityRules key={user?.id ?? 'anonymous'} />;
+}
+function CommunityRules() {
+  const { user } = useAuth();
   const { safety, setBlocked, refresh } = useForum();
   const router = useRouter();
   const styles = useThemedStyles(makeStyles);
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [confirmingId, setConfirmingId] = useState<string | null>(null);
+  const pending = useRef(false);
   const unblock = async (id: string) => {
-    if (busy) return;
-    setBusy(id); setError(null);
-    try { const result = await setBlocked(id, false); if (result.error) setError(result.error); }
-    finally { setBusy(null); }
+    if (pending.current || confirmingId !== id || !safety?.blocked_users.some((member) => member.user_id === id)) return;
+    pending.current = true; setBusy(id); setError(null);
+    try {
+      const result = await setBlocked(id, false);
+      if (result.error) setError(result.error);
+      else setConfirmingId(null);
+    } catch { setError('Could not remove this block. Please try again.'); }
+    finally { pending.current = false; setBusy(null); }
   };
   return <View style={styles.root}>
     <ScreenHeader title="Community rules & safety" />
@@ -43,10 +53,27 @@ export default function CommunityRulesScreen() {
         {!safety ? <><Text style={styles.text}>Your safety settings could not be loaded.</Text><Pressable accessibilityRole="button" style={styles.button} onPress={() => void refresh()}><Text style={styles.action}>Retry</Text></Pressable></> : <>
           {safety.is_suspended && <Text style={styles.text}>Your posting access is suspended. Contact community support to request review.</Text>}
           {safety.blocked_users.length === 0 && <Text style={styles.text}>You have no blocked members.</Text>}
-          {safety.blocked_users.map((member, index) => <View key={member.user_id} style={styles.row}>
-            <Text style={styles.text}>{member.author_name || 'Blocked member'} {index + 1}</Text>
-            <Pressable accessibilityRole="button" accessibilityLabel={`Unblock member ${index + 1}`} style={styles.button} disabled={!!busy} onPress={() => void unblock(member.user_id)}><Text style={styles.action}>{busy === member.user_id ? 'Saving…' : 'Unblock'}</Text></Pressable>
-          </View>)}
+          {safety.blocked_users.length > 0 && <Text style={styles.text}>Names reflect members&apos; current public posts and can change. The account reference stays the same, including when names match or posts are removed.</Text>}
+          {safety.blocked_users.map((member) => {
+            const label = `${member.author_name || 'Blocked member'} (ref ${member.reference})`;
+            return <View key={member.user_id} style={styles.blockedMember}>
+              <View style={styles.row}>
+                <Text style={styles.text} selectable>{label}</Text>
+                <Pressable accessibilityRole="button" accessibilityLabel={`Unblock ${label}`} style={styles.button} disabled={!!busy}
+                  onPress={() => { setConfirmingId(member.user_id); setError(null); }}><Text style={styles.action}>Unblock</Text></Pressable>
+              </View>
+              {confirmingId === member.user_id && <View style={styles.confirmation}>
+                <Text style={styles.text}>Remove your block on {label}? Their posts may appear again. Any block they placed on your account still applies.</Text>
+                <View style={styles.row}>
+                  <Pressable accessibilityRole="button" accessibilityLabel="Cancel unblock" style={styles.button} disabled={!!busy}
+                    onPress={() => { setConfirmingId(null); setError(null); }}><Text style={styles.action}>Cancel</Text></Pressable>
+                  <Pressable accessibilityRole="button" accessibilityLabel={`Confirm unblock ${label}`} style={styles.button}
+                    accessibilityState={{ disabled: !!busy, busy: busy === member.user_id }} disabled={!!busy}
+                    onPress={() => void unblock(member.user_id)}><Text style={styles.action}>{busy === member.user_id ? 'Saving…' : 'Confirm unblock'}</Text></Pressable>
+                </View>
+              </View>}
+            </View>;
+          })}
           {safety.is_moderator && <Pressable accessibilityRole="link" style={styles.button} onPress={() => router.push('/moderation')}><Text style={styles.action}>Open moderator review queue</Text></Pressable>}
         </>}
       </View>}
@@ -59,6 +86,8 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   heading: { ...font.bold, color: colors.text, fontSize: fontSize.cardTitle },
   text: { ...font.regular, color: colors.text, fontSize: fontSize.body, lineHeight: 23, flexShrink: 1 },
   card: { backgroundColor: colors.surface, padding: spacing.lg, gap: spacing.md, borderRadius: radius.lg },
+  blockedMember: { gap: spacing.sm },
+  confirmation: { padding: spacing.md, backgroundColor: colors.cream, borderRadius: radius.md, gap: spacing.sm },
   row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: spacing.sm },
   button: { minHeight: 44, justifyContent: 'center', paddingHorizontal: spacing.sm },
   action: { ...font.bold, color: colors.accent, fontSize: fontSize.body },

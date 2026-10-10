@@ -6,7 +6,7 @@ export const DELETION_SUPPORT_URL = 'mailto:adam@dyadhealthcollective.com?subjec
 
 export interface DeletionReceipt {
   ownerId: string;
-  phase: 'clearing' | 'complete' | 'local_cleanup_failed';
+  phase: 'clearing' | 'complete' | 'manual_cleanup' | 'local_cleanup_failed';
 }
 // Ephemeral, process-local receipt: survives route/provider hydration remounts,
 // but is never trusted from a URL, persisted storage, or a caller callback.
@@ -52,7 +52,7 @@ export async function deleteOwnAccount(confirmation: string, accessToken: string
   }
 }
 
-/** Call after local sign-out so account providers cannot repopulate these keys. */
+/** Removes only this owner's caches; browser auth storage may still need manual cleanup. */
 export async function clearDeletedAccountCache(userId: string): Promise<void> {
   await AsyncStorage.multiRemove(accountCacheKeys(userId));
 }

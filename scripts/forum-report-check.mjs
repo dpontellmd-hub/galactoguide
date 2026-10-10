@@ -116,3 +116,59 @@ try {
   assert.equal(textButton('Remove post'), undefined, 'Signout hides report content and actions');
   console.log('PASS: moderator queue role gate, author suspension explicit confirmation, cancellation, and signout privacy. SQL suite separately verifies server authorization.');
 } finally { if (renderer) await act(() => renderer.unmount()); }
+
+// Multiple blocked accounts must remain distinguishable when names match/reorder.
+let blockedMembers = [
+  { user_id: 'blocked-a', author_name: 'Alex', reference: '18AC9F74B130' },
+  { user_id: 'blocked-b', author_name: 'Alex', reference: 'B52D418209C6' },
+];
+let unblockMode = 'success'; let finishUnblock;
+const unblockCalls = [];
+mocks['react-native'].Linking = { openURL: async () => {} };
+mocks['@/context/ForumContext'] = { useForum: () => ({
+  safety: { blocked_users: blockedMembers, is_moderator: false, is_suspended: false }, refresh: async () => {},
+  setBlocked: async (id, blocked) => {
+    unblockCalls.push({ id, blocked });
+    if (unblockMode === 'hold') await new Promise((resolve) => { finishUnblock = resolve; });
+    if (unblockMode === 'error') return { error: 'Could not remove this block.' };
+    blockedMembers = blockedMembers.filter((member) => member.user_id !== id);
+    return { data: true };
+  },
+}) };
+const rulesCompiled = ts.transpileModule(readFileSync('src/app/community-rules.tsx', 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2022 } }).outputText;
+const rulesModule = { exports: {} };
+vm.runInNewContext(`(function(require,module,exports){${rulesCompiled}\n})`, { console })((name) => {
+  if (!mocks[name]) throw new Error(name); return mocks[name];
+}, rulesModule, rulesModule.exports);
+const Rules = rulesModule.exports.default;
+const alexA = 'Alex (ref 18AC9F74B130)'; const alexB = 'Alex (ref B52D418209C6)';
+user = { id: 'viewer' };
+try {
+  await act(() => { renderer = create(React.createElement(Rules)); });
+  assert.ok(find(`Unblock ${alexA}`)); assert.ok(find(`Unblock ${alexB}`));
+  await click(`Unblock ${alexB}`);
+  assert.ok(JSON.stringify(renderer.toJSON()).includes(`Remove your block on `));
+  assert.ok(find(`Confirm unblock ${alexB}`), 'Confirmation identifies selected account, not list position');
+  await click('Cancel unblock');
+  assert.equal(unblockCalls.length, 0, 'Cancel leaves both blocks intact');
+  await click(`Unblock ${alexB}`);
+  blockedMembers = [...blockedMembers].reverse();
+  await act(() => renderer.update(React.createElement(Rules)));
+  assert.ok(find(`Confirm unblock ${alexB}`), 'Reordering does not retarget a pending confirmation');
+  unblockMode = 'error'; await click(`Confirm unblock ${alexB}`);
+  assert.equal(blockedMembers.length, 2, 'Failure preserves both blocks');
+  assert.ok(find(`Confirm unblock ${alexB}`), 'Failure can be retried');
+  unblockMode = 'hold'; const before = unblockCalls.length;
+  await act(() => { const confirm = find(`Confirm unblock ${alexB}`).props.onPress; confirm(); confirm(); });
+  assert.equal(unblockCalls.length, before + 1, 'Double taps unblock once');
+  assert.equal(find(`Confirm unblock ${alexB}`).props.disabled, true);
+  await act(async () => finishUnblock());
+  assert.deepEqual(unblockCalls.at(-1), { id: 'blocked-b', blocked: false });
+  assert.deepEqual(blockedMembers.map((member) => member.user_id), ['blocked-a']);
+  assert.ok(find(`Unblock ${alexA}`), 'Remaining account keeps the same name/reference after another is removed');
+  assert.equal(find(`Unblock ${alexB}`), undefined);
+  await click(`Unblock ${alexA}`);
+  user = { id: 'another-viewer' }; await act(() => renderer.update(React.createElement(Rules)));
+  assert.equal(find(`Confirm unblock ${alexA}`), undefined, 'Account change clears pending confirmation');
+  console.log('PASS: duplicate display names distinguished by stable references; account-specific unblock confirmation; cancel/error/retry; reordering; duplicate taps; only selected block removed; account-switch reset.');
+} finally { if (renderer) await act(() => renderer.unmount()); }

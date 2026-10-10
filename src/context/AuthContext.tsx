@@ -65,6 +65,8 @@ interface AuthContextValue {
   appleAvailable: boolean;
   signOut: () => Promise<void>;
   signOutError: string | null;
+  /** Clears only the deleted owner's current local session; never another account. */
+  finalizeDeletedAccount: (expectedUserId: string) => Promise<{ clearedSession: boolean; manualCleanupRequired?: boolean }>;
   resetPassword: (email: string) => Promise<AuthResult>;
   passwordRecovery: boolean;
   authCallbackError: string | null;
@@ -86,6 +88,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [appleAvailable, setAppleAvailable] = useState(false);
   const [signOutPending, setSignOutPending] = useState(false);
   const [signOutError, setSignOutError] = useState<string | null>(null);
+  const [deletionCleanupPending, setDeletionCleanupPending] = useState(false);
+  const deletionCleanupFlight = useRef<Promise<{ clearedSession: boolean; manualCleanupRequired?: boolean }> | null>(null);
+  const deletionCleanupGate = useRef(false);
+  const deletionCleanupDraining = useRef(false);
+  // Process-local suppression only. Never remove shared browser auth storage for
+  // a deleted owner: another tab may have replaced that storage with account B.
+  const deletedAccountOwners = useRef(new Set<string>());
+  const authEventRevision = useRef(0);
   const signOutFlight = useRef<Promise<void> | null>(null);
   const socialPending = useRef(false);
   const signingOut = useRef(false);
@@ -107,11 +117,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const onCallbackComplete = useCallback((result: NativeCallbackResult) => {
     setAuthCallbackPending(false);
     if (signingOut.current) return;
+    if (result.session && deletedAccountOwners.current.has(result.session.user.id)) return;
     setAuthCallbackError(result.error ?? null);
     setPasswordRecovery(!!result.recovery && !result.error && !recoveryCancelled.current);
     if (result.session) setSession(result.session);
   }, []);
-  const canStartCallback = useCallback(() => !signingOut.current, []);
+  const canStartCallback = useCallback(() => !signingOut.current &&
+    (!deletionCleanupGate.current || (deletionCleanupDraining.current && socialPending.current)), []);
   const handleNativeCallback = useMemo(() => createNativeCallbackHandler(
     // Factory only stores closures; it never invokes them or reads refs during render.
     // eslint-disable-next-line react-hooks/refs
@@ -149,7 +161,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const revisionBeforeRead = authRevision;
       const { data } = await supabase.auth.getSession();
       if (!active) return;
-      if (revisionBeforeRead === authRevision && initializationEpoch === signOutEpoch.current && !signingOut.current) setSession(data.session);
+      if (revisionBeforeRead === authRevision && initializationEpoch === signOutEpoch.current && !signingOut.current) {
+        setSession(data.session && !deletedAccountOwners.current.has(data.session.user.id) ? data.session : null);
+      }
       // With no PKCE verifier (a different browser), the SDK can skip exchange
       // and retain an older session. A code left in the URL is not a valid reset.
       let unresolvedCallback = false;
@@ -173,7 +187,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const { data: sub } = supabase.auth.onAuthStateChange((event, next) => {
       if (!active) return;
       authRevision += 1;
+      authEventRevision.current += 1;
       if (signingOut.current) return;
+      if (next && deletedAccountOwners.current.has(next.user.id)) return;
       setSession(next);
       if (event === 'SIGNED_IN' || event === 'PASSWORD_RECOVERY') setAuthCallbackError(null);
       if (event === 'SIGNED_IN') setPasswordRecovery(false);
@@ -191,19 +207,116 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value = useMemo<AuthContextValue>(() => {
     const guard = (): AuthResult | null => signingOut.current
       ? { error: 'Please finish signing out before continuing.' }
+      : deletionCleanupGate.current ? { error: 'Account cleanup is in progress. Please try again shortly.' }
       : supabaseConfigured ? null : { error: 'Accounts are not available yet.' };
+
+    const signOut = (): Promise<void> => {
+      if (!supabaseConfigured) return Promise.resolve();
+      if (deletionCleanupFlight.current) return deletionCleanupFlight.current.catch(() => undefined).then(signOut);
+      if (signOutFlight.current) return signOutFlight.current;
+      signOutEpoch.current += 1;
+      signingOut.current = true;
+      recoveryCancelled.current = true;
+      setSignOutPending(true);
+      setSignOutError(null);
+      setBusy(true);
+      setSession(null);
+      setPasswordRecovery(false);
+      const operation = (async () => { try {
+        // SDK exchanges persist sessions before returning. Wait for all of them,
+        // ignore their events/results, then clear that persisted session last.
+        await Promise.all([handleNativeCallback.whenIdle(), ...authOperations.current]);
+        const { error } = await supabase.auth.signOut({ scope: 'local' });
+        if (error) throw error;
+        signingOut.current = false;
+        setAuthCallbackError(null);
+      } catch {
+        // Keep incoming auth state suppressed until the user retries sign-out.
+        setSignOutError('Could not finish signing out. Check your connection and try again.');
+      } finally { setBusy(false); setSignOutPending(false); signOutFlight.current = null; }
+      })();
+      signOutFlight.current = operation;
+      return operation;
+    };
+
+    const finalizeDeletedAccount = (expectedUserId: string): Promise<{ clearedSession: boolean; manualCleanupRequired?: boolean }> => {
+      if (!supabaseConfigured || !expectedUserId) return Promise.reject(new Error('Could not verify the deleted account.'));
+      // Finalizers outlive their route. Serialize them against each other and an
+      // explicit sign-out without capturing any screen/provider render's owner.
+      if (deletionCleanupFlight.current) return deletionCleanupFlight.current.catch(() => undefined)
+        .then(() => finalizeDeletedAccount(expectedUserId));
+      if (signOutFlight.current) return signOutFlight.current.then(() => finalizeDeletedAccount(expectedUserId));
+      if (signingOut.current) return Promise.reject(new Error('Finish signing out before clearing account data.'));
+      deletionCleanupGate.current = true;
+      deletionCleanupDraining.current = true;
+      setDeletionCleanupPending(true);
+      const operation = (async () => {
+        let clearingOwner = false;
+        try {
+          // Existing sign-ins may replace A with B while a deletion RPC is in
+          // flight. Drain them first. New sign-ins/links are barred throughout
+          // the subsequent SDK-owner check AND local sign-out critical section.
+          await Promise.all([handleNativeCallback.whenIdle(), ...authOperations.current]);
+          deletionCleanupDraining.current = false;
+          // A browser callback may have arrived while its existing social action
+          // was draining. Close the gate, then include that last callback too.
+          await handleNativeCallback.whenIdle();
+          const revisionBeforeOwnerRead = authEventRevision.current;
+          const { data, error: sessionError } = await supabase.auth.getSession();
+          if (sessionError) throw sessionError;
+
+          if (Platform.OS === 'web') {
+            deletedAccountOwners.current.add(expectedUserId);
+            setSession(current => current?.user.id === expectedUserId ? null : current);
+            if (data.session?.user.id === expectedUserId && revisionBeforeOwnerRead === authEventRevision.current) {
+              setPasswordRecovery(false);
+            }
+            // Supabase has no public atomic "sign out only owner A" operation.
+            // A local gate/revision check cannot protect shared storage against
+            // another tab between getSession and signOut. NEVER call signOut or
+            // erase shared auth keys here, even if this snapshot still shows A.
+            return { clearedSession: false, manualCleanupRequired: data.session?.user.id === expectedUserId };
+          }
+          if (data.session?.user.id !== expectedUserId) return { clearedSession: false };
+
+          signOutEpoch.current += 1;
+          clearingOwner = true;
+          signingOut.current = true;
+          recoveryCancelled.current = true;
+          setSession(null);
+          setPasswordRecovery(false);
+          const { error } = await supabase.auth.signOut({ scope: 'local' });
+          if (error) throw error;
+          signingOut.current = false;
+          setSignOutError(null);
+          setAuthCallbackError(null);
+          return { clearedSession: true };
+        } catch (error) {
+          if (clearingOwner) setSignOutError('Your account was deleted, but signing out on this device failed. Check your connection and retry sign out.');
+          throw error;
+        } finally {
+          deletionCleanupFlight.current = null;
+          deletionCleanupGate.current = false;
+          deletionCleanupDraining.current = false;
+          setDeletionCleanupPending(false);
+        }
+      })();
+      deletionCleanupFlight.current = operation;
+      return operation;
+    };
 
     return {
       session,
       user: session?.user ?? null,
       hydrated,
-      busy: busy || authCallbackPending || signOutPending,
+      busy: busy || authCallbackPending || signOutPending || deletionCleanupPending,
       configured: supabaseConfigured,
       passwordRecovery,
       authCallbackError,
       authCallbackPending,
       appleAvailable,
       signOutError,
+      finalizeDeletedAccount,
       dismissPasswordRecovery: () => { recoveryCancelled.current = true; setPasswordRecovery(false); },
 
       signUp: async (email, password) => {
@@ -303,33 +416,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         finally { endOperation(); socialPending.current = false; setBusy(false); }
       },
 
-      signOut: () => {
-        if (!supabaseConfigured) return Promise.resolve();
-        if (signOutFlight.current) return signOutFlight.current;
-        signOutEpoch.current += 1;
-        signingOut.current = true;
-        recoveryCancelled.current = true;
-        setSignOutPending(true);
-        setSignOutError(null);
-        setBusy(true);
-        setSession(null);
-        setPasswordRecovery(false);
-        const operation = (async () => { try {
-          // SDK exchanges persist sessions before returning. Wait for all of them,
-          // ignore their events/results, then clear that persisted session last.
-          await Promise.all([handleNativeCallback.whenIdle(), ...authOperations.current]);
-          const { error } = await supabase.auth.signOut({ scope: 'local' });
-          if (error) throw error;
-          signingOut.current = false;
-          setAuthCallbackError(null);
-        } catch {
-          // Keep incoming auth state suppressed until the user retries sign-out.
-          setSignOutError('Could not finish signing out. Check your connection and try again.');
-        } finally { setBusy(false); setSignOutPending(false); signOutFlight.current = null; }
-        })();
-        signOutFlight.current = operation;
-        return operation;
-      },
+      signOut,
 
       resetPassword: async (email) => {
         const blocked = guard();
@@ -410,7 +497,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       },
     };
-  }, [session, hydrated, busy, passwordRecovery, authCallbackError, authCallbackPending, appleAvailable, handleNativeCallback, beginOperation, signOutPending, signOutError]);
+  }, [session, hydrated, busy, passwordRecovery, authCallbackError, authCallbackPending, appleAvailable, handleNativeCallback, beginOperation, signOutPending, signOutError, deletionCleanupPending]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

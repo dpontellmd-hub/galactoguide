@@ -15,16 +15,18 @@ const freshSession = { user: { id: 'recovered-user' }, access_token: 'fixture', 
 const oldSession = { user: { id: 'old-user' }, access_token: 'old-fixture' };
 
 async function fixture({ platform = 'android', launchUrl = null, initialSession = null, appleEnabled = false, holdSession = false, webUrl = 'https://preview.example.invalid/auth' } = {}) {
-  let value, root, authListener, linkListener, stored = initialSession, releaseSession;
-  const calls = { exchanges: [], updates: [], oauth: [], resets: [], apple: [], idTokens: [], removes: 0 };
+  let value, root, authListener, linkListener, stored = initialSession, releaseSession, sessionReads = 0;
+  const calls = { exchanges: [], updates: [], oauth: [], resets: [], apple: [], idTokens: [], removes: 0, signOut: 0 };
   const controls = { exchangeError: false, exchangeThrows: false, emptySession: false, updateError: false, updateThrows: false,
     browserResult: { type: 'cancel' }, holdExchange: false, releaseExchange: null, appleError: null, appleBadState: false,
-    appleNoToken: false, appleIdError: false, appleAvailable: true, holdApple: false, releaseApple: null, signOutError: false };
+    appleNoToken: false, appleIdError: false, appleAvailable: true, holdApple: false, releaseApple: null, signOutError: false,
+    holdPassword: false, releasePassword: null, holdOwnerRead: false, releaseOwnerRead: null };
   const auth = {
     initialize: async () => ({ error: null }),
     getSession: async () => {
       const snapshot = stored;
-      if (holdSession) await new Promise(resolve => { releaseSession = resolve; });
+      if (holdSession && sessionReads++ === 0) await new Promise(resolve => { releaseSession = resolve; });
+      if (controls.holdOwnerRead) await new Promise(resolve => { controls.releaseOwnerRead = resolve; });
       return { data: { session: snapshot } };
     },
     onAuthStateChange: listener => { authListener = listener; return { data: { subscription: { unsubscribe() {} } } }; },
@@ -39,9 +41,16 @@ async function fixture({ platform = 'android', launchUrl = null, initialSession 
       return { data: { session: stored, redirectType: recovery ? 'recovery' : null }, error: null };
     },
     signInWithOAuth: async args => { calls.oauth.push(args); return { data: { url: 'https://provider.example.invalid' }, error: null }; },
+    signInWithPassword: async () => {
+      if (controls.holdPassword) await new Promise(resolve => { controls.releasePassword = resolve; });
+      stored = freshSession; authListener('SIGNED_IN', stored);
+      return { data: { session: stored }, error: null };
+    },
     resetPasswordForEmail: async (email, options) => { calls.resets.push({ email, ...options }); return { error: null }; },
     updateUser: async args => { calls.updates.push(args); if (controls.updateThrows) throw new Error('Offline'); return { error: controls.updateError ? { message: 'Choose another password' } : null }; },
     signOut: async () => {
+      calls.signOut += 1;
+      if (controls.signOutError === 'throw') throw new Error('Fixture sign-out transport failure');
       if (controls.signOutError) return { error: { message: 'Fixture network failure' } };
       stored = null; authListener('SIGNED_OUT', null); return { error: null };
     },
@@ -96,6 +105,12 @@ async function fixture({ platform = 'android', launchUrl = null, initialSession 
     emit: async url => { await act(async () => { linkListener({ url }); await flush(); }); },
     releaseSession: async () => { await act(async () => { releaseSession(); await flush(); }); },
     action: async (name, ...args) => { let result; await act(async () => { result = await value[name](...args); }); return result; },
+    consumer: async mounted => { await act(async () => {
+      root.update(React.createElement(AuthProvider, null, mounted ? React.createElement(Probe) : null));
+    }); },
+    external: async next => { await act(async () => {
+      stored = next; authListener(next ? 'SIGNED_IN' : 'SIGNED_OUT', next);
+    }); },
     get stored() { return stored; },
     close: async () => { await act(async () => root.unmount()); if (platform !== 'web') assert.equal(calls.removes, 1); },
   };
@@ -292,3 +307,98 @@ assert.equal(f.calls.exchanges.length, 0, 'Sign-out discards launch callback wai
 assert.equal(f.value.hydrated, true);
 await f.close();
 console.log('PASS: sign-out invalidates delayed initial session hydration and its abandoned launch callback.');
+
+// A deletion screen can disappear while its pinned account-A RPC is in flight.
+// Its saved callback must consult the persistent provider/SDK, not stale route refs.
+f = await fixture({ initialSession: oldSession });
+const detachedFinalizer = f.value.finalizeDeletedAccount;
+await f.consumer(false);
+await f.action('signInWithPassword', 'account-b@example.invalid', 'fixture-password');
+let cleanupResult;
+await act(async () => { cleanupResult = await detachedFinalizer('old-user'); });
+assert.equal(cleanupResult.clearedSession, false);
+assert.equal(f.calls.signOut, 0, 'Late account-A deletion must never invoke signOut on B');
+assert.equal(f.stored.user.id, 'recovered-user');
+await f.consumer(true);
+assert.equal(f.value.user.id, 'recovered-user', 'Account B remains signed in after consumer remount');
+await f.close();
+
+// Drain an already-started account-B login before deciding which owner to clear.
+f = await fixture({ initialSession: oldSession });
+f.controls.holdPassword = true;
+let pendingPassword, pendingCleanup;
+await act(async () => { pendingPassword = f.value.signInWithPassword('b@example.invalid', 'fixture-password'); await flush(); });
+await act(async () => { pendingCleanup = f.value.finalizeDeletedAccount('old-user'); await flush(); });
+assert.equal(f.calls.signOut, 0);
+await act(async () => { f.controls.releasePassword(); await pendingPassword; cleanupResult = await pendingCleanup; });
+assert.equal(cleanupResult.clearedSession, false);
+assert.equal(f.stored.user.id, 'recovered-user'); assert.equal(f.calls.signOut, 0);
+await f.close();
+
+// The ownership read and local cleanup are one auth critical section. A new
+// login/link cannot slip between a successful A check and signOut's persistence write.
+f = await fixture({ initialSession: oldSession });
+f.controls.holdOwnerRead = true;
+await act(async () => { pendingCleanup = f.value.finalizeDeletedAccount('old-user'); await flush(); });
+assert.equal(f.value.busy, true);
+assert.match((await f.action('signInWithPassword', 'b@example.invalid', 'fixture-password')).error, /cleanup/);
+await f.emit('galactoguide://auth?code=oauth-during-cleanup');
+assert.equal(f.calls.exchanges.length, 0);
+await act(async () => { f.controls.releaseOwnerRead(); cleanupResult = await pendingCleanup; });
+assert.equal(cleanupResult.clearedSession, true); assert.equal(f.stored, null); assert.equal(f.calls.signOut, 1);
+f.controls.holdOwnerRead = false;
+await f.action('signInWithPassword', 'b@example.invalid', 'fixture-password');
+assert.equal(f.stored.user.id, 'recovered-user', 'Login works again after the critical section ends');
+await f.close();
+
+for (const failure of [true, 'throw']) {
+  f = await fixture({ initialSession: oldSession });
+  f.controls.signOutError = failure;
+  await act(async () => { await assert.rejects(f.value.finalizeDeletedAccount('old-user')); });
+  assert.match(f.value.signOutError, /deleted/); assert.equal(f.value.busy, false);
+  f.controls.signOutError = false;
+  await f.action('signOut');
+  assert.equal(f.stored, null); assert.equal(f.value.signOutError, null);
+  await f.close();
+}
+console.log('PASS: delayed deletion after consumer unmount/account switch preserves B; pending login drains first; ownership check and cleanup bar racing logins/links; cleanup failures surface for retry.');
+
+// A browser tab is outside the local provider's operation gate. Its SIGNED_IN(B)
+// can arrive while getSession is returning an old A snapshot. Web cleanup must
+// never call SDK signOut/shared-key erasure, regardless of snapshot/revision timing.
+f = await fixture({ platform: 'web', initialSession: oldSession });
+f.controls.holdOwnerRead = true;
+await act(async () => { pendingCleanup = f.value.finalizeDeletedAccount('old-user'); await flush(); });
+await f.external(freshSession);
+assert.equal(f.value.user.id, 'recovered-user');
+await act(async () => { f.controls.releaseOwnerRead(); cleanupResult = await pendingCleanup; });
+assert.equal(cleanupResult.clearedSession, false);
+assert.equal(cleanupResult.manualCleanupRequired, true, 'Stale A snapshot cannot establish browser storage cleanup');
+assert.equal(f.calls.signOut, 0);
+assert.equal(f.stored.user.id, 'recovered-user');
+assert.equal(f.value.user.id, 'recovered-user');
+await f.close();
+
+f = await fixture({ platform: 'web', initialSession: oldSession });
+cleanupResult = await f.action('finalizeDeletedAccount', 'old-user');
+assert.equal(cleanupResult.manualCleanupRequired, true);
+assert.equal(f.calls.signOut, 0); assert.equal(f.stored.user.id, 'old-user', 'Manual cleanup state accurately acknowledges retained shared auth storage');
+assert.equal(f.value.user, null, 'Deleted A is locally suppressed so its providers cannot repopulate caches');
+await f.external(oldSession);
+assert.equal(f.value.user, null, 'Late A session events remain suppressed for this provider lifetime');
+await f.external(freshSession);
+assert.equal(f.value.user.id, 'recovered-user', 'Suppression applies only to deleted A');
+cleanupResult = await f.action('finalizeDeletedAccount', 'old-user');
+assert.equal(cleanupResult.manualCleanupRequired, false);
+assert.equal(f.calls.signOut, 0); assert.equal(f.stored.user.id, 'recovered-user');
+await f.close();
+console.log('PASS: cross-tab B event during stale A owner read cannot clear B storage; web deletion reports manual cleanup, locally suppresses only deleted A, and preserves later B sign-ins.');
+
+f = await fixture({ platform: 'web', initialSession: oldSession, holdSession: true });
+cleanupResult = await f.action('finalizeDeletedAccount', 'old-user');
+assert.equal(cleanupResult.manualCleanupRequired, true);
+await f.releaseSession();
+assert.equal(f.value.hydrated, true); assert.equal(f.value.user, null, 'Delayed initial A hydration must respect deleted-owner suppression');
+assert.equal(f.calls.signOut, 0); assert.equal(f.stored.user.id, 'old-user');
+await f.close();
+console.log('PASS: manual browser cleanup also suppresses delayed initial hydration without mutating shared auth storage.');

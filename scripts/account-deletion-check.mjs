@@ -9,6 +9,7 @@ const React = require('react');
 const { create, act } = require('react-test-renderer');
 globalThis.IS_REACT_ACT_ENVIRONMENT = true;
 let calls = [], rpcResult = { data: true, error: null }, holdRpc, removedKeys = [], routes = [], onSignOut;
+let manualCleanupRequired = false, onManualCleanup;
 let sessionOwner = 'alice';
 const supabase = {
   rpc: (name, args) => ({ setHeader: async (header, value) => {
@@ -25,6 +26,19 @@ let auth = {
   user: { id: 'alice', email: 'alice@example.test', identities: [{ provider: 'email' }, { provider: 'google' }] },
   hydrated: true, busy: false, configured: true, authCallbackError: null,
   signInWithPassword: async () => ({}), signInWithGoogle: async () => ({}), signInWithApple: async () => ({}), appleAvailable: false,
+  finalizeDeletedAccount: async (owner) => {
+    calls.push({ finalize: owner });
+    if (sessionOwner === owner) {
+      if (manualCleanupRequired) {
+        onManualCleanup?.();
+        return { clearedSession: false, manualCleanupRequired: true };
+      }
+      await supabase.auth.signOut({ scope: 'local' });
+      sessionOwner = null;
+      return { clearedSession: true };
+    }
+    return { clearedSession: false };
+  },
 };
 const modules = {
   react: React, 'react/jsx-runtime': require('react/jsx-runtime'),
@@ -123,4 +137,53 @@ await act(async () => { helper.setDeletionReceipt({ ownerId: 'bob', phase: 'comp
 await act(async () => { button('Return to account').props.onPress(); });
 assert.equal(helper.getDeletionReceipt(), null, 'Acknowledgement clears ephemeral receipt');
 await act(async () => renderer.unmount());
-console.log('Account deletion client checks passed: consent, errors, pinned token, cancellation, reauth, account switch, duplicate submit, local cleanup.');
+
+// Delayed A response after the route unmounts and the provider signs in B.
+// The captured provider method (not a screen-local user ref) owns cleanup.
+calls = []; removedKeys = []; onSignOut = undefined;
+sessionOwner = 'alice';
+auth = { ...auth, user: { id: 'alice', email: 'alice@example.test', identities: [{ provider: 'email' }] } };
+await act(async () => { renderer = create(React.createElement(Screen)); });
+await typeConfirm('DELETE');
+holdRpc = new Promise(resolve => { release = resolve; });
+await act(async () => {
+  pending = button('Permanently delete').props.onPress();
+  await Promise.resolve();
+});
+assert.equal(calls.filter(c => c.name).length, 1);
+assert.equal(calls[0].value, 'Bearer alice-fixture-token');
+await act(async () => renderer.unmount());
+sessionOwner = 'bob';
+auth = { ...auth, user: { id: 'bob', email: 'bob@example.test', identities: [{ provider: 'email' }] } };
+await act(async () => { release(); await pending; });
+assert.equal(calls.filter(c => c.signOut).length, 0, 'Late A deletion must not sign out B after route unmount');
+assert.deepEqual(calls.filter(c => c.finalize), [{ finalize: 'alice' }], 'Captured provider receives only confirmed deleted account');
+assert.equal(sessionOwner, 'bob', 'New account session remains intact');
+assert.deepEqual(removedKeys, ['galactoguide.favorites.v2:alice', 'galactoguide.session.v2:alice', 'galactoguide.situations.v2:alice'], 'Only A cache is cleared');
+await act(async () => { renderer = create(React.createElement(Screen)); });
+assert.ok(!text(renderer.root).includes('were deleted'), 'Returning as B cannot show A completion');
+await act(async () => renderer.unmount());
+
+// Browser cleanup is deliberately manual: the SDK cannot atomically clear only
+// A if another tab changes the shared auth account after its ownership read.
+calls = []; removedKeys = []; holdRpc = undefined;
+manualCleanupRequired = true; sessionOwner = 'alice';
+auth = { ...auth, user: { id: 'alice', email: 'alice@example.test', identities: [{ provider: 'email' }] } };
+await act(async () => { renderer = create(React.createElement(Screen)); });
+onManualCleanup = () => {
+  renderer.unmount();
+  auth = { ...auth, user: null };
+  renderer = create(React.createElement(Screen));
+};
+await typeConfirm('DELETE');
+await act(async () => { await button('Permanently delete').props.onPress(); });
+assert.equal(calls.filter(c => c.signOut).length, 0, 'Web deletion must never invoke generic shared-storage sign-out');
+assert.equal(sessionOwner, 'alice', 'Shared browser auth storage is left for explicit manual cleanup');
+assert.equal(helper.getDeletionReceipt().phase, 'manual_cleanup');
+assert.ok(text(renderer.root).includes('Your confirmed account was deleted'));
+assert.ok(text(renderer.root).includes('saved sign-in was not cleared automatically'));
+assert.ok(text(renderer.root).includes('Clear GalactoGuide site data in your browser settings'));
+assert.deepEqual(removedKeys, ['galactoguide.favorites.v2:alice', 'galactoguide.session.v2:alice', 'galactoguide.situations.v2:alice']);
+await act(async () => { button('Return to account').props.onPress(); });
+await act(async () => renderer.unmount());
+console.log('Account deletion client checks passed: consent, errors, pinned token, cancellation, reauth, account switch, duplicate submit, local cleanup, delayed deletion after unmount, manual browser cleanup.');

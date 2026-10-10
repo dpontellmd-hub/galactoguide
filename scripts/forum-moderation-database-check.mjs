@@ -1,6 +1,7 @@
 // Actual disposable PostgreSQL: no URLs, service credentials or network requests.
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import path from 'node:path';
 const require = createRequire(path.resolve(process.env.FORUM_TEST_RUNTIME ?? '.', 'package.json'));
@@ -8,6 +9,8 @@ const { PGlite } = require('@electric-sql/pglite');
 const db = new PGlite();
 const id = (n) => `00000000-0000-4000-8000-${String(n).padStart(12, '0')}`;
 const alice=id(1), bob=id(2), moderator=id(3), stranger=id(4), thread=id(10), reply=id(11), nested=id(12), other=id(13);
+const averyOne=id(5), averyTwo=id(6), olderThread=id(20), newestReply=id(21), sameNameThread=id(22);
+const reference = (user) => createHash('md5').update(user).digest('hex').slice(0,12).toUpperCase();
 const q = async (sql,args=[]) => (await db.query(sql,args)).rows;
 const as = async (user) => {
  await db.exec('reset role');
@@ -27,7 +30,7 @@ try {
  const migration=readFileSync('supabase/migrations/20261010_forum_moderation.sql','utf8');
  await db.exec(migration);
  await db.exec(migration); // repeat-safe migration
- for (const user of [alice,bob,moderator,stranger]) await q('insert into auth.users(id) values($1)',[user]);
+ for (const user of [alice,bob,moderator,stranger,averyOne,averyTwo]) await q('insert into auth.users(id) values($1)',[user]);
  await q('insert into public.forum_moderators(user_id) values($1)',[moderator]);
  await q(`insert into public.forum_threads(id,user_id,author_name,title,body,topic) values
  ($1,$2,'Alice','A support question','Breastfeeding and breast milk are welcome clinical terms','Everyday support'),
@@ -70,7 +73,7 @@ try {
  assert.equal((await q('delete from public.forum_threads where id=$1 returning id',[thread])).length,0);
  assert.equal((await q('delete from public.forum_replies where id=$1 returning id',[reply])).length,0);
  await q('select public.set_forum_block($1,true)',[bob]);
- assert.deepEqual((await q('select public.get_forum_safety() s'))[0].s.blocked_users,[{user_id:bob,author_name:'Blocked member'}]);
+ assert.deepEqual((await q('select public.get_forum_safety() s'))[0].s.blocked_users,[{user_id:bob,author_name:'Bob',reference:reference(bob)}]);
  assert.equal((await q('select * from public.forum_threads where id=$1',[other])).length,0);
  assert.equal((await q('select * from public.forum_replies where id=$1',[reply])).length,0);
  await deny('select public.set_forum_helpful(\'reply\',$1,true)',[reply],/unavailable/);
@@ -83,6 +86,56 @@ try {
  await deny('select public.set_forum_helpful(\'thread\',$1,true)',[thread],/unavailable/);
  await as(alice); await q('select public.set_forum_block($1,false)',[bob]);
  assert.equal((await q('select * from public.forum_replies where id=$1',[reply])).length,1);
+ // Block labels use only newest public content; duplicate names remain distinguishable.
+ await db.exec('reset role');
+ await q(`update auth.users set raw_user_meta_data='{"name":"PRIVATE PROFILE NAME","email":"private@example.test"}' where id in ($1,$2)`,[averyOne,averyTwo]);
+ await q(`insert into public.forum_threads(id,user_id,author_name,title,body,topic,created_at) values
+ ($1,$2,'Older display','Earlier public thread','A public fixture discussion','Everyday support','2000-01-01'),
+ ($3,$4,'Avery','Same public name','A separate public fixture discussion','Everyday support','2001-01-01')`,[olderThread,averyOne,sameNameThread,averyTwo]);
+ await q(`insert into public.forum_replies(id,thread_id,user_id,author_name,body,created_at) values($1,$2,$3,'Avery','Newest public author name','2002-01-01')`,[newestReply,olderThread,averyOne]);
+ await as(alice);
+ await q('select public.set_forum_block($1,true)',[averyTwo]);
+ await q('select public.set_forum_block($1,true)',[averyOne]);
+ // Equal timestamps must use UUID order, not insertion order or the label.
+ await db.exec('reset role');
+ await q(`update public.forum_blocks set created_at='2003-01-01' where user_id=$1`,[alice]);
+ await as(alice);
+ const multipleBlocks=(await q('select public.get_forum_safety() s'))[0].s.blocked_users;
+ assert.deepEqual(multipleBlocks,[
+  {user_id:averyOne,author_name:'Avery',reference:reference(averyOne)},
+  {user_id:averyTwo,author_name:'Avery',reference:reference(averyTwo)},
+ ]);
+ assert.notEqual(multipleBlocks[0].reference,multipleBlocks[1].reference);
+ assert.match(multipleBlocks[0].reference,/^[0-9A-F]{12}$/);
+ assert.equal(JSON.stringify(multipleBlocks).includes('PRIVATE PROFILE'),false);
+ assert.equal(JSON.stringify(multipleBlocks).includes('private@example.test'),false);
+ assert.deepEqual((await q('select public.get_forum_safety() s'))[0].s.blocked_users,multipleBlocks,'Reload preserves deterministic block order and references');
+ await db.exec('reset role');
+ await q(`update public.forum_blocks set created_at='2002-01-01' where user_id=$1 and blocked_user_id=$2`,[alice,averyTwo]);
+ await as(alice);
+ assert.deepEqual((await q('select public.get_forum_safety() s'))[0].s.blocked_users,[multipleBlocks[1],multipleBlocks[0]],'Creation time is the primary order, before the UUID tie-breaker');
+ await db.exec('reset role');
+ await q(`update public.forum_blocks set created_at='2003-01-01' where user_id=$1`,[alice]);
+ await as(averyOne);
+ assert.deepEqual((await q('select public.get_forum_safety() s'))[0].s.blocked_users,[],'Incoming blocks do not reveal the blocker list');
+ await q('select public.delete_forum_reply($1)',[newestReply]);
+ await as(alice);
+ assert.equal((await q('select public.get_forum_safety() s'))[0].s.blocked_users[0].author_name,'Older display','Deleted newest content falls back to remaining public content');
+ await as(averyOne);
+ await q('select public.delete_forum_thread($1)',[olderThread]);
+ await as(alice);
+ const afterContentDeletion=(await q('select public.get_forum_safety() s'))[0].s.blocked_users;
+ assert.deepEqual(afterContentDeletion[0],{user_id:averyOne,author_name:'Blocked member',reference:reference(averyOne)},'No public content uses safe fallback and the same reference');
+ assert.deepEqual(afterContentDeletion[1],multipleBlocks[1]);
+ await as(stranger);
+ assert.deepEqual((await q('select public.get_forum_safety() s'))[0].s.blocked_users,[],'Another viewer cannot see Alice blocks');
+ await q('select public.set_forum_block($1,true)',[bob]);
+ assert.deepEqual((await q('select public.get_forum_safety() s'))[0].s.blocked_users,[{user_id:bob,author_name:'Bob',reference:reference(bob)}],'Each viewer sees only their own list');
+ await q('select public.set_forum_block($1,false)',[bob]);
+ await as(alice);
+ await q('select public.set_forum_block($1,false)',[averyOne]);
+ assert.deepEqual((await q('select public.get_forum_safety() s'))[0].s.blocked_users,[multipleBlocks[1]],'Unblocking one duplicate name preserves the other exact identity');
+ await q('select public.set_forum_block($1,false)',[averyTwo]);
  const r1=await report('reply',reply);
  assert.equal(await report('reply',reply,'A retry returns the existing report'),r1);
  const r2=await report('thread',other);
@@ -139,5 +192,5 @@ try {
  assert.equal((await q('select * from public.forum_reports where target_user_id=$1 or reporter_id=$1',[bob])).length,0);
  assert.equal((await q('select * from public.forum_moderation_audit where subject_id=$1',[bob])).length,0);
  assert.equal((await q('select * from public.forum_replies where id=$1',[nested])).length,1);
- console.log('PASS: repeat migration; anonymous/member privilege rejection; metadata self-grant rejection; direct-write filters/immutable metadata; bilateral block RLS and interaction checks; authoritative report queue; report validation/retry; moderator removal/suspension/restoration/dismissal; suspended safety reporting; preserved replies; 5/minute rate cap; account deletion cascades.');
+ console.log('PASS: repeat migration; anonymous/member privilege rejection; metadata self-grant rejection; direct-write filters/immutable metadata; bilateral block RLS and interaction checks; multiple-block public labels/stable references/order/unblock/privacy; authoritative report queue; report validation/retry; moderator removal/suspension/restoration/dismissal; suspended safety reporting; preserved replies; 5/minute rate cap; account deletion cascades.');
 } finally { await db.close(); }

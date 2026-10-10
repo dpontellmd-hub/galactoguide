@@ -195,8 +195,22 @@ create or replace function public.get_forum_safety()
 returns jsonb language sql stable security definer set search_path='' as $$
  select jsonb_build_object('is_moderator',public.forum_is_moderator(),
  'is_suspended',exists(select 1 from public.forum_suspensions where user_id=auth.uid()),
- 'blocked_users',coalesce((select jsonb_agg(jsonb_build_object('user_id',blocked_user_id,'author_name','Blocked member'))
- from public.forum_blocks where user_id=auth.uid()),'[]'::jsonb));
+ 'blocked_users',coalesce((select jsonb_agg(jsonb_build_object(
+   'user_id',b.blocked_user_id,
+   'author_name',coalesce(display.author_name,'Blocked member'),
+   'reference',upper(substr(md5(b.blocked_user_id::text),1,12)))
+   order by b.created_at,b.blocked_user_id)
+ from public.forum_blocks b
+ left join lateral (
+   select posts.author_name from (
+     select t.author_name,t.created_at,t.id,'thread' as kind from public.forum_threads t
+       where t.user_id=b.blocked_user_id and t.deleted_at is null
+     union all
+     select r.author_name,r.created_at,r.id,'reply' as kind from public.forum_replies r
+       where r.user_id=b.blocked_user_id and r.deleted_at is null
+   ) posts order by posts.created_at desc,posts.id,posts.kind limit 1
+ ) display on true
+ where b.user_id=auth.uid()),'[]'::jsonb));
 $$;
 create or replace function public.set_forum_block(p_user_id uuid,p_blocked boolean)
 returns boolean language plpgsql security definer set search_path='' as $$
