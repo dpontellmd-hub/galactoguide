@@ -244,7 +244,7 @@ try {
   await guest.page.getByRole('heading', { name: 'Start a thread', exact: true }).waitFor();
   await guest.context.close();
   assert.deepEqual(pageErrors, []);
-  console.log('PASS: root hosting/assets, deep links, responsive policies, PKCE recovery, validation/retry/expiration, reset-email redirect, deletion consent/cancel/server gate/local signout, moderator role gate/cancel/confirmed removal. All remote I/O mocked on a reserved .invalid backend.');
+  console.log('PASS: root hosting/assets, deep links, responsive policies, PKCE recovery, validation/retry/expiration, reset-email redirect, deletion consent/cancel/server gate/manual browser cleanup, moderator role gate/cancel/confirmed removal. All remote I/O mocked on a reserved .invalid backend.');
   if (process.env.CHECK_DESKTOP === '1') {
     process.env.APP_URL = origin;
     await import('./desktop-pages-smoke.mjs');
