@@ -1,5 +1,7 @@
 # Forum deletion and helpful votes
 
+Release-readiness moderation is separately prepared in `migrations/20261010_forum_moderation.sql` and is **not deployed**. See [moderation backend setup, retention decisions, and isolated checks](../docs/FORUM_MODERATION_BACKEND.md). Do not apply it to a shared/live database without separate approval. Fresh fixtures run this migration after `schema.sql`. It supersedes the original reply deletion described below: replies become tombstones, preserving their response tree and moderator report metadata. Account deletion has its own disabled migration and [review requirements](../docs/ACCOUNT_DELETION.md).
+
 For an existing database, apply `migrations/20260914_forum_helpful.sql` before releasing the updated app.
 For a fresh database, run `schema.sql`, which includes this migration. Both can be re-run.
 

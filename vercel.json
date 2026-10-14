@@ -1,5 +1,10 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "git": {
+    "deploymentEnabled": {
+      "codex/release-readiness": false
+    }
+  },
   "framework": null,
   "installCommand": "npm ci",
   "buildCommand": "npm run build:web",
@@ -10,6 +15,14 @@
     { "source": "/threads/:id", "destination": "/threads/[id]" }
   ],
   "headers": [
+    { "source": "/delete-account", "headers": [
+      { "key": "Referrer-Policy", "value": "no-referrer" },
+      { "key": "Cache-Control", "value": "no-store" }
+    ] },
+    { "source": "/moderation", "headers": [
+      { "key": "Referrer-Policy", "value": "no-referrer" },
+      { "key": "Cache-Control", "value": "no-store" }
+    ] },
     { "source": "/reset-password", "headers": [
       { "key": "Referrer-Policy", "value": "no-referrer" },
       { "key": "Cache-Control", "value": "no-store" }

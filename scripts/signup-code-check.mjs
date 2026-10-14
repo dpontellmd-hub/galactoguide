@@ -31,13 +31,18 @@ const auth = {
     return { data: { session }, error: null };
   },
   resend: async args => { calls.resend.push(args); return { error: null }; },
-  signOut: async () => { session = null; listener('SIGNED_OUT', null); },
+  signOut: async () => { session = null; listener('SIGNED_OUT', null); return { error: null }; },
 };
 const modules = {
   react: React, 'react/jsx-runtime': require('react/jsx-runtime'),
   'react-native': { Platform: { OS: 'web' } },
   'expo-auth-session': { makeRedirectUri: () => 'unused' },
   'expo-auth-session/build/QueryParams': {},
+  'expo-apple-authentication': {},
+  'expo-constants': { default: { expoConfig: { extra: {} } } },
+  'expo-linking': {},
+  '@/lib/native-auth-callback': { createNativeCallbackHandler: () => Object.assign(async () => ({ handled: false }), { whenIdle: async () => [] }) },
+  '@/lib/apple-sign-in': {},
   'expo-web-browser': { maybeCompleteAuthSession() {} },
   '@/lib/site': { webPath: route => '/' + route },
   '@/lib/supabase': { supabaseConfigured: true, supabase: { auth } },

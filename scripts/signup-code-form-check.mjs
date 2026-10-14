@@ -24,7 +24,9 @@ const auth = {
 const modules = {
   react: React, 'react/jsx-runtime': require('react/jsx-runtime'),
   '@expo/vector-icons': { Ionicons: () => null },
+  'expo-apple-authentication': {},
   'react-native': {
+    Platform: { OS: 'web' },
     ActivityIndicator: 'ActivityIndicator', Pressable: 'Pressable', Text: 'Text',
     TextInput: 'TextInput', View: 'View', StyleSheet: { create: value => value },
   },

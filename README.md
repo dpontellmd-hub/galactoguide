@@ -194,15 +194,14 @@ bug fixes.” Add only shipped changes, and keep older entries for the history.
   `assets/images/icon.png` and the iOS `assets/expo.icon`.
 - A **privacy policy** URL is required by both stores (health app) before submission.
 - Feedback posts to the existing Formspree endpoint (`formspree.io/f/xlgokjgl`).
-- Comment reports use that same inbox, with the comment, author, thread IDs/title,
-  and optional reason. Users confirm before sending; failures keep the reason for
-  retry. Reporting does not remove the comment. Formspree's existing recipient
-  remains in effect (the doctor's feedback inbox); `adam@dyadhealthcollective.com`
-  is shown as a fallback contact if submission fails. To route reports separately,
-  set `EXPO_PUBLIC_FORUM_REPORT_ENDPOINT` to a Formspree form with the desired
-  verified recipient and rebuild. Check reports locally with
-  `node scripts/forum-report-check.mjs`
-  (requires `react-test-renderer@19.2.3` at that path). These checks mock delivery;
-  they do not send email.
+- Thread and reply reports use the Supabase moderator queue; they no longer send
+  post content through Formspree. Members can block/unblock accounts, and moderators
+  can review reports, remove posts, suspend posting, and restore access. Community
+  rules and contact details are available from discussions. See
+  [moderation setup and limits](docs/FORUM_MODERATION_BACKEND.md). No live roles or
+  policies are installed by this code change. Check local UI behavior with
+  `node scripts/forum-report-check.mjs` and `node scripts/forum-interactions-check.mjs`
+  (`FORUM_TEST_RUNTIME` points to react-test-renderer@19.2.3). These use fixtures,
+  never a shared backend. The database fixture has separate instructions in the doc.
 - Content/data lives in `src/data/galactogogues.ts` and `galactofuges.ts` — edit there to
   update substances (and `sources.ts` for references).
