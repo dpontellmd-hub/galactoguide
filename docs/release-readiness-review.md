@@ -51,6 +51,17 @@ Blocked members show their current public display name and a stable account refe
 
 1. Approve or revise deletion retention: erase owned forum text/identity and reports by/about the departing account while preserving other people's replies. Decide whether a narrowly defined abuse-evidence retention exception is needed, and set support-email, provider-log and backup retention. Do not enable the deletion configuration before that review.
 2. Confirm the deletion-request operator, ownership-verification procedure and response target. Adam and Diana's moderation assignment does not establish who handles deletion requests.
-3. Approve and implement Apple server-side authorization revocation before automatic deletion for Apple-linked accounts. Separately approve Apple capability and Supabase Apple-provider setup before enabling login in a signed build.
+3. Approve isolated Apple provider/key/capability setup and verify the prepared server-side authorization revocation before enabling Apple-linked deletion or login in a signed build. See the [specific setup handoff](apple-sign-in-setup.md); no production configuration is permitted by this draft.
 4. Verify Adam and Diana's exact account IDs in an isolated setup, then separately approve real moderator grants. Agree queue review frequency, urgent-report escalation, suspension/appeal handling and final community rules. The code alone does not establish staffed moderation.
 5. Finalize publisher identity, privacy/store declarations, icons and other outstanding release checklist items separately. This draft is not evidence of store compliance or permission to submit publicly.
+
+## October 14 Apple preparation
+
+The draft now includes gated native entitlements and a fresh-code Apple revocation
+function with service-only deletion RPCs. It refuses the production project and
+remains off by default. Tests run real signature verification and SQL with mocked
+Auth/Apple transport; no Apple credential is used. The earlier real local backend
+run at `727fb8f` does not validate this new function/migration. The local backend
+remains stopped, and signed-device/provider acceptance is pending. The complete
+operator actions, target identifiers, data flow and user-only secret handoff are
+in [Apple sign-in setup](apple-sign-in-setup.md).

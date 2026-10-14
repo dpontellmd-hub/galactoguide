@@ -52,42 +52,36 @@ Configuration to verify later, with separate approval:
   reset/OAuth flows before opening their links can replace that verifier; use the
   latest request. The app does not import credentials from another environment.
 
-## Apple sign-in: configuration still required
+## Apple sign-in: isolated implementation prepared, external setup pending
 
-The prepared iOS flow uses the system Apple sheet and Apple's native button,
-checks device availability, generates a fresh 256-bit nonce and random state,
-sends SHA-256(nonce) to Apple, validates returned state and identity token, and
-sends the original nonce to Supabase `signInWithIdToken`. Supabase verifies the
-token signature/audience and nonce. Only email is requested; there is no need to
-collect a legal name for this app. Google and email sign-in remain available.
-Cancellation is not reported as a successful session. Tokens/codes are never
-logged or written by this helper.
+Native sign-in uses the system Apple sheet and Apple's native button, device
+availability checks, a fresh 256-bit nonce and random state. SHA-256(nonce) goes
+to Apple; the original nonce goes to Supabase `signInWithIdToken`. Supabase
+validates signature/audience/nonce. Only email is requested, not a legal name.
+Cancellation never reports a session. The ordinary sign-in helper does not
+exchange or retain provider refresh tokens.
 
-Before enabling, obtain approval for all of these external steps:
+`app.config.js` now prepares `ios.usesAppleSignIn` and the
+`expo-apple-authentication` plugin when `GALACTOGUIDE_APPLE_SIGN_IN=1` and
+`GALACTOGUIDE_NATIVE_BUILD=1`. It refuses the production backend. Outside the
+synthetic QA export, an explicit isolated `EXPO_PUBLIC_SUPABASE_URL`, client-safe
+publishable key, and matching `GALACTOGUIDE_APPLE_ISOLATED_BACKEND` are required.
+Default configuration remains unchanged and Apple remains disabled. Evaluating
+this config is local; running EAS Build could synchronize Apple capabilities and
+profiles, so no signed build is authorized or run here.
 
-1. In the intended isolated Supabase project, enable the Apple provider with
-   `com.dyadhealthcollective.galactoguide` as an accepted native client ID/audience.
-   Keep nonce verification enabled. Native ID-token sign-in does not require
-   adding an Apple web OAuth flow or embedding a client secret in the app.
-2. On Apple team `WZPCR7N6GT`, enable Sign in with Apple for the existing bundle ID.
-   Review its association/grouping and the correct publisher/team before doing so.
-3. Add `ios.usesAppleSignIn: true` and the `expo-apple-authentication` config plugin
-   to app configuration **after approval**. They are intentionally absent now.
-   Regenerate the provisioning profile to include the entitlement only through an
-   approved credential workflow. This branch does not change that profile.
-4. Complete the server-side Apple token-revocation design for account deletion
-   before enabling Apple for real users. The current helper does not retain Apple's
-   short-lived authorization code or obtain/store an Apple refresh token. Deletion
-   of an Apple-linked account therefore remains blocked by the prepared backend.
-   A future approved server flow must exchange a fresh Apple authorization code,
-   securely keep/use the provider token needed for revocation, and revoke it before
-   deleting the app account. This requires a server-held Apple signing key/client
-   secret and approved storage/retention choices; never place those in `extra`,
-   `EXPO_PUBLIC_*`, the JavaScript bundle, or source control. Do not enable Apple
-   merely because an ID-token test passes.
-5. Only when these prerequisites are satisfied, set
-   `GALACTOGUIDE_APPLE_SIGN_IN=1` for an approved native build. The flag alone does
-   not enable the Apple capability. No build or submission was made in this phase.
+The prepared Edge Function exchanges a **fresh deletion-specific authorization
+code**, validates Apple's signed ID token against the stored Apple identity and
+server challenge, revokes the resulting refresh token, and only then finalizes
+atomic account deletion through a service-only RPC. Tokens stay in server memory;
+no reusable provider token is stored. This design requires the user to complete
+the Apple sheet at deletion time. It does not offer unattended token revocation
+or bypass Apple verification when the user cannot complete it.
+
+See [Apple setup and approval handoff](apple-sign-in-setup.md) for the exact flow,
+security gates, operator settings, failure recovery and approval-dependent steps.
+No Apple key, provider configuration, capability, profile or hosted resource has
+been created or modified. No migration or Edge Function has been deployed.
 
 If Apple email relay is used, verify the sender/relay configuration for account
 email before rollout. Existing Google/email accounts are not manually merged by

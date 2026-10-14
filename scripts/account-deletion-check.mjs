@@ -45,6 +45,7 @@ const modules = {
   'expo-apple-authentication': {},
   '@react-native-async-storage/async-storage': { multiRemove: async (keys) => { removedKeys.push(...keys); } },
   '@/lib/supabase': { supabase, supabaseConfigured: true },
+  '@/lib/apple-account-deletion': { deleteAppleAccount: async token => { calls.push({ apple: token }); return { deleted: false }; } },
   'react-native': { Platform: { OS: 'web' }, Linking: { openURL: async () => {} }, StyleSheet: { create: x => x }, Pressable: 'Pressable', ScrollView: 'ScrollView', Text: 'Text', TextInput: 'TextInput', View: 'View' },
   'expo-router': { useRouter: () => ({ replace: p => routes.push(p), push: p => routes.push(p) }) },
   '@/components/ScreenHeader': { ScreenHeader: 'ScreenHeader' },
@@ -76,6 +77,8 @@ assert.equal((await helper.deleteOwnAccount('DELETE', 'alice-token')).deleted, f
 rpcResult = { data: true, error: null };
 await helper.deleteOwnAccount('DELETE', 'alice-token');
 assert.deepEqual(JSON.parse(JSON.stringify(calls.at(-1))), { name: 'delete_own_account', args: { p_confirmation: 'DELETE' }, header: 'Authorization', value: 'Bearer alice-token' });
+await helper.deleteOwnAccount('DELETE', 'apple-owner-token', true);
+assert.deepEqual(JSON.parse(JSON.stringify(calls.at(-1))), { apple: 'apple-owner-token' }, 'Apple accounts use the separate server-revocation path');
 calls = [];
 const Screen = load('src/app/delete-account.tsx', 'screen').default;
 let renderer;

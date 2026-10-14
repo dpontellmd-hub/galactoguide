@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { Linking, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import * as AppleAuthentication from 'expo-apple-authentication';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -33,14 +32,14 @@ export default function DeleteAccountScreen() {
     setPassword('');
   }
 
-  const verify = async (provider: 'password' | 'google' | 'apple') => {
+  const verify = async (provider: 'password' | 'google') => {
     if (inFlight.current) return;
     inFlight.current = true;
     setWorking(true); setMessage(''); setConfirmation('');
     try {
       const result = provider === 'password'
         ? await auth.signInWithPassword(auth.user?.email ?? '', password)
-        : provider === 'google' ? await auth.signInWithGoogle('delete-account') : await auth.signInWithApple();
+        : await auth.signInWithGoogle('delete-account');
       setMessage(result.error ?? (result.cancelled ? 'Verification cancelled. Your account was not deleted.'
         : result.sessionStarted ? 'Identity verified. Review the account shown and type DELETE to confirm.'
         : 'Review the account shown before confirming. Only a completed sign-in verifies your identity; cancelling does not delete anything.'));
@@ -62,7 +61,7 @@ export default function DeleteAccountScreen() {
         setMessage('The signed-in account changed. Review it and confirm again.');
         return;
       }
-      const result = await deleteOwnAccount(confirmation, data.session.access_token);
+      const result = await deleteOwnAccount(confirmation, data.session.access_token, providers.includes('apple'));
       if (!result.deleted) { setMessage(result.error ?? 'Deletion was not confirmed.'); return; }
       serverDeleted = true;
       setDeletionReceipt({ ownerId: owner, phase: 'clearing' });
@@ -95,16 +94,16 @@ export default function DeleteAccountScreen() {
         {auth.authCallbackError ? <Text accessibilityRole="alert" style={styles.notice}>{auth.authCallbackError}</Text> : null}
         {!deleted && auth.user ? <>
           <Text style={styles.heading}>Account: {auth.user.email ?? 'Current signed-in account'}</Text>
-          <Text style={styles.copy}>Verify your identity with a fresh sign-in before deleting. After verification, review the account and confirm below within five minutes.</Text>
-          {providers.includes('email') && <>
+          <Text style={styles.copy}>{providers.includes('apple')
+            ? 'Review the account and confirm below. Apple verification happens after confirmation, before your account is deleted.'
+            : 'Verify your identity with a fresh sign-in before deleting. After verification, review the account and confirm below within five minutes.'}</Text>
+          {!providers.includes('apple') && providers.includes('email') && <>
             <TextInput secureTextEntry value={password} onChangeText={setPassword} style={styles.input} placeholder="Current password" accessibilityLabel="Current password" autoComplete="current-password" editable={!disabled} />
             <Pressable style={styles.button} disabled={disabled || !password} onPress={() => verify('password')} accessibilityRole="button"><Text style={styles.buttonText}>Verify with password</Text></Pressable>
           </>}
-          {providers.includes('google') && <Pressable style={styles.button} disabled={disabled} onPress={() => verify('google')} accessibilityRole="button"><Text style={styles.buttonText}>Verify with Google</Text></Pressable>}
-          {Platform.OS === 'ios' && providers.includes('apple') && auth.appleAvailable && <View pointerEvents={disabled ? 'none' : 'auto'} accessibilityElementsHidden={disabled}>
-            <AppleAuthentication.AppleAuthenticationButton buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE} buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK} style={{ height: 44, width: '100%' }} cornerRadius={radius.md} onPress={() => verify('apple')} />
-          </View>}
+          {!providers.includes('apple') && providers.includes('google') && <Pressable style={styles.button} disabled={disabled} onPress={() => verify('google')} accessibilityRole="button"><Text style={styles.buttonText}>Verify with Google</Text></Pressable>}
           <Text style={styles.copy}>Type DELETE to permanently delete the account shown above. You can leave this page to cancel.</Text>
+          {providers.includes('apple') && <Text style={styles.copy}>After you confirm, Apple will ask you to verify the same Apple account. Its authorization must be revoked before deletion can finish. Cancelling keeps your account.</Text>}
           <TextInput value={confirmation} onChangeText={setConfirmation} style={styles.input} placeholder="DELETE" accessibilityLabel="Type DELETE to confirm permanent account deletion" autoCapitalize="characters" autoCorrect={false} editable={!disabled} />
           <Pressable style={[styles.button, (disabled || confirmation !== 'DELETE') && styles.disabled]} disabled={disabled || confirmation !== 'DELETE' || !!auth.authCallbackError} onPress={remove} accessibilityRole="button"><Text style={styles.buttonText}>{working ? 'Please wait…' : 'Permanently delete my account'}</Text></Pressable>
         </> : !deleted ? <>

@@ -1,5 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { supabase, supabaseConfigured } from '@/lib/supabase';
+import { deleteAppleAccount } from '@/lib/apple-account-deletion';
 
 export const DELETION_CONFIRMATION = 'DELETE';
 export const DELETION_SUPPORT_URL = 'mailto:adam@dyadhealthcollective.com?subject=GalactoGuide%20account%20deletion%20request';
@@ -28,11 +29,12 @@ export function accountCacheKeys(userId: string): string[] {
 }
 
 /** The server derives the owner from the verified JWT. Never send a target user ID. */
-export async function deleteOwnAccount(confirmation: string, accessToken: string): Promise<{ deleted: boolean; error?: string }> {
+export async function deleteOwnAccount(confirmation: string, accessToken: string, appleLinked = false): Promise<{ deleted: boolean; error?: string }> {
   if (confirmation !== DELETION_CONFIRMATION) return { deleted: false, error: 'Type DELETE to confirm.' };
   if (!supabaseConfigured) return { deleted: false, error: 'Account deletion is not configured. Use the deletion request link for help.' };
   try {
     if (!accessToken) return { deleted: false, error: 'Sign in again before deleting your account.' };
+    if (appleLinked) return await deleteAppleAccount(accessToken);
     const { data, error } = await supabase.rpc('delete_own_account', { p_confirmation: confirmation })
       .setHeader('Authorization', `Bearer ${accessToken}`);
     if (error) {

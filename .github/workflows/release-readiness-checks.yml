@@ -36,6 +36,7 @@ jobs:
           FORUM_TEST_RUNTIME: ${{ github.workspace }}
         run: |
           node scripts/release-isolation-check.cjs
+          node scripts/apple-client-check.mjs
           for check in auth-callback signup-code signup-code-form account-isolation account-deletion forum-interactions forum-report navigation-layout; do
             node "scripts/${check}-check.mjs"
           done
@@ -46,6 +47,7 @@ jobs:
           node scripts/forum-database-check.mjs
           node scripts/forum-moderation-database-check.mjs
           node scripts/account-deletion-database-check.mjs
+          node scripts/apple-server-check.mjs
       - name: Isolated web export and browser fixtures
         env:
           WEB_EXPORT_DIR: .tmp/release-readiness-ci
